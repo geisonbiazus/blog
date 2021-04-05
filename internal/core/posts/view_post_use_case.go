@@ -28,7 +28,7 @@ func (u *ViewPostUseCase) renderPost(post Post) (RenderedPost, error) {
 
 	return RenderedPost{
 		Title:   post.Title,
-		Authors: post.Authors,
+		Author:  post.Author,
 		Time:    post.Time,
 		Content: renderedContent,
 	}, nil

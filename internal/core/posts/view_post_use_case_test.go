@@ -26,7 +26,7 @@ func TestViewPostUseCase(t *testing.T) {
 		postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
 		post := posts.Post{
 			Title:   "Title",
-			Authors: []string{"Author"},
+			Author:  "Author",
 			Time:    postTime,
 			Path:    "path",
 			Content: "content",
@@ -58,7 +58,7 @@ func TestViewPostUseCase(t *testing.T) {
 		renderedContent, _ := f.renderer.Render(f.post.Content)
 		assert.DeepEqual(t, rennderedPost, posts.RenderedPost{
 			Title:   f.post.Title,
-			Authors: f.post.Authors,
+			Author:  f.post.Author,
 			Time:    f.post.Time,
 			Content: renderedContent,
 		})

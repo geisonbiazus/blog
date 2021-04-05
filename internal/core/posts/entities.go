@@ -4,7 +4,7 @@ import "time"
 
 type Post struct {
 	Title   string
-	Authors []string
+	Author  string
 	Time    time.Time
 	Path    string
 	Content string
@@ -12,7 +12,7 @@ type Post struct {
 
 type RenderedPost struct {
 	Title   string
-	Authors []string
+	Author  string
 	Time    time.Time
 	Content string
 }
