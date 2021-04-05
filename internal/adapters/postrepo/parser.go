@@ -1,4 +1,4 @@
-package post_repo
+package postrepo
 
 import (
 	"errors"
