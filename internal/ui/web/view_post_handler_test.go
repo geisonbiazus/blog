@@ -21,7 +21,8 @@ type viewPostHandlerFixture struct {
 func TestViewPostHandler(t *testing.T) {
 	setup := func() *viewPostHandlerFixture {
 		usecase := &viewPostUseCaseSpy{}
-		server := httptest.NewServer(web.NewRouter(usecase))
+		templateRenderer, _ := web.NewTemplateRenderer("../../../web/template")
+		server := httptest.NewServer(web.NewRouter(templateRenderer, usecase))
 
 		return &viewPostHandlerFixture{
 			usecase: usecase,

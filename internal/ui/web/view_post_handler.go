@@ -1,7 +1,6 @@
 package web
 
 import (
-	"errors"
 	"html/template"
 	"net/http"
 	"strings"
@@ -25,15 +24,16 @@ func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	path := strings.TrimPrefix(req.URL.Path, "/")
 	renderedPost, err := h.usecase.Run(path)
 
-	if errors.Is(err, posts.ErrPostNotFound) {
-		res.WriteHeader(http.StatusNotFound)
-		h.template.Render(res, "404.html", nil)
-	} else if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		h.template.Render(res, "500.html", nil)
-	} else {
+	switch err {
+	case nil:
 		res.WriteHeader(http.StatusOK)
 		h.template.Render(res, "post.html", h.toViewModel(renderedPost))
+	case posts.ErrPostNotFound:
+		res.WriteHeader(http.StatusNotFound)
+		h.template.Render(res, "404.html", nil)
+	default:
+		res.WriteHeader(http.StatusInternalServerError)
+		h.template.Render(res, "500.html", nil)
 	}
 }
 
