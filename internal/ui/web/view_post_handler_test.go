@@ -1,7 +1,6 @@
 package web_test
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -28,8 +27,8 @@ func TestViewPostHandler(t *testing.T) {
 		}
 
 		usecase.RenderedPost = renderedPost
-
 		res, _ := http.Get(server.URL + "/test-post")
+
 		body, _ := io.ReadAll(res.Body)
 		bodyString := string(body)
 
@@ -38,9 +37,8 @@ func TestViewPostHandler(t *testing.T) {
 
 		assert.True(t, strings.Contains(bodyString, renderedPost.Title))
 		assert.True(t, strings.Contains(bodyString, renderedPost.Author))
+		assert.True(t, strings.Contains(bodyString, renderedPost.Time.Format("02 Jan 06")))
 		assert.True(t, strings.Contains(bodyString, renderedPost.Content))
-
-		fmt.Println(bodyString)
 	})
 }
 

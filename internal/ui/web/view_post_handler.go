@@ -2,18 +2,21 @@ package web
 
 import (
 	"html/template"
-	"io"
 	"net/http"
 	"strings"
+
+	"github.com/geisonbiazus/blog/internal/core/posts"
 )
 
 type ViewPostHandler struct {
-	usecase ViewPostUseCase
+	usecase  ViewPostUseCase
+	template *TemplateRenderer
 }
 
-func NewViewPostHandler(usecase ViewPostUseCase) *ViewPostHandler {
+func NewViewPostHandler(usecase ViewPostUseCase, templateRenderer *TemplateRenderer) *ViewPostHandler {
 	return &ViewPostHandler{
-		usecase: usecase,
+		usecase:  usecase,
+		template: templateRenderer,
 	}
 }
 
@@ -21,18 +24,22 @@ func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	path := strings.TrimPrefix(req.URL.Path, "/")
 	renderedPost, _ := h.usecase.Run(path)
 
-	renderTemplate(res, "post.go.tmpl", renderedPost)
 	res.WriteHeader(http.StatusOK)
+	h.template.Render(res, "post.html", h.toViewModel(renderedPost))
 }
 
-func renderTemplate(writter io.Writer, templateName string, data interface{}) {
-	fm := template.FuncMap{
-		"htmlsafe": func(html string) template.HTML {
-			return template.HTML(html)
-		},
+func (h *ViewPostHandler) toViewModel(p posts.RenderedPost) postViewModel {
+	return postViewModel{
+		Title:   p.Title,
+		Author:  p.Author,
+		Date:    p.Time.Format("02 Jan 06"),
+		Content: template.HTML(p.Content),
 	}
+}
 
-	tmpl := template.Must(template.New("").Funcs(fm).ParseGlob("../../../web/template/*.tmpl"))
-
-	tmpl.ExecuteTemplate(writter, templateName, data)
+type postViewModel struct {
+	Title   string
+	Author  string
+	Date    string
+	Content template.HTML
 }

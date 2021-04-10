@@ -5,7 +5,8 @@ import "net/http"
 func NewRouter(viewPostUseCase ViewPostUseCase) http.Handler {
 	mux := http.NewServeMux()
 
-	viewPostHandler := NewViewPostHandler(viewPostUseCase)
+	templateRenderer, _ := NewTemplateRenderer()
+	viewPostHandler := NewViewPostHandler(viewPostUseCase, templateRenderer)
 
 	mux.Handle("/", viewPostHandler)
 
