@@ -1,10 +1,10 @@
-package postrepo_test
+package filesystem_test
 
 import (
 	"testing"
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/adapters/postrepo"
+	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/core/posts"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
@@ -74,26 +74,26 @@ func TestParseFileContent(t *testing.T) {
 	})
 
 	t.Run("It ignores content without separator", func(t *testing.T) {
-		assertParseError(t, "", postrepo.ErrInvalidFormat)
-		assertParseError(t, "Content\n", postrepo.ErrInvalidFormat)
-		assertParseError(t, "author: Author\n", postrepo.ErrInvalidFormat)
+		assertParseError(t, "", filesystem.ErrInvalidFormat)
+		assertParseError(t, "Content\n", filesystem.ErrInvalidFormat)
+		assertParseError(t, "author: Author\n", filesystem.ErrInvalidFormat)
 	})
 
 	t.Run("It returns error if time is in an invalid format", func(t *testing.T) {
-		assertParseError(t, "time: 04/04/2021\n--\n", postrepo.ErrInvalidTime)
+		assertParseError(t, "time: 04/04/2021\n--\n", filesystem.ErrInvalidTime)
 	})
 }
 
 func assertParsedContent(t *testing.T, content string, expectedPost posts.Post) {
 	t.Helper()
-	post, err := postrepo.ParseFileContent(content)
+	post, err := filesystem.ParseFileContent(content)
 	assert.DeepEqual(t, expectedPost, post)
 	assert.Nil(t, err)
 }
 
 func assertParseError(t *testing.T, content string, expectedError error) {
 	t.Helper()
-	post, err := postrepo.ParseFileContent(content)
+	post, err := filesystem.ParseFileContent(content)
 	assert.DeepEqual(t, posts.Post{}, post)
 	assert.Equal(t, expectedError, err)
 }

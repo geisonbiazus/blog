@@ -1,4 +1,4 @@
-package postrepo
+package filesystem
 
 import (
 	"io/ioutil"
@@ -6,15 +6,15 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/posts"
 )
 
-type FileSystemPostRepo struct {
+type PostRepo struct {
 	BasePath string
 }
 
-func NewFileSystemPostRepo(basePath string) *FileSystemPostRepo {
-	return &FileSystemPostRepo{BasePath: basePath}
+func NewPostRepo(basePath string) *PostRepo {
+	return &PostRepo{BasePath: basePath}
 }
 
-func (r *FileSystemPostRepo) GetPostByPath(path string) (posts.Post, error) {
+func (r *PostRepo) GetPostByPath(path string) (posts.Post, error) {
 	content, err := ioutil.ReadFile(r.BasePath + "/" + path + ".md")
 
 	if err != nil {

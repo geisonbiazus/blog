@@ -1,22 +1,22 @@
-package postrepo_test
+package filesystem_test
 
 import (
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/adapters/postrepo"
+	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/core/posts"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
-type fileSystemPostRepoFixture struct {
-	repo *postrepo.FileSystemPostRepo
+type postRepoFixture struct {
+	repo *filesystem.PostRepo
 }
 
-func TestFileSystemPostRepo(t *testing.T) {
-	setup := func() *fileSystemPostRepoFixture {
-		repo := postrepo.NewFileSystemPostRepo("./test_posts")
+func TestPostRepo(t *testing.T) {
+	setup := func() *postRepoFixture {
+		repo := filesystem.NewPostRepo("./test")
 
-		return &fileSystemPostRepoFixture{
+		return &postRepoFixture{
 			repo: repo,
 		}
 	}

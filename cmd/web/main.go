@@ -1,7 +1,9 @@
 package main
 
 import (
-	"github.com/geisonbiazus/blog/internal/adapters/postrepo"
+	"log"
+
+	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer"
 	"github.com/geisonbiazus/blog/internal/core/posts"
 	"github.com/geisonbiazus/blog/internal/ui/web"
@@ -9,8 +11,8 @@ import (
 
 func main() {
 	renderer := renderer.NewGoldmarkRenderer()
-	postRepo := postrepo.NewFileSystemPostRepo("internal/adapters/postrepo/test_posts")
+	postRepo := filesystem.NewPostRepo("internal/adapters/postrepo/test_posts")
 	viewPostUseCase := posts.NewVewPostUseCase(postRepo, renderer)
 	server := web.NewServer(3000, "web/template", viewPostUseCase)
-	server.Start()
+	log.Fatal(server.Start())
 }

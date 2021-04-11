@@ -1,4 +1,4 @@
-package postrepo
+package filesystem
 
 import (
 	"errors"
