@@ -16,6 +16,6 @@ func NewTemplateRenderer(basePath string) (*TemplateRenderer, error) {
 	return &TemplateRenderer{tmpl: tmpl}, err
 }
 
-func (r *TemplateRenderer) Render(writter io.Writer, templateName string, data interface{}) {
-	r.tmpl.ExecuteTemplate(writter, templateName, data)
+func (r *TemplateRenderer) Render(writer io.Writer, templateName string, data interface{}) {
+	r.tmpl.ExecuteTemplate(writer, templateName, data)
 }

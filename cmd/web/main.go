@@ -13,6 +13,14 @@ func main() {
 	renderer := goldmark.NewGoldmarkRenderer()
 	postRepo := filesystem.NewPostRepo("posts")
 	viewPostUseCase := posts.NewVewPostUseCase(postRepo, renderer)
-	server := web.NewServer(3000, "web/template", viewPostUseCase)
+
+	server := &web.Server{
+		Port:         3000,
+		TemplatePath: "web/template",
+		UseCases: &web.UseCases{
+			ViewPost: viewPostUseCase,
+		},
+	}
+
 	log.Fatal(server.Start())
 }

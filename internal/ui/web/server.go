@@ -6,13 +6,9 @@ import (
 )
 
 type Server struct {
-	Port            int
-	TemplatePath    string
-	ViewPostUseCase ViewPostUseCase
-}
-
-func NewServer(port int, templatePath string, viewPostUseCase ViewPostUseCase) *Server {
-	return &Server{Port: port, TemplatePath: templatePath, ViewPostUseCase: viewPostUseCase}
+	Port         int
+	TemplatePath string
+	UseCases     *UseCases
 }
 
 func (s *Server) Start() error {
@@ -23,7 +19,7 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	router := NewRouter(templateRenderer, s.ViewPostUseCase)
+	router := NewRouter(templateRenderer, s.UseCases)
 
 	return http.ListenAndServe(addr, router)
 }

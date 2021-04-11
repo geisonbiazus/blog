@@ -8,21 +8,19 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/core/posts"
-	"github.com/geisonbiazus/blog/internal/ui/web"
 	"github.com/geisonbiazus/blog/internal/ui/web/testhelper"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
 type viewPostHandlerFixture struct {
-	usecase *viewPostUseCaseSpy
+	usecase *testhelper.ViewPostUseCaseSpy
 	server  *httptest.Server
 }
 
 func TestViewPostHandler(t *testing.T) {
 	setup := func() *viewPostHandlerFixture {
-		usecase := &viewPostUseCaseSpy{}
-		templateRenderer, _ := web.NewTemplateRenderer("../../../web/template")
-		server := httptest.NewServer(web.NewRouter(templateRenderer, usecase))
+		server, usecases := testhelper.NewTestServer()
+		usecase := usecases.ViewPost.(*testhelper.ViewPostUseCaseSpy)
 
 		return &viewPostHandlerFixture{
 			usecase: usecase,
@@ -86,15 +84,4 @@ func TestViewPostHandler(t *testing.T) {
 
 		assert.True(t, strings.Contains(body, "Internal server error"))
 	})
-}
-
-type viewPostUseCaseSpy struct {
-	ReceivedPath string
-	RenderedPost posts.RenderedPost
-	Error        error
-}
-
-func (u *viewPostUseCaseSpy) Run(path string) (posts.RenderedPost, error) {
-	u.ReceivedPath = path
-	return u.RenderedPost, u.Error
 }
