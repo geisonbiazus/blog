@@ -1,15 +1,15 @@
-package renderer_test
+package goldmark_test
 
 import (
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/adapters/renderer"
+	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
 func TestGoldmarkRenderer(t *testing.T) {
 	t.Run("Given a markdown string, it converts to HTML", func(t *testing.T) {
-		rend := renderer.NewGoldmarkRenderer()
+		rend := goldmark.NewGoldmarkRenderer()
 
 		html, err := rend.Render(sampleMarkdown)
 		assert.Equal(t, sampleHTML, html)

@@ -1,4 +1,4 @@
-package renderer
+package goldmark
 
 import (
 	"bytes"
