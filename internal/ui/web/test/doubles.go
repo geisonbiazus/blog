@@ -1,4 +1,4 @@
-package testhelper
+package test
 
 import "github.com/geisonbiazus/blog/internal/core/posts"
 

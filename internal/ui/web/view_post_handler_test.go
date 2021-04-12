@@ -8,19 +8,20 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/core/posts"
-	"github.com/geisonbiazus/blog/internal/ui/web/testhelper"
+	"github.com/geisonbiazus/blog/internal/ui/web/test"
 	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
 
 type viewPostHandlerFixture struct {
-	usecase *testhelper.ViewPostUseCaseSpy
+	usecase *test.ViewPostUseCaseSpy
 	server  *httptest.Server
 }
 
 func TestViewPostHandler(t *testing.T) {
 	setup := func() *viewPostHandlerFixture {
-		server, usecases := testhelper.NewTestServer()
-		usecase := usecases.ViewPost.(*testhelper.ViewPostUseCaseSpy)
+		server, usecases := test.NewTestServer()
+		usecase := usecases.ViewPost.(*test.ViewPostUseCaseSpy)
 
 		return &viewPostHandlerFixture{
 			usecase: usecase,
@@ -40,9 +41,10 @@ func TestViewPostHandler(t *testing.T) {
 		}
 
 		f.usecase.RenderedPost = renderedPost
+
 		res, _ := http.Get(f.server.URL + "/test-post")
 
-		body := testhelper.ReadBody(res)
+		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 		assert.Equal(t, "test-post", f.usecase.ReceivedPath)
@@ -61,7 +63,7 @@ func TestViewPostHandler(t *testing.T) {
 
 		res, _ := http.Get(f.server.URL + "/wrong-path")
 
-		body := testhelper.ReadBody(res)
+		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusNotFound, res.StatusCode)
 		assert.Equal(t, "wrong-path", f.usecase.ReceivedPath)
@@ -69,7 +71,7 @@ func TestViewPostHandler(t *testing.T) {
 		assert.True(t, strings.Contains(body, "Page not found"))
 	})
 
-	t.Run("Returns server error when sother error happens", func(t *testing.T) {
+	t.Run("Returns server error when other error happens", func(t *testing.T) {
 		f := setup()
 		defer f.server.Close()
 
@@ -77,7 +79,7 @@ func TestViewPostHandler(t *testing.T) {
 
 		res, _ := http.Get(f.server.URL + "/post-path")
 
-		body := testhelper.ReadBody(res)
+		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 		assert.Equal(t, "post-path", f.usecase.ReceivedPath)

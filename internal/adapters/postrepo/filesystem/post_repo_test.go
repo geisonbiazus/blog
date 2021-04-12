@@ -14,7 +14,7 @@ type postRepoFixture struct {
 
 func TestPostRepo(t *testing.T) {
 	setup := func() *postRepoFixture {
-		repo := filesystem.NewPostRepo("./test")
+		repo := filesystem.NewPostRepo("../../../../test/posts")
 
 		return &postRepoFixture{
 			repo: repo,
