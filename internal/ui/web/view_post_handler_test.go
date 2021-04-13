@@ -8,82 +8,101 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/core/posts"
-	"github.com/geisonbiazus/blog/internal/ui/web/test"
+	"github.com/geisonbiazus/blog/internal/ui/web"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
 
 type viewPostHandlerFixture struct {
-	usecase *test.ViewPostUseCaseSpy
-	server  *httptest.Server
+	usecase *viewPostUseCaseSpy
+	handler http.Handler
 }
 
 func TestViewPostHandler(t *testing.T) {
 	setup := func() *viewPostHandlerFixture {
-		server, usecases := test.NewTestServer()
-		usecase := usecases.ViewPost.(*test.ViewPostUseCaseSpy)
+		usecase := &viewPostUseCaseSpy{}
+		templateRenderer := newTestTemplateRenderer()
+		handler := web.NewViewPostHandler(usecase, templateRenderer)
 
 		return &viewPostHandlerFixture{
 			usecase: usecase,
-			server:  server,
+			handler: handler,
 		}
 	}
 
 	t.Run("Given a valid post path it responds with the post HTML", func(t *testing.T) {
 		f := setup()
-		defer f.server.Close()
 
-		renderedPost := posts.RenderedPost{
-			Title:   "post title",
-			Author:  "post author",
-			Time:    testhelper.ParseTime("2021-04-03T00:00:00+00:00"),
-			Content: "<p>Content<p>",
-		}
-
+		renderedPost := buildRenderedPost()
 		f.usecase.RenderedPost = renderedPost
 
-		res, _ := http.Get(f.server.URL + "/test-post")
-
+		res := doGetRequest(f.handler, "/post-path")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
-		assert.Equal(t, "test-post", f.usecase.ReceivedPath)
-
-		assert.True(t, strings.Contains(body, renderedPost.Title))
-		assert.True(t, strings.Contains(body, renderedPost.Author))
-		assert.True(t, strings.Contains(body, renderedPost.Time.Format("02 Jan 06")))
-		assert.True(t, strings.Contains(body, renderedPost.Content))
+		assert.Equal(t, "post-path", f.usecase.ReceivedPath)
+		assertContainsRenderedPost(t, body, renderedPost)
 	})
 
 	t.Run("Given a wrong post path it responds with not found", func(t *testing.T) {
 		f := setup()
-		defer f.server.Close()
 
 		f.usecase.Error = posts.ErrPostNotFound
 
-		res, _ := http.Get(f.server.URL + "/wrong-path")
-
+		res := doGetRequest(f.handler, "/post-path")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusNotFound, res.StatusCode)
-		assert.Equal(t, "wrong-path", f.usecase.ReceivedPath)
-
+		assert.Equal(t, "post-path", f.usecase.ReceivedPath)
 		assert.True(t, strings.Contains(body, "Page not found"))
 	})
 
 	t.Run("Returns server error when other error happens", func(t *testing.T) {
 		f := setup()
-		defer f.server.Close()
 
 		f.usecase.Error = errors.New("any error")
 
-		res, _ := http.Get(f.server.URL + "/post-path")
-
+		res := doGetRequest(f.handler, "/post-path")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 		assert.Equal(t, "post-path", f.usecase.ReceivedPath)
-
 		assert.True(t, strings.Contains(body, "Internal server error"))
 	})
+}
+
+func buildRenderedPost() posts.RenderedPost {
+	return posts.RenderedPost{
+		Title:   "post title",
+		Author:  "post author",
+		Time:    testhelper.ParseTime("2021-04-03T00:00:00+00:00"),
+		Content: "<p>Content<p>",
+	}
+}
+
+func doGetRequest(handler http.Handler, path string) *http.Response {
+	req := httptest.NewRequest(http.MethodGet, path, nil)
+	rw := httptest.NewRecorder()
+
+	handler.ServeHTTP(rw, req)
+
+	return rw.Result()
+}
+
+func assertContainsRenderedPost(t *testing.T, body string, renderedPost posts.RenderedPost) {
+	assert.True(t, strings.Contains(body, renderedPost.Title))
+	assert.True(t, strings.Contains(body, renderedPost.Author))
+	assert.True(t, strings.Contains(body, renderedPost.Time.Format("02 Jan 06")))
+	assert.True(t, strings.Contains(body, renderedPost.Content))
+}
+
+type viewPostUseCaseSpy struct {
+	ReceivedPath string
+	RenderedPost posts.RenderedPost
+	Error        error
+}
+
+func (u *viewPostUseCaseSpy) Run(path string) (posts.RenderedPost, error) {
+	u.ReceivedPath = path
+	return u.RenderedPost, u.Error
 }
