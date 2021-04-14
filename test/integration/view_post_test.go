@@ -6,33 +6,17 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
-	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
-	"github.com/geisonbiazus/blog/internal/core/posts"
-	"github.com/geisonbiazus/blog/internal/ui/web"
+	"github.com/geisonbiazus/blog/internal/app"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
 
 func TestViewPostIntegration(t *testing.T) {
 	setup := func() *httptest.Server {
-		templateRenderer, err := web.NewTemplateRenderer("../../web/template")
-
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		postRepo := filesystem.NewPostRepo("../posts")
-		renderer := goldmark.NewGoldmarkRenderer()
-		viewPostUseCase := posts.NewVewPostUseCase(postRepo, renderer)
-
-		usecases := &web.UseCases{
-			ViewPost: viewPostUseCase,
-		}
-
-		router := web.NewRouter(templateRenderer, usecases)
-
-		server := httptest.NewServer(router)
+		c := app.NewContext()
+		c.TemplatePath = "../../web/template"
+		c.PostBasePath = "../posts"
+		server := httptest.NewServer(c.Router())
 
 		return server
 	}

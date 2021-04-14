@@ -1,6 +1,8 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
 	"github.com/geisonbiazus/blog/internal/core/posts"
@@ -23,10 +25,19 @@ func NewContext() *Context {
 
 func (c *Context) WebServer() *web.Server {
 	return &web.Server{
-		Port:         c.Port,
-		TemplatePath: c.TemplatePath,
-		UseCases:     c.UseCases(),
+		Port:   c.Port,
+		Router: c.Router(),
 	}
+}
+
+func (c *Context) Router() http.Handler {
+	router, err := web.NewRouter(c.TemplatePath, c.UseCases())
+
+	if err != nil {
+		panic(err)
+	}
+
+	return router
 }
 
 func (c *Context) UseCases() *web.UseCases {
