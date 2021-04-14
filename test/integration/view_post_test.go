@@ -15,7 +15,7 @@ func TestViewPostIntegration(t *testing.T) {
 	setup := func() *httptest.Server {
 		c := app.NewContext()
 		c.TemplatePath = "../../web/template"
-		c.PostBasePath = "../posts"
+		c.PostPath = "../posts"
 		server := httptest.NewServer(c.Router())
 
 		return server

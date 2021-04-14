@@ -7,27 +7,25 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
 	"github.com/geisonbiazus/blog/internal/core/posts"
 	"github.com/geisonbiazus/blog/internal/ui/web"
+	"github.com/geisonbiazus/blog/pkg/env"
 )
 
 type Context struct {
 	Port         int
 	TemplatePath string
-	PostBasePath string
+	PostPath     string
 }
 
 func NewContext() *Context {
 	return &Context{
-		Port:         3000,
-		TemplatePath: "web/template",
-		PostBasePath: "posts",
+		Port:         env.GetInt("PORT", 3000),
+		TemplatePath: env.GetString("TEMPLATE_PATH", "web/template"),
+		PostPath:     env.GetString("POST_PATH", "posts"),
 	}
 }
 
 func (c *Context) WebServer() *web.Server {
-	return &web.Server{
-		Port:   c.Port,
-		Router: c.Router(),
-	}
+	return web.NewServer(c.Port, c.Router())
 }
 
 func (c *Context) Router() http.Handler {
@@ -51,7 +49,7 @@ func (c *Context) ViewPostUseCase() *posts.ViewPostUseCase {
 }
 
 func (c *Context) PostRepo() *filesystem.PostRepo {
-	return filesystem.NewPostRepo(c.PostBasePath)
+	return filesystem.NewPostRepo(c.PostPath)
 }
 
 func (c *Context) Renderer() *goldmark.GoldmarkRenderer {
