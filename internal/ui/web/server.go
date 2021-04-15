@@ -6,20 +6,18 @@ import (
 )
 
 type Server struct {
-	Port         int
-	TemplatePath string
-	UseCases     *UseCases
+	Port   int
+	Router http.Handler
+}
+
+func NewServer(port int, router http.Handler) *Server {
+	return &Server{
+		Port:   port,
+		Router: router,
+	}
 }
 
 func (s *Server) Start() error {
 	addr := fmt.Sprintf(":%v", s.Port)
-	templateRenderer, err := NewTemplateRenderer(s.TemplatePath)
-
-	if err != nil {
-		return err
-	}
-
-	router := NewRouter(templateRenderer, s.UseCases)
-
-	return http.ListenAndServe(addr, router)
+	return http.ListenAndServe(addr, s.Router)
 }
