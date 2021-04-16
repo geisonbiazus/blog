@@ -4,6 +4,7 @@ import "errors"
 
 type PostRepo interface {
 	GetPostByPath(path string) (Post, error)
+	GetAllPosts() ([]Post, error)
 }
 
 var ErrPostNotFound = errors.New("post not found")

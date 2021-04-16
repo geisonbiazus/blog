@@ -17,8 +17,8 @@ type viewPostUseCaseFixture struct {
 
 func TestViewPostUseCase(t *testing.T) {
 	setup := func() *viewPostUseCaseFixture {
-		repo := &PostRepoSpy{}
-		renderer := &RendererSpy{}
+		repo := NewPostRepoSpy()
+		renderer := NewRendererSpy()
 		usecase := posts.NewVewPostUseCase(repo, renderer)
 
 		return &viewPostUseCaseFixture{
