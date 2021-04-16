@@ -2,7 +2,6 @@ package posts_test
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 
@@ -12,30 +11,18 @@ import (
 
 type viewPostUseCaseFixture struct {
 	usecase  *posts.ViewPostUseCase
-	post     posts.Post
-	repo     *FakePostRepo
-	renderer *FakeRenderer
+	repo     *PostRepoSpy
+	renderer *RendererSpy
 }
 
 func TestViewPostUseCase(t *testing.T) {
 	setup := func() *viewPostUseCaseFixture {
-		repo := &FakePostRepo{}
-		renderer := &FakeRenderer{}
+		repo := &PostRepoSpy{}
+		renderer := &RendererSpy{}
 		usecase := posts.NewVewPostUseCase(repo, renderer)
-
-		postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
-		post := posts.Post{
-			Title:   "Title",
-			Author:  "Author",
-			Time:    postTime,
-			Path:    "path",
-			Content: "content",
-		}
-		repo.AddPost(post)
 
 		return &viewPostUseCaseFixture{
 			usecase:  usecase,
-			post:     post,
 			repo:     repo,
 			renderer: renderer,
 		}
@@ -44,8 +31,11 @@ func TestViewPostUseCase(t *testing.T) {
 	t.Run("It returns error when post is not found", func(t *testing.T) {
 		f := setup()
 
-		body, err := f.usecase.Run("wrong-path")
+		f.repo.ReturnError = posts.ErrPostNotFound
 
+		body, err := f.usecase.Run("path")
+
+		assert.Equal(t, "path", f.repo.ReceivedPath)
 		assert.DeepEqual(t, posts.RenderedPost{}, body)
 		assert.Equal(t, posts.ErrPostNotFound, err)
 	})
@@ -53,14 +43,19 @@ func TestViewPostUseCase(t *testing.T) {
 	t.Run("It returns the rendered post when post is found", func(t *testing.T) {
 		f := setup()
 
-		rennderedPost, err := f.usecase.Run(f.post.Path)
+		post := newPost()
+		f.repo.ReturnPost = post
+		f.renderer.ReturnRenderedContent = "Rendered content"
 
-		renderedContent, _ := f.renderer.Render(f.post.Content)
+		rennderedPost, err := f.usecase.Run("path")
+
+		assert.Equal(t, "path", f.repo.ReceivedPath)
+		assert.Equal(t, post.Content, f.renderer.ReceivedContent)
 		assert.DeepEqual(t, rennderedPost, posts.RenderedPost{
-			Title:   f.post.Title,
-			Author:  f.post.Author,
-			Time:    f.post.Time,
-			Content: renderedContent,
+			Title:   post.Title,
+			Author:  post.Author,
+			Time:    post.Time,
+			Content: "Rendered content",
 		})
 		assert.Nil(t, err)
 	})
@@ -68,40 +63,23 @@ func TestViewPostUseCase(t *testing.T) {
 	t.Run("It returns error when fails to render", func(t *testing.T) {
 		f := setup()
 
-		f.renderer.RenderError = errors.New("render error")
+		f.renderer.ReturnError = errors.New("render error")
 
-		rennderedPost, err := f.usecase.Run(f.post.Path)
-
+		rennderedPost, err := f.usecase.Run("path")
+		assert.Equal(t, "path", f.repo.ReceivedPath)
 		assert.DeepEqual(t, rennderedPost, posts.RenderedPost{})
-		assert.Equal(t, f.renderer.RenderError, err)
+		assert.Equal(t, f.renderer.ReturnError, err)
 	})
 }
 
-type FakePostRepo struct {
-	posts []posts.Post
-}
+func newPost() posts.Post {
+	postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
 
-func (f *FakePostRepo) AddPost(post posts.Post) {
-	f.posts = append(f.posts, post)
-}
-
-func (f *FakePostRepo) GetPostByPath(path string) (posts.Post, error) {
-	for _, post := range f.posts {
-		if post.Path == path {
-			return post, nil
-		}
+	return posts.Post{
+		Title:   "Title",
+		Author:  "Author",
+		Time:    postTime,
+		Path:    "path",
+		Content: "content",
 	}
-	return posts.Post{}, posts.ErrPostNotFound
-}
-
-type FakeRenderer struct {
-	RenderError error
-}
-
-func (r *FakeRenderer) Render(content string) (string, error) {
-	if r.RenderError != nil {
-		return "", r.RenderError
-	}
-
-	return fmt.Sprintf("Rendered %s", content), nil
 }
