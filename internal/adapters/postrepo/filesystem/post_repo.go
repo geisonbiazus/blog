@@ -3,6 +3,7 @@ package filesystem
 import (
 	"io/fs"
 	"io/ioutil"
+	"log"
 	"os"
 	"sort"
 	"strings"
@@ -40,27 +41,33 @@ func (r *PostRepo) GetAllPosts() ([]posts.Post, error) {
 	}
 
 	for _, entry := range entries {
-		postList, err = r.maybeLoadPostFromFile(postList, entry)
+		postList = r.maybeLoadPostFromFile(postList, entry)
 	}
 
-	sort.Slice(postList, func(i, j int) bool {
-		return postList[i].Time.After(postList[j].Time)
-	})
-
-	return postList, err
+	return r.sortPostsByTimeDesc(postList), err
 }
 
-func (r *PostRepo) maybeLoadPostFromFile(postList []posts.Post, entry fs.DirEntry) ([]posts.Post, error) {
+func (r *PostRepo) maybeLoadPostFromFile(postList []posts.Post, entry fs.DirEntry) []posts.Post {
 	if !strings.HasSuffix(entry.Name(), ".md") {
-		return postList, nil
+		return postList
 	}
 
 	fileName := strings.TrimSuffix(entry.Name(), ".md")
 	post, err := r.GetPostByPath(fileName)
 
 	if err != nil {
-		return postList, err
+		log.Printf("WARNING: error loading post \"%s\": %v", fileName, err)
+
+		return postList
 	}
 
-	return append(postList, post), nil
+	return append(postList, post)
+}
+
+func (r *PostRepo) sortPostsByTimeDesc(postList []posts.Post) []posts.Post {
+	sort.Slice(postList, func(i, j int) bool {
+		return postList[i].Time.After(postList[j].Time)
+	})
+
+	return postList
 }
