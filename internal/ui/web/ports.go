@@ -9,3 +9,7 @@ type UseCases struct {
 type ViewPostUseCase interface {
 	Run(path string) (posts.RenderedPost, error)
 }
+
+type ListPostUseCase interface {
+	Run() ([]posts.Post, error)
+}

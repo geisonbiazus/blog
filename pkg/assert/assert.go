@@ -2,6 +2,7 @@ package assert
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -44,5 +45,12 @@ func False(t *testing.T, actual bool) {
 	t.Helper()
 	if actual {
 		t.Errorf("\n%v should not be false", actual)
+	}
+}
+
+func Contains(t *testing.T, content, expected string) {
+	t.Helper()
+	if !strings.Contains(content, expected) {
+		t.Errorf("\nExpected to contain \"%s\" but it doesn't. \nContent:\n%s", expected, content)
 	}
 }
