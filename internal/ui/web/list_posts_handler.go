@@ -45,7 +45,7 @@ func (h *ListPostsHandler) toViewModel(post posts.Post) postListViewModel {
 	return postListViewModel{
 		Title:  post.Title,
 		Author: post.Author,
-		Date:   post.Time.Format("02 Jan 06"),
+		Date:   post.Time.Format(DateFormat),
 		Path:   post.Path,
 	}
 }

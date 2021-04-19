@@ -92,7 +92,7 @@ func doGetRequest(handler http.Handler, path string) *http.Response {
 func assertContainsRenderedPost(t *testing.T, body string, renderedPost posts.RenderedPost) {
 	assert.Contains(t, body, renderedPost.Title)
 	assert.Contains(t, body, renderedPost.Author)
-	assert.Contains(t, body, renderedPost.Time.Format("02 Jan 06"))
+	assert.Contains(t, body, renderedPost.Time.Format(web.DateFormat))
 	assert.Contains(t, body, renderedPost.Content)
 }
 

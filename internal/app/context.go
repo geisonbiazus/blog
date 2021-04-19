@@ -40,12 +40,17 @@ func (c *Context) Router() http.Handler {
 
 func (c *Context) UseCases() *web.UseCases {
 	return &web.UseCases{
-		ViewPost: c.ViewPostUseCase(),
+		ViewPost:  c.ViewPostUseCase(),
+		ListPosts: c.ListPostsUseCase(),
 	}
 }
 
 func (c *Context) ViewPostUseCase() *posts.ViewPostUseCase {
 	return posts.NewVewPostUseCase(c.PostRepo(), c.Renderer())
+}
+
+func (c *Context) ListPostsUseCase() *posts.ListPostsUseCase {
+	return posts.NewListPostsUseCase(c.PostRepo())
 }
 
 func (c *Context) PostRepo() *filesystem.PostRepo {

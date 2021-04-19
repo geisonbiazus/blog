@@ -41,7 +41,7 @@ func (h *ViewPostHandler) toViewModel(p posts.RenderedPost) postViewModel {
 	return postViewModel{
 		Title:   p.Title,
 		Author:  p.Author,
-		Date:    p.Time.Format("02 Jan 06"),
+		Date:    p.Time.Format(DateFormat),
 		Content: template.HTML(p.Content),
 	}
 }

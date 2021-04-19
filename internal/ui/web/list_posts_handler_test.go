@@ -46,7 +46,7 @@ func TestListPostsHandler(t *testing.T) {
 
 		f.usecase.ReturnError = errors.New("some error")
 
-		res := doGetRequest(f.handler, "/index")
+		res := doGetRequest(f.handler, "/posts")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
@@ -57,7 +57,7 @@ func TestListPostsHandler(t *testing.T) {
 func assertContainsListedPost(t *testing.T, body string, post posts.Post) {
 	assert.Contains(t, body, post.Title)
 	assert.Contains(t, body, post.Author)
-	assert.Contains(t, body, post.Time.Format("02 Jan 06"))
+	assert.Contains(t, body, post.Time.Format(web.DateFormat))
 	assert.Contains(t, body, post.Path)
 }
 
