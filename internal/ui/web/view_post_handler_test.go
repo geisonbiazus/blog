@@ -34,7 +34,7 @@ func TestViewPostHandler(t *testing.T) {
 		f := setup()
 
 		renderedPost := buildRenderedPost()
-		f.usecase.RenderedPost = renderedPost
+		f.usecase.ReturnPost = renderedPost
 
 		res := doGetRequest(f.handler, "/post-path")
 		body := testhelper.ReadResponseBody(res)
@@ -47,7 +47,7 @@ func TestViewPostHandler(t *testing.T) {
 	t.Run("Given a wrong post path it responds with not found", func(t *testing.T) {
 		f := setup()
 
-		f.usecase.Error = posts.ErrPostNotFound
+		f.usecase.ReturnError = posts.ErrPostNotFound
 
 		res := doGetRequest(f.handler, "/post-path")
 		body := testhelper.ReadResponseBody(res)
@@ -60,7 +60,7 @@ func TestViewPostHandler(t *testing.T) {
 	t.Run("Returns server error when other error happens", func(t *testing.T) {
 		f := setup()
 
-		f.usecase.Error = errors.New("any error")
+		f.usecase.ReturnError = errors.New("any error")
 
 		res := doGetRequest(f.handler, "/post-path")
 		body := testhelper.ReadResponseBody(res)
@@ -90,19 +90,19 @@ func doGetRequest(handler http.Handler, path string) *http.Response {
 }
 
 func assertContainsRenderedPost(t *testing.T, body string, renderedPost posts.RenderedPost) {
-	assert.True(t, strings.Contains(body, renderedPost.Title))
-	assert.True(t, strings.Contains(body, renderedPost.Author))
-	assert.True(t, strings.Contains(body, renderedPost.Time.Format("02 Jan 06")))
-	assert.True(t, strings.Contains(body, renderedPost.Content))
+	assert.Contains(t, body, renderedPost.Title)
+	assert.Contains(t, body, renderedPost.Author)
+	assert.Contains(t, body, renderedPost.Time.Format(web.DateFormat))
+	assert.Contains(t, body, renderedPost.Content)
 }
 
 type viewPostUseCaseSpy struct {
 	ReceivedPath string
-	RenderedPost posts.RenderedPost
-	Error        error
+	ReturnPost   posts.RenderedPost
+	ReturnError  error
 }
 
 func (u *viewPostUseCaseSpy) Run(path string) (posts.RenderedPost, error) {
 	u.ReceivedPath = path
-	return u.RenderedPost, u.Error
+	return u.ReturnPost, u.ReturnError
 }

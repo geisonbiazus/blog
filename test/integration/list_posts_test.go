@@ -8,19 +8,19 @@ import (
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
 
-func TestViewPostIntegration(t *testing.T) {
-	t.Run("Given a valid post path it responds with the post HTML", func(t *testing.T) {
+func TestListPostsIntegration(t *testing.T) {
+	t.Run("Returns a list of the published posts", func(t *testing.T) {
 		server := newServer()
 		defer server.Close()
 
-		res, _ := http.Get(server.URL + "/test-post")
+		res, _ := http.Get(server.URL + "/posts")
 
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 		assert.Contains(t, body, "Test Post")
+		assert.Contains(t, body, "/test-post")
 		assert.Contains(t, body, "Geison Biazus")
 		assert.Contains(t, body, "April 5, 2021")
-		assert.Contains(t, body, "Content")
 	})
 }

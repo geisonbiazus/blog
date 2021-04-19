@@ -1,7 +1,12 @@
 package filesystem
 
 import (
+	"io/fs"
 	"io/ioutil"
+	"log"
+	"os"
+	"sort"
+	"strings"
 
 	"github.com/geisonbiazus/blog/internal/core/posts"
 )
@@ -25,4 +30,44 @@ func (r *PostRepo) GetPostByPath(path string) (posts.Post, error) {
 	post.Path = path
 
 	return post, err
+}
+
+func (r *PostRepo) GetAllPosts() ([]posts.Post, error) {
+	postList := []posts.Post{}
+	entries, err := os.ReadDir(r.BasePath)
+
+	if err != nil {
+		return postList, err
+	}
+
+	for _, entry := range entries {
+		postList = r.maybeLoadPostFromFile(postList, entry)
+	}
+
+	return r.sortPostsByTimeDesc(postList), err
+}
+
+func (r *PostRepo) maybeLoadPostFromFile(postList []posts.Post, entry fs.DirEntry) []posts.Post {
+	if !strings.HasSuffix(entry.Name(), ".md") {
+		return postList
+	}
+
+	fileName := strings.TrimSuffix(entry.Name(), ".md")
+	post, err := r.GetPostByPath(fileName)
+
+	if err != nil {
+		log.Printf("WARNING: error loading post \"%s\": %v", fileName, err)
+
+		return postList
+	}
+
+	return append(postList, post)
+}
+
+func (r *PostRepo) sortPostsByTimeDesc(postList []posts.Post) []posts.Post {
+	sort.Slice(postList, func(i, j int) bool {
+		return postList[i].Time.After(postList[j].Time)
+	})
+
+	return postList
 }

@@ -27,7 +27,7 @@ func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	switch err {
 	case nil:
 		res.WriteHeader(http.StatusOK)
-		h.template.Render(res, "post.html", h.toViewModel(renderedPost))
+		h.template.Render(res, "view_post.html", h.toViewModel(renderedPost))
 	case posts.ErrPostNotFound:
 		res.WriteHeader(http.StatusNotFound)
 		h.template.Render(res, "404.html", nil)
@@ -41,7 +41,7 @@ func (h *ViewPostHandler) toViewModel(p posts.RenderedPost) postViewModel {
 	return postViewModel{
 		Title:   p.Title,
 		Author:  p.Author,
-		Date:    p.Time.Format("02 Jan 06"),
+		Date:    p.Time.Format(DateFormat),
 		Content: template.HTML(p.Content),
 	}
 }

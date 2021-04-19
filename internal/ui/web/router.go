@@ -12,9 +12,9 @@ func NewRouter(templatePath string, usecases *UseCases) (http.Handler, error) {
 	}
 
 	mux := http.NewServeMux()
-	viewPostHandler := NewViewPostHandler(usecases.ViewPost, templateRenderer)
 
-	mux.Handle("/", viewPostHandler)
+	mux.Handle("/posts", NewListPostsHandler(usecases.ListPosts, templateRenderer))
+	mux.Handle("/", NewViewPostHandler(usecases.ViewPost, templateRenderer))
 
 	return mux, nil
 }
