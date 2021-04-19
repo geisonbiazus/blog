@@ -1,6 +1,7 @@
 package web_test
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
@@ -10,18 +11,18 @@ import (
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
 
-type listPostHandlerFixture struct {
+type listPostsHandlerFixture struct {
 	usecase *listPostUseCaseSpy
 	handler http.Handler
 }
 
-func TestListPostHandler(t *testing.T) {
-	setup := func() *listPostHandlerFixture {
+func TestListPostsHandler(t *testing.T) {
+	setup := func() *listPostsHandlerFixture {
 		usecase := &listPostUseCaseSpy{}
 		templateRenderer := newTestTemplateRenderer()
-		handler := web.NewListPostHandler(usecase, templateRenderer)
+		handler := web.NewListPostsHandler(usecase, templateRenderer)
 
-		return &listPostHandlerFixture{
+		return &listPostsHandlerFixture{
 			usecase: usecase,
 			handler: handler,
 		}
@@ -36,8 +37,28 @@ func TestListPostHandler(t *testing.T) {
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
-		assert.Contains(t, body, post1.Title)
+		assertContainsListedPost(t, body, post2)
+		assertContainsListedPost(t, body, post1)
 	})
+
+	t.Run("It renders server error when and error is returned", func(t *testing.T) {
+		f := setup()
+
+		f.usecase.ReturnError = errors.New("some error")
+
+		res := doGetRequest(f.handler, "/index")
+		body := testhelper.ReadResponseBody(res)
+
+		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+		assert.Contains(t, body, "Internal server error")
+	})
+}
+
+func assertContainsListedPost(t *testing.T, body string, post posts.Post) {
+	assert.Contains(t, body, post.Title)
+	assert.Contains(t, body, post.Author)
+	assert.Contains(t, body, post.Time.Format("02 Jan 06"))
+	assert.Contains(t, body, post.Path)
 }
 
 type listPostUseCaseSpy struct {
