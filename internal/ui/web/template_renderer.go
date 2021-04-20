@@ -1,6 +1,7 @@
 package web
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"io"
@@ -17,5 +18,7 @@ func NewTemplateRenderer(basePath string) (*TemplateRenderer, error) {
 }
 
 func (r *TemplateRenderer) Render(writer io.Writer, templateName string, data interface{}) {
-	r.tmpl.ExecuteTemplate(writer, templateName, data)
+	buf := bytes.NewBuffer([]byte{})
+	r.tmpl.ExecuteTemplate(buf, templateName, data)
+	r.tmpl.ExecuteTemplate(writer, "layout.html", template.HTML(buf.String()))
 }
