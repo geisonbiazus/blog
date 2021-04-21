@@ -1,7 +1,9 @@
+<h1 class="mb-3">Article index</h1>
+
 {{ range . }}
-<p>
-  <a href="/{{ .Path }}">{{ .Title }}</a> <br>
-  {{ .Date }} <br>
-  {{ .Author }} <br>
+<p class="lh-sm">
+  <a class="fs-3 link-primary" href="/{{ .Path }}">{{ .Title }}</a> <br>
+  <span class="fs-6 ">{{ .Date }}</span><br>
+  <span class="fs-6 text-muted fst-italic">{{ .Author }}</span><br>
 </p>
 {{ end }}

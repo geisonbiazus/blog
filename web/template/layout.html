@@ -15,16 +15,12 @@
   <style>
     .blog-container {
       max-width: 720px;
-      font-size: 18px;
     }
 
-    body {
-      font-size: 18px;
-    }
   </style>
 </head>
 
-<body>
+<body class="fs-5">
   <header class="d-flex justify-content-center bg-primary text-white">
     <h1 class="mt-4 mb-4">Geison Biazus</h1>
   </header>
@@ -41,8 +37,8 @@
     </div>
   </nav>
 
-  <div class="container blog-container">
-    {{.}}
+  <div class="container blog-container pt-3">
+    {{ . }}
   </div>
 </body>
 
