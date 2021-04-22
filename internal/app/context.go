@@ -13,6 +13,7 @@ import (
 type Context struct {
 	Port         int
 	TemplatePath string
+	StaticPath   string
 	PostPath     string
 }
 
@@ -20,6 +21,7 @@ func NewContext() *Context {
 	return &Context{
 		Port:         env.GetInt("PORT", 3000),
 		TemplatePath: env.GetString("TEMPLATE_PATH", "web/template"),
+		StaticPath:   env.GetString("STATIC_PATH", "web/static"),
 		PostPath:     env.GetString("POST_PATH", "posts"),
 	}
 }
@@ -29,7 +31,7 @@ func (c *Context) WebServer() *web.Server {
 }
 
 func (c *Context) Router() http.Handler {
-	router, err := web.NewRouter(c.TemplatePath, c.UseCases())
+	router, err := web.NewRouter(c.TemplatePath, c.StaticPath, c.UseCases())
 
 	if err != nil {
 		panic(err)
