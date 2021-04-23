@@ -8,15 +8,17 @@ import (
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
 
-func TestStaticIntegration(t *testing.T) {
-	t.Run("It serves static files", func(t *testing.T) {
+func TestHomeIntegration(t *testing.T) {
+	t.Run("It renders home page", func(t *testing.T) {
 		server := newServer()
 		defer server.Close()
 
-		res, _ := http.Get(server.URL + "/static/styles.css")
+		res, _ := http.Get(server.URL)
+
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
-		assert.Contains(t, body, ".blog-container")
+		assert.Contains(t, body, "Geison Biazus")
+		assert.Contains(t, body, "Hello")
 	})
 }

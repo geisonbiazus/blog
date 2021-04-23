@@ -16,6 +16,7 @@ func NewRouter(templatePath, staticFilesPath string, usecases *UseCases) (http.H
 	mux.Handle("/static/", http.StripPrefix("/static", http.FileServer(http.Dir(staticFilesPath))))
 	mux.Handle("/posts", NewListPostsHandler(usecases.ListPosts, templateRenderer))
 	mux.Handle("/posts/", NewViewPostHandler(usecases.ViewPost, templateRenderer))
+	mux.Handle("/", NewTemplateHandler(templateRenderer, "home.html"))
 
 	return mux, nil
 }
