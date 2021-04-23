@@ -21,7 +21,7 @@ func NewViewPostHandler(usecase ViewPostUseCase, templateRenderer *TemplateRende
 }
 
 func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	path := strings.TrimPrefix(req.URL.Path, "/")
+	path := strings.TrimPrefix(req.URL.Path, "/posts/")
 	renderedPost, err := h.usecase.Run(path)
 
 	switch err {

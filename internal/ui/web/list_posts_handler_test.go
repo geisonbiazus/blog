@@ -2,6 +2,7 @@ package web_test
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -58,7 +59,7 @@ func assertContainsListedPost(t *testing.T, body string, post posts.Post) {
 	assert.Contains(t, body, post.Title)
 	assert.Contains(t, body, post.Author)
 	assert.Contains(t, body, post.Time.Format(web.DateFormat))
-	assert.Contains(t, body, post.Path)
+	assert.Contains(t, body, fmt.Sprintf("/posts/%s", post.Path))
 }
 
 type listPostUseCaseSpy struct {

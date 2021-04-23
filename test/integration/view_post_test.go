@@ -13,7 +13,7 @@ func TestViewPostIntegration(t *testing.T) {
 		server := newServer()
 		defer server.Close()
 
-		res, _ := http.Get(server.URL + "/test-post")
+		res, _ := http.Get(server.URL + "/posts/test-post")
 
 		body := testhelper.ReadResponseBody(res)
 

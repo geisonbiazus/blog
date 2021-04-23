@@ -19,7 +19,7 @@ func TestListPostsIntegration(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 		assert.Contains(t, body, "Test Post")
-		assert.Contains(t, body, "/test-post")
+		assert.Contains(t, body, "/posts/test-post")
 		assert.Contains(t, body, "Geison Biazus")
 		assert.Contains(t, body, "April 5, 2021")
 	})

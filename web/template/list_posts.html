@@ -2,7 +2,7 @@
 
 {{ range . }}
 <p class="lh-sm">
-  <a class="fs-3 link-primary" href="/{{ .Path }}">{{ .Title }}</a> <br>
+  <a class="fs-3 link-primary" href="{{ .Path }}">{{ .Title }}</a> <br>
   <span class="fs-6 ">{{ .Date }}</span><br>
   <span class="fs-6 text-muted fst-italic">{{ .Author }}</span><br>
 </p>
