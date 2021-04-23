@@ -2,6 +2,7 @@ package app
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
@@ -20,9 +21,9 @@ type Context struct {
 func NewContext() *Context {
 	return &Context{
 		Port:         env.GetInt("PORT", 3000),
-		TemplatePath: env.GetString("TEMPLATE_PATH", "web/template"),
-		StaticPath:   env.GetString("STATIC_PATH", "web/static"),
-		PostPath:     env.GetString("POST_PATH", "posts"),
+		TemplatePath: env.GetString("TEMPLATE_PATH", filepath.Join("web", "template")),
+		StaticPath:   env.GetString("STATIC_PATH", filepath.Join("web", "static")),
+		PostPath:     env.GetString("POST_PATH", filepath.Join("posts")),
 	}
 }
 
