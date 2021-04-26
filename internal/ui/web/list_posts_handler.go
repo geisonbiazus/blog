@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/geisonbiazus/blog/internal/core/posts"
@@ -46,7 +47,7 @@ func (h *ListPostsHandler) toViewModel(post posts.Post) postListViewModel {
 		Title:  post.Title,
 		Author: post.Author,
 		Date:   post.Time.Format(DateFormat),
-		Path:   post.Path,
+		Path:   fmt.Sprintf("/posts/%s", post.Path),
 	}
 }
 

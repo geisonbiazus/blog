@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/static/favicon/site.webmanifest">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
+  <link href="/static/styles.css" rel="stylesheet">
+  <title>Geison Biazus Blog</title>
+
+  </style>
+</head>
+
+<body class="fs-5">
+  <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
+    <div class="container">
+      <span class="navbar-brand mb-0 h1" href="/">Geison Biazus</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse fs-6" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto" id="menu">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/posts">All posts</a>
+          </li>
+        </ul>
+        <div>
+          <ul class="navbar-nav flex-row">
+            <li class="nav-item">
+              <a class="nav-link pe-2" target="_blank" href="https://github.com/geisonbiazus" title="Github">
+                <i class="bi-github" role="img" aria-label="GitHub"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-2" target="_blank" href="https://www.linkedin.com/in/geisonbiazus" title="Github">
+                <i class="bi-linkedin" role="img" aria-label="Linkedin"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-2" target="_blank" href="https://twitter.com/geisonbiazus" title="Github">
+                <i class="bi-twitter" role="img" aria-label="Twitter"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container blog-container pt-3">
+    {{ . }}
+  </div>
+
+  <script>
+    function setActiveMenu() {
+      const path = window.location.pathname;
+      const activeItem = document.querySelector(`#menu a[href='${path}']`);
+
+      if (activeItem) {
+        activeItem.classList.add('active');
+      }
+    }
+
+    setActiveMenu();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

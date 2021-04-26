@@ -2,6 +2,7 @@ package app
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
@@ -13,14 +14,16 @@ import (
 type Context struct {
 	Port         int
 	TemplatePath string
+	StaticPath   string
 	PostPath     string
 }
 
 func NewContext() *Context {
 	return &Context{
 		Port:         env.GetInt("PORT", 3000),
-		TemplatePath: env.GetString("TEMPLATE_PATH", "web/template"),
-		PostPath:     env.GetString("POST_PATH", "posts"),
+		TemplatePath: env.GetString("TEMPLATE_PATH", filepath.Join("web", "template")),
+		StaticPath:   env.GetString("STATIC_PATH", filepath.Join("web", "static")),
+		PostPath:     env.GetString("POST_PATH", filepath.Join("posts")),
 	}
 }
 
@@ -29,7 +32,7 @@ func (c *Context) WebServer() *web.Server {
 }
 
 func (c *Context) Router() http.Handler {
-	router, err := web.NewRouter(c.TemplatePath, c.UseCases())
+	router, err := web.NewRouter(c.TemplatePath, c.StaticPath, c.UseCases())
 
 	if err != nil {
 		panic(err)

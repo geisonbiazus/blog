@@ -36,7 +36,7 @@ func TestViewPostHandler(t *testing.T) {
 		renderedPost := buildRenderedPost()
 		f.usecase.ReturnPost = renderedPost
 
-		res := doGetRequest(f.handler, "/post-path")
+		res := doGetRequest(f.handler, "/posts/post-path")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -49,7 +49,7 @@ func TestViewPostHandler(t *testing.T) {
 
 		f.usecase.ReturnError = posts.ErrPostNotFound
 
-		res := doGetRequest(f.handler, "/post-path")
+		res := doGetRequest(f.handler, "/posts/post-path")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusNotFound, res.StatusCode)
@@ -62,7 +62,7 @@ func TestViewPostHandler(t *testing.T) {
 
 		f.usecase.ReturnError = errors.New("any error")
 
-		res := doGetRequest(f.handler, "/post-path")
+		res := doGetRequest(f.handler, "/posts/post-path")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)

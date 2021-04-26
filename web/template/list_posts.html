@@ -1,21 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+<h1 class="mb-3">All posts</h1>
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-
-<body>
-  {{ range . }}
-  <p>
-    <a href="/{{ .Path }}">{{ .Title }}</a> <br>
-    {{ .Date }} <br>
-    {{ .Author }} <br>
-  </p>
-  {{ end }}
-</body>
-
-</html>
+{{ range . }}
+<p class="lh-sm">
+  <a class="fs-3 link-primary" href="{{ .Path }}">{{ .Title }}</a> <br>
+  <span class="fs-6 ">{{ .Date }}</span><br>
+  <span class="fs-6 text-muted fst-italic">{{ .Author }}</span><br>
+</p>
+{{ end }}

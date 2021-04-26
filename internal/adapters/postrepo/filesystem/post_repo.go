@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -20,7 +21,7 @@ func NewPostRepo(basePath string) *PostRepo {
 }
 
 func (r *PostRepo) GetPostByPath(path string) (posts.Post, error) {
-	content, err := ioutil.ReadFile(r.BasePath + "/" + path + ".md")
+	content, err := ioutil.ReadFile(filepath.Join(r.BasePath, path+".md"))
 
 	if err != nil {
 		return posts.Post{}, posts.ErrPostNotFound

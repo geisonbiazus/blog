@@ -3,7 +3,7 @@ package web
 import (
 	"html/template"
 	"net/http"
-	"strings"
+	"path"
 
 	"github.com/geisonbiazus/blog/internal/core/posts"
 )
@@ -21,7 +21,7 @@ func NewViewPostHandler(usecase ViewPostUseCase, templateRenderer *TemplateRende
 }
 
 func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	path := strings.TrimPrefix(req.URL.Path, "/")
+	path := path.Base(req.URL.Path)
 	renderedPost, err := h.usecase.Run(path)
 
 	switch err {

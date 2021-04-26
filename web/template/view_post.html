@@ -1,20 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+<h1 class="mb-0">{{ .Title }}</h1> 
+<span class="fs-6 text-muted">{{ .Date }} - </span>
+<span class="fs-6 text-muted fst-italic">{{ .Author }}</span><br>
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-
-<body>
-  <p>Title: {{.Title}}</p>
-  <p>Author: {{.Author}}</p>
-  <p>Author: {{.Date}}</p>
-
+<div class="mt-3">
   {{.Content}}
-
-</body>
-
-</html>
+</div>
