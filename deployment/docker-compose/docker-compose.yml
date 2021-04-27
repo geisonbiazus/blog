@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ../..
+    image: geisonbiazus/blog:latest
+    restart: always
+    environment:
+      VIRTUAL_HOST: blog.geisonbiazus.com
+      LETSENCRYPT_HOST: blog.geisonbiazus.com
+    ports:
+      - 5000:3000
