@@ -4,7 +4,13 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'deployment/**'
+      - './README/md'
   pull_request:
+    paths-ignore:
+      - 'deployment/**'
+      - './README/md'
 
 jobs:
   test:
@@ -47,5 +53,5 @@ jobs:
         with:
           push: true
           tags: |
-            geisonbiazus/markdown-notes-backend:latest
-            geisonbiazus/markdown-notes-backend:${{ github.run_number }}
+            geisonbiazus/blog:latest
+            geisonbiazus/blog:${{ github.run_number }}
