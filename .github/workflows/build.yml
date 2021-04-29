@@ -55,3 +55,24 @@ jobs:
           tags: |
             geisonbiazus/blog:latest
             geisonbiazus/blog:${{ github.run_number }}
+  
+  update_docker_compose:
+    name: Update docker-compose
+    needs: build_and_push_image
+    # if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update docker-compose file
+        run: "sed -i -e 's|image: geisonbiazus/blog:.*|image: geisonbiazus/blog:${{ github.run_number }}|'  deployment/docker-compose/docker-compose.yml"
+
+      - name: Commit changes
+        run: |
+          echo "${{ github.ref }}"
+          git config --global user.name 'Geison Biazus'
+          git config --global user.email 'geisonbiazus@gmail.com'
+          git commit -am "Update docker-compose image version to ${{ github.run_number }}"
+          git push
+
+          
