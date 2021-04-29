@@ -2,15 +2,15 @@ name: Build
 
 on:
   push:
-    branches:
-      - main
+  #   branches:
+  #     - main
     paths-ignore:
       - 'deployment/**'
-      - './README/md'
-  pull_request:
-    paths-ignore:
-      - 'deployment/**'
-      - './README/md'
+      # - './README/md'
+  # pull_request:
+  #   paths-ignore:
+  #     - 'deployment/**'
+  #     - './README/md'
 
 jobs:
   test:
