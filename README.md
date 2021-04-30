@@ -9,5 +9,3 @@ Run tests
 ```
 go test ./...
 ```
-
-force ci
