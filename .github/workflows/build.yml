@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'cmd/**'
-      - 'internal/**'
+    paths-ignore:
+      - 'deployment/**'
+      - './README/md'
   pull_request:
-    paths:
-      - 'cmd/**'
-      - 'internal/**'
+    paths-ignore:
+      - 'deployment/**'
+      - './README/md'
 
 jobs:
   test:
@@ -26,3 +26,67 @@ jobs:
 
       - name: Run tests
         run: go test ./...
+
+  build_and_push_image:
+    name: Build and push Docker image
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            geisonbiazus/blog:latest
+            geisonbiazus/blog:${{ github.run_number }}
+  
+  deploy:
+    name: Deploy app
+    needs: build_and_push_image
+    if: github.ref == 'refs/heads/main'
+    container: docker:20-git
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install docker compose
+        run: apk add docker-compose
+
+      - name: Update docker-compose file
+        run: "sed -i -e 's|image: geisonbiazus/blog:.*|image: geisonbiazus/blog:${{ github.run_number }}|'  deployment/docker-compose/docker-compose.yml"
+
+      - name: Commit changes
+        run: |
+          echo "${{ github.ref }}"
+          git config --global user.name 'Geison Biazus'
+          git config --global user.email 'geisonbiazus@gmail.com'
+          git commit -am "Update docker-compose image version to ${{ github.run_number }}"
+          git push
+
+      - name: Configure ssh
+        run: |
+          mkdir ~/.ssh
+          echo "${{ secrets.DOCKER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.DOCKER_SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa
+          chmod 644 ~/.ssh/id_rsa.pub
+          ssh-keyscan -H geisonbiazus.com >> ~/.ssh/known_hosts
+
+      - name: Deploy changes
+        run: DOCKER_HOST=ssh://root@geisonbiazus.com docker-compose -f deployment/docker-compose/docker-compose.yml up -d
