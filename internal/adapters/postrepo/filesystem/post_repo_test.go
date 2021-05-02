@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
-	"github.com/geisonbiazus/blog/internal/core/posts"
+	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
@@ -21,8 +21,8 @@ func TestPostRepo(t *testing.T) {
 
 			post, err := repo.GetPostByPath("wrong_path")
 
-			assert.DeepEqual(t, posts.Post{}, post)
-			assert.Equal(t, posts.ErrPostNotFound, err)
+			assert.DeepEqual(t, blog.Post{}, post)
+			assert.Equal(t, blog.ErrPostNotFound, err)
 		})
 
 		t.Run("It returns parsed post when the file exists", func(t *testing.T) {
@@ -38,23 +38,23 @@ func TestPostRepo(t *testing.T) {
 	t.Run("GetAllPosts()", func(t *testing.T) {
 		t.Run("Given a path with no post files, it returns empty", func(t *testing.T) {
 			repo := filesystem.NewPostRepo(emptyFolder)
-			postList, err := repo.GetAllPosts()
+			posts, err := repo.GetAllPosts()
 
-			assert.DeepEqual(t, []posts.Post{}, postList)
+			assert.DeepEqual(t, []blog.Post{}, posts)
 			assert.Nil(t, err)
 		})
 
 		t.Run("Given a non-existent path, it returns error", func(t *testing.T) {
 			repo := filesystem.NewPostRepo(invalidPath)
-			postList, err := repo.GetAllPosts()
+			posts, err := repo.GetAllPosts()
 
-			assert.DeepEqual(t, []posts.Post{}, postList)
+			assert.DeepEqual(t, []blog.Post{}, posts)
 			assert.NotNil(t, err)
 		})
 
 		t.Run("Given a path with post files, it returns all posts sorted by descending date", func(t *testing.T) {
 			repo := filesystem.NewPostRepo(postPath)
-			expectedPosts := []posts.Post{testPost1, testPost3, testPost2}
+			expectedPosts := []blog.Post{testPost1, testPost3, testPost2}
 
 			actualPosts, err := repo.GetAllPosts()
 
@@ -64,7 +64,7 @@ func TestPostRepo(t *testing.T) {
 
 		t.Run("Given an invalid post in the folder, it ignores the invalid and returns the rest", func(t *testing.T) {
 			repo := filesystem.NewPostRepo(pathWithInvalidPost)
-			expectedPosts := []posts.Post{testPost1, testPost2}
+			expectedPosts := []blog.Post{testPost1, testPost2}
 
 			actualPosts, err := repo.GetAllPosts()
 
@@ -74,7 +74,7 @@ func TestPostRepo(t *testing.T) {
 
 		t.Run("Given a path other types of files, it ignores the other files", func(t *testing.T) {
 			repo := filesystem.NewPostRepo(pathWithDifferentFiles)
-			expectedPosts := []posts.Post{testPost1}
+			expectedPosts := []blog.Post{testPost1}
 
 			actualPosts, err := repo.GetAllPosts()
 
@@ -84,7 +84,7 @@ func TestPostRepo(t *testing.T) {
 	})
 }
 
-var testPost1 = posts.Post{
+var testPost1 = blog.Post{
 	Title:  "Test Post 1",
 	Author: "Geison Biazus",
 	Path:   "test-post-1",
@@ -95,7 +95,7 @@ var testPost1 = posts.Post{
 		"Content\n",
 }
 
-var testPost2 = posts.Post{
+var testPost2 = blog.Post{
 	Title:   "Test Post 2",
 	Author:  "Geison Biazus",
 	Path:    "test-post-2",
@@ -103,7 +103,7 @@ var testPost2 = posts.Post{
 	Content: "",
 }
 
-var testPost3 = posts.Post{
+var testPost3 = blog.Post{
 	Title:   "Test Post 3",
 	Author:  "Geison Biazus",
 	Path:    "test-post-3",

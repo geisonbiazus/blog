@@ -1,4 +1,4 @@
-package posts
+package blog
 
 type ListPostsUseCase struct {
 	postRepo PostRepo

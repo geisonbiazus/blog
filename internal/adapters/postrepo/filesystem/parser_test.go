@@ -5,21 +5,21 @@ import (
 	"time"
 
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
-	"github.com/geisonbiazus/blog/internal/core/posts"
+	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
 func TestParseFileContent(t *testing.T) {
 	t.Run("It parses content header into a Post", func(t *testing.T) {
-		assertParsedContent(t, "title: Post Title\n--\n", posts.Post{Title: "Post Title"})
-		assertParsedContent(t, "author: Author Name\n--\n", posts.Post{Author: "Author Name"})
-		assertParsedContent(t, "time: 2021-04-04 22:00\n--\n", posts.Post{Time: toTime("2021-04-04T22:00:00Z")})
+		assertParsedContent(t, "title: Post Title\n--\n", blog.Post{Title: "Post Title"})
+		assertParsedContent(t, "author: Author Name\n--\n", blog.Post{Author: "Author Name"})
+		assertParsedContent(t, "time: 2021-04-04 22:00\n--\n", blog.Post{Time: toTime("2021-04-04T22:00:00Z")})
 		assertParsedContent(t, ""+
 			"title: Post Title\n"+
 			"author: Author Name\n"+
 			"time: 2021-04-04 22:00\n"+
 			"--\n",
-			posts.Post{
+			blog.Post{
 				Title:  "Post Title",
 				Author: "Author Name",
 				Time:   toTime("2021-04-04T22:00:00Z"),
@@ -30,7 +30,7 @@ func TestParseFileContent(t *testing.T) {
 		assertParsedContent(t, ""+
 			"--\n"+
 			"Content\n",
-			posts.Post{
+			blog.Post{
 				Content: "" +
 					"Content\n",
 			})
@@ -40,7 +40,7 @@ func TestParseFileContent(t *testing.T) {
 			"Only first separator is considered\n"+
 			"--\n"+
 			"After second separator\n",
-			posts.Post{
+			blog.Post{
 				Content: "" +
 					"Only first separator is considered\n" +
 					"--\n" +
@@ -60,7 +60,7 @@ func TestParseFileContent(t *testing.T) {
 			"Content\n"+
 			"--\n"+
 			"- list\n",
-			posts.Post{
+			blog.Post{
 				Title:  "Post Title",
 				Author: "Author Name",
 				Time:   toTime("2021-04-04T22:00:00Z"),
@@ -84,7 +84,7 @@ func TestParseFileContent(t *testing.T) {
 	})
 }
 
-func assertParsedContent(t *testing.T, content string, expectedPost posts.Post) {
+func assertParsedContent(t *testing.T, content string, expectedPost blog.Post) {
 	t.Helper()
 	post, err := filesystem.ParseFileContent(content)
 	assert.DeepEqual(t, expectedPost, post)
@@ -94,7 +94,7 @@ func assertParsedContent(t *testing.T, content string, expectedPost posts.Post) 
 func assertParseError(t *testing.T, content string, expectedError error) {
 	t.Helper()
 	post, err := filesystem.ParseFileContent(content)
-	assert.DeepEqual(t, posts.Post{}, post)
+	assert.DeepEqual(t, blog.Post{}, post)
 	assert.Equal(t, expectedError, err)
 }
 

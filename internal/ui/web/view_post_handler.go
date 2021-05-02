@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/geisonbiazus/blog/internal/core/posts"
+	"github.com/geisonbiazus/blog/internal/core/blog"
 )
 
 type ViewPostHandler struct {
@@ -28,7 +28,7 @@ func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	case nil:
 		res.WriteHeader(http.StatusOK)
 		h.template.Render(res, "view_post.html", h.toViewModel(renderedPost))
-	case posts.ErrPostNotFound:
+	case blog.ErrPostNotFound:
 		res.WriteHeader(http.StatusNotFound)
 		h.template.Render(res, "404.html", nil)
 	default:
@@ -37,7 +37,7 @@ func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	}
 }
 
-func (h *ViewPostHandler) toViewModel(p posts.RenderedPost) postViewModel {
+func (h *ViewPostHandler) toViewModel(p blog.RenderedPost) postViewModel {
 	return postViewModel{
 		Title:   p.Title,
 		Author:  p.Author,

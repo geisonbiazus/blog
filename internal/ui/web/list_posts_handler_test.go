@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/core/posts"
+	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/ui/web"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
@@ -32,7 +32,7 @@ func TestListPostsHandler(t *testing.T) {
 	t.Run("Given a list of posts exists it renders the posts", func(t *testing.T) {
 		f := setup()
 
-		f.usecase.ReturnPosts = []posts.Post{post2, post1}
+		f.usecase.ReturnPosts = []blog.Post{post2, post1}
 
 		res := doGetRequest(f.handler, "/index")
 		body := testhelper.ReadResponseBody(res)
@@ -55,7 +55,8 @@ func TestListPostsHandler(t *testing.T) {
 	})
 }
 
-func assertContainsListedPost(t *testing.T, body string, post posts.Post) {
+func assertContainsListedPost(t *testing.T, body string, post blog.Post) {
+	t.Helper()
 	assert.Contains(t, body, post.Title)
 	assert.Contains(t, body, post.Author)
 	assert.Contains(t, body, post.Time.Format(web.DateFormat))
@@ -63,22 +64,22 @@ func assertContainsListedPost(t *testing.T, body string, post posts.Post) {
 }
 
 type listPostUseCaseSpy struct {
-	ReturnPosts []posts.Post
+	ReturnPosts []blog.Post
 	ReturnError error
 }
 
-func (u *listPostUseCaseSpy) Run() ([]posts.Post, error) {
+func (u *listPostUseCaseSpy) Run() ([]blog.Post, error) {
 	return u.ReturnPosts, u.ReturnError
 }
 
-var post1 = posts.Post{
+var post1 = blog.Post{
 	Title:  "Test Post 1",
 	Author: "Geison Biazus",
 	Path:   "test-post-1",
 	Time:   testhelper.ParseTime("2021-04-05T18:47:00Z"),
 }
 
-var post2 = posts.Post{
+var post2 = blog.Post{
 	Title:  "Test Post 2",
 	Author: "Geison Biazus",
 	Path:   "test-post-2",

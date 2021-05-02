@@ -1,6 +1,6 @@
 package web
 
-import "github.com/geisonbiazus/blog/internal/core/posts"
+import "github.com/geisonbiazus/blog/internal/core/blog"
 
 type UseCases struct {
 	ViewPost  ViewPostUseCase
@@ -8,9 +8,9 @@ type UseCases struct {
 }
 
 type ViewPostUseCase interface {
-	Run(path string) (posts.RenderedPost, error)
+	Run(path string) (blog.RenderedPost, error)
 }
 
 type ListPostUseCase interface {
-	Run() ([]posts.Post, error)
+	Run() ([]blog.Post, error)
 }
