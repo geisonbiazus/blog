@@ -1,26 +1,24 @@
-package posts_test
+package blog_test
 
-import (
-	"github.com/geisonbiazus/blog/internal/core/posts"
-)
+import "github.com/geisonbiazus/blog/internal/core/blog"
 
 type PostRepoSpy struct {
 	ReceivedPath string
-	ReturnPost   posts.Post
-	ReturnPosts  []posts.Post
+	ReturnPost   blog.Post
+	ReturnPosts  []blog.Post
 	ReturnError  error
 }
 
 func NewPostRepoSpy() *PostRepoSpy {
-	return &PostRepoSpy{ReturnPosts: []posts.Post{}}
+	return &PostRepoSpy{ReturnPosts: []blog.Post{}}
 }
 
-func (r *PostRepoSpy) GetPostByPath(path string) (posts.Post, error) {
+func (r *PostRepoSpy) GetPostByPath(path string) (blog.Post, error) {
 	r.ReceivedPath = path
 	return r.ReturnPost, r.ReturnError
 }
 
-func (r *PostRepoSpy) GetAllPosts() ([]posts.Post, error) {
+func (r *PostRepoSpy) GetAllPosts() ([]blog.Post, error) {
 	return r.ReturnPosts, r.ReturnError
 }
 

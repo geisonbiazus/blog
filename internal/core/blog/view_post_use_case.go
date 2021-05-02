@@ -1,4 +1,4 @@
-package posts
+package blog
 
 type ViewPostUseCase struct {
 	postRepo PostRepo

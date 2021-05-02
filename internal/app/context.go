@@ -6,7 +6,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
-	"github.com/geisonbiazus/blog/internal/core/posts"
+	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/ui/web"
 	"github.com/geisonbiazus/blog/pkg/env"
 )
@@ -48,12 +48,12 @@ func (c *Context) UseCases() *web.UseCases {
 	}
 }
 
-func (c *Context) ViewPostUseCase() *posts.ViewPostUseCase {
-	return posts.NewVewPostUseCase(c.PostRepo(), c.Renderer())
+func (c *Context) ViewPostUseCase() *blog.ViewPostUseCase {
+	return blog.NewVewPostUseCase(c.PostRepo(), c.Renderer())
 }
 
-func (c *Context) ListPostsUseCase() *posts.ListPostsUseCase {
-	return posts.NewListPostsUseCase(c.PostRepo())
+func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
+	return blog.NewListPostsUseCase(c.PostRepo())
 }
 
 func (c *Context) PostRepo() *filesystem.PostRepo {

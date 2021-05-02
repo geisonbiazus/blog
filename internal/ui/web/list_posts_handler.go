@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/geisonbiazus/blog/internal/core/posts"
+	"github.com/geisonbiazus/blog/internal/core/blog"
 )
 
 type ListPostsHandler struct {
@@ -20,10 +20,10 @@ func NewListPostsHandler(usecase ListPostUseCase, templateRenderer *TemplateRend
 }
 
 func (h *ListPostsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	postList, err := h.usecase.Run()
+	posts, err := h.usecase.Run()
 
 	if err == nil {
-		models := h.toViewModelList(postList)
+		models := h.toViewModelList(posts)
 		w.WriteHeader(http.StatusOK)
 		h.template.Render(w, "list_posts.html", models)
 	} else {
@@ -32,18 +32,18 @@ func (h *ListPostsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *ListPostsHandler) toViewModelList(postList []posts.Post) []postListViewModel {
-	models := []postListViewModel{}
+func (h *ListPostsHandler) toViewModelList(posts []blog.Post) []postsViewModel {
+	models := []postsViewModel{}
 
-	for _, post := range postList {
+	for _, post := range posts {
 		models = append(models, h.toViewModel(post))
 	}
 
 	return models
 }
 
-func (h *ListPostsHandler) toViewModel(post posts.Post) postListViewModel {
-	return postListViewModel{
+func (h *ListPostsHandler) toViewModel(post blog.Post) postsViewModel {
+	return postsViewModel{
 		Title:  post.Title,
 		Author: post.Author,
 		Date:   post.Time.Format(DateFormat),
@@ -51,7 +51,7 @@ func (h *ListPostsHandler) toViewModel(post posts.Post) postListViewModel {
 	}
 }
 
-type postListViewModel struct {
+type postsViewModel struct {
 	Title  string
 	Path   string
 	Author string

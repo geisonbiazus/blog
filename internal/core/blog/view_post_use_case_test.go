@@ -1,16 +1,16 @@
-package posts_test
+package blog_test
 
 import (
 	"errors"
 	"testing"
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/core/posts"
+	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
 type viewPostUseCaseFixture struct {
-	usecase  *posts.ViewPostUseCase
+	usecase  *blog.ViewPostUseCase
 	repo     *PostRepoSpy
 	renderer *RendererSpy
 }
@@ -19,7 +19,7 @@ func TestViewPostUseCase(t *testing.T) {
 	setup := func() *viewPostUseCaseFixture {
 		repo := NewPostRepoSpy()
 		renderer := NewRendererSpy()
-		usecase := posts.NewVewPostUseCase(repo, renderer)
+		usecase := blog.NewVewPostUseCase(repo, renderer)
 
 		return &viewPostUseCaseFixture{
 			usecase:  usecase,
@@ -31,13 +31,13 @@ func TestViewPostUseCase(t *testing.T) {
 	t.Run("It returns error when post is not found", func(t *testing.T) {
 		f := setup()
 
-		f.repo.ReturnError = posts.ErrPostNotFound
+		f.repo.ReturnError = blog.ErrPostNotFound
 
 		body, err := f.usecase.Run("path")
 
 		assert.Equal(t, "path", f.repo.ReceivedPath)
-		assert.DeepEqual(t, posts.RenderedPost{}, body)
-		assert.Equal(t, posts.ErrPostNotFound, err)
+		assert.DeepEqual(t, blog.RenderedPost{}, body)
+		assert.Equal(t, blog.ErrPostNotFound, err)
 	})
 
 	t.Run("It returns the rendered post when post is found", func(t *testing.T) {
@@ -51,7 +51,7 @@ func TestViewPostUseCase(t *testing.T) {
 
 		assert.Equal(t, "path", f.repo.ReceivedPath)
 		assert.Equal(t, post.Content, f.renderer.ReceivedContent)
-		assert.DeepEqual(t, rennderedPost, posts.RenderedPost{
+		assert.DeepEqual(t, rennderedPost, blog.RenderedPost{
 			Title:   post.Title,
 			Author:  post.Author,
 			Time:    post.Time,
@@ -67,15 +67,15 @@ func TestViewPostUseCase(t *testing.T) {
 
 		rennderedPost, err := f.usecase.Run("path")
 		assert.Equal(t, "path", f.repo.ReceivedPath)
-		assert.DeepEqual(t, rennderedPost, posts.RenderedPost{})
+		assert.DeepEqual(t, rennderedPost, blog.RenderedPost{})
 		assert.Equal(t, f.renderer.ReturnError, err)
 	})
 }
 
-func newPost() posts.Post {
+func newPost() blog.Post {
 	postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
 
-	return posts.Post{
+	return blog.Post{
 		Title:   "Title",
 		Author:  "Author",
 		Time:    postTime,

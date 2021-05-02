@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/core/posts"
+	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/ui/web"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
@@ -47,7 +47,7 @@ func TestViewPostHandler(t *testing.T) {
 	t.Run("Given a wrong post path it responds with not found", func(t *testing.T) {
 		f := setup()
 
-		f.usecase.ReturnError = posts.ErrPostNotFound
+		f.usecase.ReturnError = blog.ErrPostNotFound
 
 		res := doGetRequest(f.handler, "/posts/post-path")
 		body := testhelper.ReadResponseBody(res)
@@ -71,8 +71,8 @@ func TestViewPostHandler(t *testing.T) {
 	})
 }
 
-func buildRenderedPost() posts.RenderedPost {
-	return posts.RenderedPost{
+func buildRenderedPost() blog.RenderedPost {
+	return blog.RenderedPost{
 		Title:   "post title",
 		Author:  "post author",
 		Time:    testhelper.ParseTime("2021-04-03T00:00:00+00:00"),
@@ -89,7 +89,7 @@ func doGetRequest(handler http.Handler, path string) *http.Response {
 	return rw.Result()
 }
 
-func assertContainsRenderedPost(t *testing.T, body string, renderedPost posts.RenderedPost) {
+func assertContainsRenderedPost(t *testing.T, body string, renderedPost blog.RenderedPost) {
 	assert.Contains(t, body, renderedPost.Title)
 	assert.Contains(t, body, renderedPost.Author)
 	assert.Contains(t, body, renderedPost.Time.Format(web.DateFormat))
@@ -98,11 +98,11 @@ func assertContainsRenderedPost(t *testing.T, body string, renderedPost posts.Re
 
 type viewPostUseCaseSpy struct {
 	ReceivedPath string
-	ReturnPost   posts.RenderedPost
+	ReturnPost   blog.RenderedPost
 	ReturnError  error
 }
 
-func (u *viewPostUseCaseSpy) Run(path string) (posts.RenderedPost, error) {
+func (u *viewPostUseCaseSpy) Run(path string) (blog.RenderedPost, error) {
 	u.ReceivedPath = path
 	return u.ReturnPost, u.ReturnError
 }

@@ -1,22 +1,22 @@
-package posts_test
+package blog_test
 
 import (
 	"errors"
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/core/posts"
+	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
 type listPostsUseCaseFixture struct {
-	usecase *posts.ListPostsUseCase
+	usecase *blog.ListPostsUseCase
 	repo    *PostRepoSpy
 }
 
 func TestTestListPostsUseCase(t *testing.T) {
 	setup := func() *listPostsUseCaseFixture {
 		repo := NewPostRepoSpy()
-		usecase := posts.NewListPostsUseCase(repo)
+		usecase := blog.NewListPostsUseCase(repo)
 		return &listPostsUseCaseFixture{
 			usecase: usecase,
 			repo:    repo,
@@ -28,19 +28,19 @@ func TestTestListPostsUseCase(t *testing.T) {
 
 		result, err := f.usecase.Run()
 
-		assert.DeepEqual(t, []posts.Post{}, result)
+		assert.DeepEqual(t, []blog.Post{}, result)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Given some posts, it returns them", func(t *testing.T) {
 		f := setup()
 
-		postList := []posts.Post{newPost()}
-		f.repo.ReturnPosts = postList
+		posts := []blog.Post{newPost()}
+		f.repo.ReturnPosts = posts
 
 		result, err := f.usecase.Run()
 
-		assert.DeepEqual(t, postList, result)
+		assert.DeepEqual(t, posts, result)
 		assert.Nil(t, err)
 	})
 
@@ -51,7 +51,7 @@ func TestTestListPostsUseCase(t *testing.T) {
 
 		result, err := f.usecase.Run()
 
-		assert.DeepEqual(t, []posts.Post{}, result)
+		assert.DeepEqual(t, []blog.Post{}, result)
 		assert.Equal(t, f.repo.ReturnError, err)
 	})
 }
