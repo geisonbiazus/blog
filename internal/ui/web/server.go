@@ -22,6 +22,8 @@ func NewServer(port int, router http.Handler, logger *log.Logger) *Server {
 
 func (s *Server) Start() error {
 	addr := fmt.Sprintf(":%v", s.Port)
+	logHandler := NewLogHandler(s.Logger, s.Router)
+
 	s.Logger.Printf("Starting server on port %v", s.Port)
-	return http.ListenAndServe(addr, s.Router)
+	return http.ListenAndServe(addr, logHandler)
 }
