@@ -6,3 +6,7 @@
   max-width: 100%;
   height: auto;
 }
+
+#post-content pre {
+  padding: 8px;
+}
