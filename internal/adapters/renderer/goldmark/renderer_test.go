@@ -15,6 +15,14 @@ func TestGoldmarkRenderer(t *testing.T) {
 		assert.Equal(t, sampleHTML, html)
 		assert.Nil(t, err)
 	})
+
+	t.Run("Given a code block, it highlights the syntax", func(t *testing.T) {
+		rend := goldmark.NewGoldmarkRenderer()
+
+		html, err := rend.Render(codeMarkdown)
+		assert.Equal(t, highlightedCodeHTML, html)
+		assert.Nil(t, err)
+	})
 }
 
 const sampleMarkdown = `# Title 1
@@ -74,3 +82,14 @@ But now with a line break in the middle.</p>
 <pre><code>Code Block
 </code></pre>
 `
+
+const codeMarkdown = "```go" + `
+func main() {
+	fmt.Println("Hello World")
+}
+` + "```"
+
+const highlightedCodeHTML = `<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello World&#34;</span>)
+}
+</pre>`
