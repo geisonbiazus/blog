@@ -1,7 +1,9 @@
 package app
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
@@ -28,7 +30,7 @@ func NewContext() *Context {
 }
 
 func (c *Context) WebServer() *web.Server {
-	return web.NewServer(c.Port, c.Router())
+	return web.NewServer(c.Port, c.Router(), c.Logger())
 }
 
 func (c *Context) Router() http.Handler {
@@ -62,4 +64,8 @@ func (c *Context) PostRepo() *filesystem.PostRepo {
 
 func (c *Context) Renderer() *goldmark.GoldmarkRenderer {
 	return goldmark.NewGoldmarkRenderer()
+}
+
+func (c *Context) Logger() *log.Logger {
+	return log.New(os.Stdout, "web: ", log.Ldate|log.Ltime|log.LUTC)
 }

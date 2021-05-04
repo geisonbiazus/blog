@@ -3,7 +3,6 @@ package web_test
 import (
 	"errors"
 	"net/http"
-	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -78,15 +77,6 @@ func buildRenderedPost() blog.RenderedPost {
 		Time:    testhelper.ParseTime("2021-04-03T00:00:00+00:00"),
 		Content: "<p>Content<p>",
 	}
-}
-
-func doGetRequest(handler http.Handler, path string) *http.Response {
-	req := httptest.NewRequest(http.MethodGet, path, nil)
-	rw := httptest.NewRecorder()
-
-	handler.ServeHTTP(rw, req)
-
-	return rw.Result()
 }
 
 func assertContainsRenderedPost(t *testing.T, body string, renderedPost blog.RenderedPost) {
