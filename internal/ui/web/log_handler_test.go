@@ -19,6 +19,20 @@ func TestLogHandler(t *testing.T) {
 
 		doGetRequest(logHandler, "/log-path")
 
-		assert.Equal(t, "GET /log-path 404\n", buf.String())
+		logHandler = web.NewLogHandler(logger, acceptedHandler())
+
+		doGetRequest(logHandler, "/another-path")
+
+		assert.Equal(t, ""+
+			`{"type":"request","method":"GET","path":"/log-path","status":404}`+"\n"+
+			`{"type":"request","method":"GET","path":"/another-path","status":202}`+"\n",
+			buf.String(),
+		)
+	})
+}
+
+func acceptedHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusAccepted)
 	})
 }

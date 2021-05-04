@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 )
@@ -15,9 +16,31 @@ func NewLogHandler(logger *log.Logger, handler http.Handler) *LogHandler {
 }
 
 func (h *LogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	loggingWritter := newLoggingResponseWriter(w)
-	h.Handler.ServeHTTP(loggingWritter, r)
-	h.Logger.Printf("%s %s %v", r.Method, r.URL.Path, loggingWritter.statusCode)
+	lw := newLoggingResponseWriter(w)
+	h.Handler.ServeHTTP(lw, r)
+	h.Logger.Println(h.createRequestLogEntry(lw, r))
+}
+
+func (h *LogHandler) createRequestLogEntry(lw *loggingResponseWriter, r *http.Request) string {
+	requestLog, err := json.Marshal(logEntry{
+		Type:   "request",
+		Method: r.Method,
+		Path:   r.URL.Path,
+		Status: lw.statusCode,
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	return string(requestLog)
+}
+
+type logEntry struct {
+	Type   string `json:"type"`
+	Method string `json:"method"`
+	Path   string `json:"path"`
+	Status int    `json:"status"`
 }
 
 type loggingResponseWriter struct {
