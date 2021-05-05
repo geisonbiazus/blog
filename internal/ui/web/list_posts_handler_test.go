@@ -73,15 +73,17 @@ func (u *listPostUseCaseSpy) Run() ([]blog.Post, error) {
 }
 
 var post1 = blog.Post{
-	Title:  "Test Post 1",
-	Author: "Geison Biazus",
-	Path:   "test-post-1",
-	Time:   testhelper.ParseTime("2021-04-05T18:47:00Z"),
+	Title:   "Test Post 1",
+	Author:  "Geison Biazus",
+	Path:    "test-post-1",
+	Time:    testhelper.ParseTime("2021-04-05T18:47:00Z"),
+	Content: "Content for post 1",
 }
 
 var post2 = blog.Post{
-	Title:  "Test Post 2",
-	Author: "Geison Biazus",
-	Path:   "test-post-2",
-	Time:   testhelper.ParseTime("2021-04-04T14:33:00Z"),
+	Title:   "Test Post 2",
+	Author:  "Geison Biazus",
+	Path:    "test-post-2",
+	Time:    testhelper.ParseTime("2021-04-04T14:33:00Z"),
+	Content: "Content for post 2",
 }
