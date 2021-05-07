@@ -1,6 +1,7 @@
 package web_test
 
 import (
+	"errors"
 	"net/http"
 	"regexp"
 	"testing"
@@ -53,6 +54,18 @@ func TestFeedPostsHandler(t *testing.T) {
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 		assert.Equal(t, "application/atom+xml", res.Header.Get("Content-Type"))
 		assertFeedEqual(t, expectedEmptyFeed, body)
+	})
+
+	t.Run("Given an error occurs on getting the posts it returns 500", func(t *testing.T) {
+		f := setup()
+
+		f.usecase.ReturnError = errors.New("any error")
+
+		res := doGetRequest(f.handler, "/feed.atom")
+		body := testhelper.ReadResponseBody(res)
+
+		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+		assert.Contains(t, body, "Internal server error")
 	})
 }
 

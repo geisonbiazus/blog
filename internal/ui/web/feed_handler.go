@@ -24,12 +24,29 @@ func NewFeedHandler(usecase ListPostUseCase, templateRenderer *TemplateRenderer,
 }
 
 func (h *FeedHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	posts, _ := h.usecase.Run()
+	posts, err := h.usecase.Run()
+
+	if err != nil {
+		h.renderServerError(w)
+	} else {
+		h.renderFeed(w, posts)
+	}
+}
+
+func (h *FeedHandler) renderServerError(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusInternalServerError)
+	h.template.Render(w, "500.html", nil)
+}
+
+func (h *FeedHandler) renderFeed(w http.ResponseWriter, posts []blog.Post) {
 	feed := h.buildFeed(posts)
 
 	w.Header().Add("Content-Type", "application/atom+xml")
 	w.WriteHeader(http.StatusOK)
-	feed.WriteAtom(w)
+
+	if err := feed.WriteAtom(w); err != nil {
+		panic(fmt.Sprintf("Something went wrong rendering the feed: %v", err))
+	}
 }
 
 func (h *FeedHandler) buildFeed(posts []blog.Post) *feeds.Feed {
