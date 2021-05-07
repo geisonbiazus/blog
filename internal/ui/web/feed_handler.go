@@ -51,7 +51,7 @@ func (h *FeedHandler) renderFeed(w http.ResponseWriter, posts []blog.Post) {
 
 func (h *FeedHandler) buildFeed(posts []blog.Post) *feeds.Feed {
 	return &feeds.Feed{
-		Title:       "Geison Biazus Blog",
+		Title:       "Geison Biazus",
 		Link:        &feeds.Link{Href: h.baseURL},
 		Description: "My personal blog about software development.",
 		Author:      &feeds.Author{Name: "Geison Biazus", Email: "geisonbiazus@gmail.com"},

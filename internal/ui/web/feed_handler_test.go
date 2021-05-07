@@ -81,7 +81,7 @@ func removeWhiteSpaces(source string) string {
 }
 
 var expectedFeed = `<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom">
-	<title>Geison Biazus Blog</title>
+	<title>Geison Biazus</title>
 	<id>http://example.com</id>
 	<updated>2021-04-04T14:33:00Z</updated>
 	<subtitle>My personal blog about software development.</subtitle>
@@ -115,7 +115,7 @@ var expectedFeed = `<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://ww
 </feed>`
 
 var expectedEmptyFeed = `<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom">
-	<title>Geison Biazus Blog</title>
+	<title>Geison Biazus</title>
 	<id>http://example.com</id>
 	<updated>2021-04-01T12:00:00Z</updated>
 	<subtitle>My personal blog about software development.</subtitle>
