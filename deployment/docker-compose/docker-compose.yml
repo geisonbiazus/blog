@@ -6,5 +6,6 @@ services:
     environment:
       VIRTUAL_HOST: blog.geisonbiazus.com
       LETSENCRYPT_HOST: blog.geisonbiazus.com
+      BASE_URL: https://blog.geisonbiazus.com
     ports:
       - 5000:3000

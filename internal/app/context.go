@@ -18,6 +18,7 @@ type Context struct {
 	TemplatePath string
 	StaticPath   string
 	PostPath     string
+	BaseURL      string
 }
 
 func NewContext() *Context {
@@ -26,6 +27,7 @@ func NewContext() *Context {
 		TemplatePath: env.GetString("TEMPLATE_PATH", filepath.Join("web", "template")),
 		StaticPath:   env.GetString("STATIC_PATH", filepath.Join("web", "static")),
 		PostPath:     env.GetString("POST_PATH", filepath.Join("posts")),
+		BaseURL:      env.GetString("BASE_URL", "http://localhost:3000"),
 	}
 }
 
@@ -34,7 +36,7 @@ func (c *Context) WebServer() *web.Server {
 }
 
 func (c *Context) Router() http.Handler {
-	router, err := web.NewRouter(c.TemplatePath, c.StaticPath, c.UseCases())
+	router, err := web.NewRouter(c.TemplatePath, c.StaticPath, c.UseCases(), c.BaseURL)
 
 	if err != nil {
 		panic(err)
@@ -55,7 +57,7 @@ func (c *Context) ViewPostUseCase() *blog.ViewPostUseCase {
 }
 
 func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
-	return blog.NewListPostsUseCase(c.PostRepo())
+	return blog.NewListPostsUseCase(c.PostRepo(), c.Renderer())
 }
 
 func (c *Context) PostRepo() *filesystem.PostRepo {

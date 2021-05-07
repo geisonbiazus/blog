@@ -20,16 +20,14 @@ func (u *ViewPostUseCase) Run(path string) (RenderedPost, error) {
 }
 
 func (u *ViewPostUseCase) renderPost(post Post) (RenderedPost, error) {
-	renderedContent, err := u.renderer.Render(post.Content)
+	renderedContent, err := u.renderer.Render(post.Markdown)
 
 	if err != nil {
 		return RenderedPost{}, err
 	}
 
 	return RenderedPost{
-		Title:   post.Title,
-		Author:  post.Author,
-		Time:    post.Time,
-		Content: renderedContent,
+		Post: post,
+		HTML: renderedContent,
 	}, nil
 }

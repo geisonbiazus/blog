@@ -72,18 +72,21 @@ func TestViewPostHandler(t *testing.T) {
 
 func buildRenderedPost() blog.RenderedPost {
 	return blog.RenderedPost{
-		Title:   "post title",
-		Author:  "post author",
-		Time:    testhelper.ParseTime("2021-04-03T00:00:00+00:00"),
-		Content: "<p>Content<p>",
+		Post: blog.Post{
+			Title:  "post title",
+			Author: "post author",
+			Path:   "post-path",
+			Time:   testhelper.ParseTime("2021-04-03T00:00:00+00:00"),
+		},
+		HTML: "<p>Content<p>",
 	}
 }
 
 func assertContainsRenderedPost(t *testing.T, body string, renderedPost blog.RenderedPost) {
-	assert.Contains(t, body, renderedPost.Title)
-	assert.Contains(t, body, renderedPost.Author)
-	assert.Contains(t, body, renderedPost.Time.Format(web.DateFormat))
-	assert.Contains(t, body, renderedPost.Content)
+	assert.Contains(t, body, renderedPost.Post.Title)
+	assert.Contains(t, body, renderedPost.Post.Author)
+	assert.Contains(t, body, renderedPost.Post.Time.Format(web.DateFormat))
+	assert.Contains(t, body, renderedPost.HTML)
 }
 
 type viewPostUseCaseSpy struct {
