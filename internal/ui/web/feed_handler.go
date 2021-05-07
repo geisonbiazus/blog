@@ -82,7 +82,7 @@ func (h *FeedHandler) buildFeedItems(posts []blog.RenderedPost) []*feeds.Item {
 func (h *FeedHandler) buildFeedItem(post blog.RenderedPost) *feeds.Item {
 	return &feeds.Item{
 		Title:   post.Post.Title,
-		Link:    &feeds.Link{Href: fmt.Sprintf("%s/%s", h.baseURL, post.Post.Path)},
+		Link:    &feeds.Link{Href: fmt.Sprintf("%s/posts/%s", h.baseURL, post.Post.Path)},
 		Content: post.HTML,
 		Author:  &feeds.Author{Name: post.Post.Author},
 		Created: post.Post.Time,

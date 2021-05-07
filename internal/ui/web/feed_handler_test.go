@@ -93,9 +93,9 @@ var expectedFeed = `<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://ww
 	<entry>
 		<title>Test Post 2</title>
 		<updated>2021-04-04T14:33:00Z</updated>
-		<id>tag:example.com,2021-04-04:/test-post-2</id>
+		<id>tag:example.com,2021-04-04:/posts/test-post-2</id>
 		<content type="html">Rendered content for post 2</content>
-		<link href="http://example.com/test-post-2" rel="alternate"></link>
+		<link href="http://example.com/posts/test-post-2" rel="alternate"></link>
 		<summary type="html"></summary>
 		<author>
 			<name>Geison Biazus</name>
@@ -104,9 +104,9 @@ var expectedFeed = `<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://ww
 	<entry>
 		<title>Test Post 1</title>
 		<updated>2021-04-05T18:47:00Z</updated>
-		<id>tag:example.com,2021-04-05:/test-post-1</id>
+		<id>tag:example.com,2021-04-05:/posts/test-post-1</id>
 		<content type="html">Rendered content for post 1</content>
-		<link href="http://example.com/test-post-1" rel="alternate"></link>
+		<link href="http://example.com/posts/test-post-1" rel="alternate"></link>
 		<summary type="html"></summary>
 		<author>
 			<name>Geison Biazus</name>
