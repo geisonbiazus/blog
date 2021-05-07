@@ -31,7 +31,7 @@ func TestParseFileContent(t *testing.T) {
 			"--\n"+
 			"Content\n",
 			blog.Post{
-				Content: "" +
+				Markdown: "" +
 					"Content\n",
 			})
 
@@ -41,7 +41,7 @@ func TestParseFileContent(t *testing.T) {
 			"--\n"+
 			"After second separator\n",
 			blog.Post{
-				Content: "" +
+				Markdown: "" +
 					"Only first separator is considered\n" +
 					"--\n" +
 					"After second separator\n",
@@ -64,7 +64,7 @@ func TestParseFileContent(t *testing.T) {
 				Title:  "Post Title",
 				Author: "Author Name",
 				Time:   toTime("2021-04-04T22:00:00Z"),
-				Content: "" +
+				Markdown: "" +
 					"## Subtitle\n" +
 					"\n" +
 					"Content\n" +

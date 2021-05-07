@@ -29,7 +29,7 @@ func (p *parser) parse() (blog.Post, error) {
 	header, body := p.splitHeaderAndBody()
 
 	p.parseHeader(header)
-	p.post.Content = body
+	p.post.Markdown = body
 
 	return p.post, p.err
 }

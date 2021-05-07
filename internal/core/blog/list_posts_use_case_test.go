@@ -23,12 +23,12 @@ func TestTestListPostsUseCase(t *testing.T) {
 		}
 	}
 
-	t.Run("Given not posts, it returns an empty slice", func(t *testing.T) {
+	t.Run("Given no post exists, it returns an empty slice", func(t *testing.T) {
 		f := setup()
 
-		result, err := f.usecase.Run()
+		posts, err := f.usecase.Run()
 
-		assert.DeepEqual(t, []blog.Post{}, result)
+		assert.DeepEqual(t, []blog.Post{}, posts)
 		assert.Nil(t, err)
 	})
 

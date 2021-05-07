@@ -89,24 +89,24 @@ var testPost1 = blog.Post{
 	Author: "Geison Biazus",
 	Path:   "test-post-1",
 	Time:   toTime("2021-04-05T18:47:00Z"),
-	Content: "" +
+	Markdown: "" +
 		"## Subtitle\n" +
 		"\n" +
 		"Content\n",
 }
 
 var testPost2 = blog.Post{
-	Title:   "Test Post 2",
-	Author:  "Geison Biazus",
-	Path:    "test-post-2",
-	Time:    toTime("2021-04-04T14:33:00Z"),
-	Content: "",
+	Title:    "Test Post 2",
+	Author:   "Geison Biazus",
+	Path:     "test-post-2",
+	Time:     toTime("2021-04-04T14:33:00Z"),
+	Markdown: "",
 }
 
 var testPost3 = blog.Post{
-	Title:   "Test Post 3",
-	Author:  "Geison Biazus",
-	Path:    "test-post-3",
-	Time:    toTime("2021-04-05T18:40:00Z"),
-	Content: "",
+	Title:    "Test Post 3",
+	Author:   "Geison Biazus",
+	Path:     "test-post-3",
+	Time:     toTime("2021-04-05T18:40:00Z"),
+	Markdown: "",
 }

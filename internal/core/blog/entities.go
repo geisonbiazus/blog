@@ -3,16 +3,14 @@ package blog
 import "time"
 
 type Post struct {
-	Title   string
-	Author  string
-	Time    time.Time
-	Path    string
-	Content string
+	Title    string
+	Author   string
+	Time     time.Time
+	Path     string
+	Markdown string
 }
 
 type RenderedPost struct {
-	Title   string
-	Author  string
-	Time    time.Time
-	Content string
+	Post Post
+	HTML string
 }

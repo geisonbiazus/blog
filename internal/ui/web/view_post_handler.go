@@ -39,10 +39,10 @@ func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 
 func (h *ViewPostHandler) toViewModel(p blog.RenderedPost) postViewModel {
 	return postViewModel{
-		Title:   p.Title,
-		Author:  p.Author,
-		Date:    p.Time.Format(DateFormat),
-		Content: template.HTML(p.Content),
+		Title:   p.Post.Title,
+		Author:  p.Post.Author,
+		Date:    p.Post.Time.Format(DateFormat),
+		Content: template.HTML(p.HTML),
 	}
 }
 
