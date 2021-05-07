@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   blog:
-    image: geisonbiazus/blog:39
+    image: geisonbiazus/blog:41
     restart: always
     environment:
       VIRTUAL_HOST: blog.geisonbiazus.com
