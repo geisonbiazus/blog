@@ -33,7 +33,7 @@ func TestFeedPostsHandler(t *testing.T) {
 	t.Run("Given a list of posts exists it returns the feed containing all posts", func(t *testing.T) {
 		f := setup()
 
-		f.usecase.ReturnPosts = []blog.Post{post2, post1}
+		f.usecase.ReturnPosts = []blog.RenderedPost{renderedPost2, renderedPost1}
 
 		res := doGetRequest(f.handler, "/feed.atom")
 		body := testhelper.ReadResponseBody(res)
@@ -46,7 +46,7 @@ func TestFeedPostsHandler(t *testing.T) {
 	t.Run("Given no post exists it returns the empty feed", func(t *testing.T) {
 		f := setup()
 
-		f.usecase.ReturnPosts = []blog.Post{}
+		f.usecase.ReturnPosts = []blog.RenderedPost{}
 
 		res := doGetRequest(f.handler, "/feed.atom")
 		body := testhelper.ReadResponseBody(res)
@@ -94,7 +94,7 @@ var expectedFeed = `<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://ww
 		<title>Test Post 2</title>
 		<updated>2021-04-04T14:33:00Z</updated>
 		<id>tag:example.com,2021-04-04:/test-post-2</id>
-		<content type="html">Content for post 2</content>
+		<content type="html">Rendered content for post 2</content>
 		<link href="http://example.com/test-post-2" rel="alternate"></link>
 		<summary type="html"></summary>
 		<author>
@@ -105,7 +105,7 @@ var expectedFeed = `<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://ww
 		<title>Test Post 1</title>
 		<updated>2021-04-05T18:47:00Z</updated>
 		<id>tag:example.com,2021-04-05:/test-post-1</id>
-		<content type="html">Content for post 1</content>
+		<content type="html">Rendered content for post 1</content>
 		<link href="http://example.com/test-post-1" rel="alternate"></link>
 		<summary type="html"></summary>
 		<author>

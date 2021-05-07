@@ -57,7 +57,7 @@ func (c *Context) ViewPostUseCase() *blog.ViewPostUseCase {
 }
 
 func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
-	return blog.NewListPostsUseCase(c.PostRepo())
+	return blog.NewListPostsUseCase(c.PostRepo(), c.Renderer())
 }
 
 func (c *Context) PostRepo() *filesystem.PostRepo {

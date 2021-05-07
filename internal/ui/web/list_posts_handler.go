@@ -32,7 +32,7 @@ func (h *ListPostsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *ListPostsHandler) toViewModelList(posts []blog.Post) []postsViewModel {
+func (h *ListPostsHandler) toViewModelList(posts []blog.RenderedPost) []postsViewModel {
 	models := []postsViewModel{}
 
 	for _, post := range posts {
@@ -42,12 +42,12 @@ func (h *ListPostsHandler) toViewModelList(posts []blog.Post) []postsViewModel {
 	return models
 }
 
-func (h *ListPostsHandler) toViewModel(post blog.Post) postsViewModel {
+func (h *ListPostsHandler) toViewModel(post blog.RenderedPost) postsViewModel {
 	return postsViewModel{
-		Title:  post.Title,
-		Author: post.Author,
-		Date:   post.Time.Format(DateFormat),
-		Path:   fmt.Sprintf("/posts/%s", post.Path),
+		Title:  post.Post.Title,
+		Author: post.Post.Author,
+		Date:   post.Post.Time.Format(DateFormat),
+		Path:   fmt.Sprintf("/posts/%s", post.Post.Path),
 	}
 }
 

@@ -38,7 +38,7 @@ func (h *FeedHandler) renderServerError(w http.ResponseWriter) {
 	h.template.Render(w, "500.html", nil)
 }
 
-func (h *FeedHandler) renderFeed(w http.ResponseWriter, posts []blog.Post) {
+func (h *FeedHandler) renderFeed(w http.ResponseWriter, posts []blog.RenderedPost) {
 	feed := h.buildFeed(posts)
 
 	w.Header().Add("Content-Type", "application/atom+xml")
@@ -49,7 +49,7 @@ func (h *FeedHandler) renderFeed(w http.ResponseWriter, posts []blog.Post) {
 	}
 }
 
-func (h *FeedHandler) buildFeed(posts []blog.Post) *feeds.Feed {
+func (h *FeedHandler) buildFeed(posts []blog.RenderedPost) *feeds.Feed {
 	return &feeds.Feed{
 		Title:       "Geison Biazus",
 		Link:        &feeds.Link{Href: h.baseURL},
@@ -60,16 +60,16 @@ func (h *FeedHandler) buildFeed(posts []blog.Post) *feeds.Feed {
 	}
 }
 
-func (h *FeedHandler) resolveUpdatedTime(posts []blog.Post) time.Time {
+func (h *FeedHandler) resolveUpdatedTime(posts []blog.RenderedPost) time.Time {
 	if len(posts) == 0 {
 		defaultTime, _ := time.Parse(time.RFC3339, "2021-04-01T12:00:00Z")
 		return defaultTime
 	}
 
-	return posts[0].Time
+	return posts[0].Post.Time
 }
 
-func (h *FeedHandler) buildFeedItems(posts []blog.Post) []*feeds.Item {
+func (h *FeedHandler) buildFeedItems(posts []blog.RenderedPost) []*feeds.Item {
 	items := []*feeds.Item{}
 
 	for _, post := range posts {
@@ -79,12 +79,12 @@ func (h *FeedHandler) buildFeedItems(posts []blog.Post) []*feeds.Item {
 	return items
 }
 
-func (h *FeedHandler) buildFeedItem(post blog.Post) *feeds.Item {
+func (h *FeedHandler) buildFeedItem(post blog.RenderedPost) *feeds.Item {
 	return &feeds.Item{
-		Title:   post.Title,
-		Link:    &feeds.Link{Href: fmt.Sprintf("%s/%s", h.baseURL, post.Path)},
-		Content: post.Markdown,
-		Author:  &feeds.Author{Name: post.Author},
-		Created: post.Time,
+		Title:   post.Post.Title,
+		Link:    &feeds.Link{Href: fmt.Sprintf("%s/%s", h.baseURL, post.Post.Path)},
+		Content: post.HTML,
+		Author:  &feeds.Author{Name: post.Post.Author},
+		Created: post.Post.Time,
 	}
 }

@@ -12,5 +12,5 @@ type ViewPostUseCase interface {
 }
 
 type ListPostUseCase interface {
-	Run() ([]blog.Post, error)
+	Run() ([]blog.RenderedPost, error)
 }
