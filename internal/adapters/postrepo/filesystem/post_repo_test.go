@@ -85,10 +85,12 @@ func TestPostRepo(t *testing.T) {
 }
 
 var testPost1 = blog.Post{
-	Title:  "Test Post 1",
-	Author: "Geison Biazus",
-	Path:   "test-post-1",
-	Time:   toTime("2021-04-05T18:47:00Z"),
+	Title:       "Test Post 1",
+	Author:      "Geison Biazus",
+	Path:        "test-post-1",
+	Description: "Description of post 1",
+	ImagePath:   "/post-image-1.png",
+	Time:        toTime("2021-04-05T18:47:00Z"),
 	Markdown: "" +
 		"## Subtitle\n" +
 		"\n" +
@@ -96,17 +98,21 @@ var testPost1 = blog.Post{
 }
 
 var testPost2 = blog.Post{
-	Title:    "Test Post 2",
-	Author:   "Geison Biazus",
-	Path:     "test-post-2",
-	Time:     toTime("2021-04-04T14:33:00Z"),
-	Markdown: "",
+	Title:       "Test Post 2",
+	Author:      "Geison Biazus",
+	Path:        "test-post-2",
+	Description: "Description of post 2",
+	ImagePath:   "/post-image-2.png",
+	Time:        toTime("2021-04-04T14:33:00Z"),
+	Markdown:    "",
 }
 
 var testPost3 = blog.Post{
-	Title:    "Test Post 3",
-	Author:   "Geison Biazus",
-	Path:     "test-post-3",
-	Time:     toTime("2021-04-05T18:40:00Z"),
-	Markdown: "",
+	Title:       "Test Post 3",
+	Author:      "Geison Biazus",
+	Path:        "test-post-3",
+	Description: "Description of post 3",
+	ImagePath:   "/post-image-3.png",
+	Time:        toTime("2021-04-05T18:40:00Z"),
+	Markdown:    "",
 }

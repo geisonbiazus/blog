@@ -13,16 +13,22 @@ func TestParseFileContent(t *testing.T) {
 	t.Run("It parses content header into a Post", func(t *testing.T) {
 		assertParsedContent(t, "title: Post Title\n--\n", blog.Post{Title: "Post Title"})
 		assertParsedContent(t, "author: Author Name\n--\n", blog.Post{Author: "Author Name"})
+		assertParsedContent(t, "description: Post description\n--\n", blog.Post{Description: "Post description"})
+		assertParsedContent(t, "image_path: /image.png\n--\n", blog.Post{ImagePath: "/image.png"})
 		assertParsedContent(t, "time: 2021-04-04 22:00\n--\n", blog.Post{Time: toTime("2021-04-04T22:00:00Z")})
 		assertParsedContent(t, ""+
 			"title: Post Title\n"+
 			"author: Author Name\n"+
+			"description: Description\n"+
+			"image_path: /image.png\n"+
 			"time: 2021-04-04 22:00\n"+
 			"--\n",
 			blog.Post{
-				Title:  "Post Title",
-				Author: "Author Name",
-				Time:   toTime("2021-04-04T22:00:00Z"),
+				Title:       "Post Title",
+				Author:      "Author Name",
+				Description: "Description",
+				ImagePath:   "/image.png",
+				Time:        toTime("2021-04-04T22:00:00Z"),
 			})
 	})
 
@@ -53,6 +59,8 @@ func TestParseFileContent(t *testing.T) {
 		assertParsedContent(t, ""+
 			"title: Post Title\n"+
 			"author: Author Name\n"+
+			"description: Description\n"+
+			"image_path: /image.png\n"+
 			"time: 2021-04-04 22:00\n"+
 			"--\n"+
 			"## Subtitle\n"+
@@ -61,9 +69,11 @@ func TestParseFileContent(t *testing.T) {
 			"--\n"+
 			"- list\n",
 			blog.Post{
-				Title:  "Post Title",
-				Author: "Author Name",
-				Time:   toTime("2021-04-04T22:00:00Z"),
+				Title:       "Post Title",
+				Author:      "Author Name",
+				Description: "Description",
+				ImagePath:   "/image.png",
+				Time:        toTime("2021-04-04T22:00:00Z"),
 				Markdown: "" +
 					"## Subtitle\n" +
 					"\n" +

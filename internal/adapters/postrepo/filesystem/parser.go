@@ -53,6 +53,8 @@ func (p *parser) parseHeader(header string) {
 	for _, line := range lines {
 		p.parseTitle(line)
 		p.parseAuthor(line)
+		p.parseDescription(line)
+		p.parseImagePath(line)
 		p.parsePostTime(line)
 	}
 }
@@ -66,6 +68,18 @@ func (p *parser) parseTitle(content string) {
 func (p *parser) parseAuthor(content string) {
 	if author := p.parseString(content, "author:"); author != "" {
 		p.post.Author = author
+	}
+}
+
+func (p *parser) parseDescription(content string) {
+	if description := p.parseString(content, "description:"); description != "" {
+		p.post.Description = description
+	}
+}
+
+func (p *parser) parseImagePath(content string) {
+	if image_path := p.parseString(content, "image_path:"); image_path != "" {
+		p.post.ImagePath = image_path
 	}
 }
 
