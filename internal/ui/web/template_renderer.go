@@ -1,22 +1,27 @@
 package web
 
 import (
-	"fmt"
 	"html/template"
 	"io"
+	"path/filepath"
 )
 
 type TemplateRenderer struct {
-	path string
-	tmpl *template.Template
+	basePath string
+	tmpl     *template.Template
 }
 
 func NewTemplateRenderer(basePath string) (*TemplateRenderer, error) {
-	path := fmt.Sprintf("%s/*", basePath)
-	tmpl, err := template.ParseGlob(path)
-	return &TemplateRenderer{tmpl: tmpl, path: path}, err
+	tmpl, err := template.ParseFiles(filepath.Join(basePath, "layout.html"))
+	return &TemplateRenderer{tmpl: tmpl, basePath: basePath}, err
 }
 
 func (r *TemplateRenderer) Render(writer io.Writer, templateName string, data interface{}) {
-	r.tmpl.ExecuteTemplate(writer, templateName, data)
+	tmpl, err := template.ParseFiles(filepath.Join(r.basePath, "layout.html"), filepath.Join(r.basePath, templateName))
+
+	if err != nil {
+		panic(err)
+	}
+
+	tmpl.Execute(writer, data)
 }

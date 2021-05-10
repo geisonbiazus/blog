@@ -87,8 +87,9 @@ func buildRenderedPost() blog.RenderedPost {
 func assertContainsRenderedPost(t *testing.T, body string, renderedPost blog.RenderedPost) {
 	assert.Contains(t, body, renderedPost.Post.Title)
 	assert.Contains(t, body, renderedPost.Post.Author)
-	// assert.Contains(t, body, renderedPost.Post.Description)
-	// assert.Contains(t, body, renderedPost.Post.ImagePath)
+	assert.Contains(t, body, renderedPost.Post.Description)
+	assert.Contains(t, body, renderedPost.Post.ImagePath)
+	assert.Contains(t, body, renderedPost.Post.Path)
 	assert.Contains(t, body, renderedPost.Post.Time.Format(web.DateFormat))
 	assert.Contains(t, body, renderedPost.HTML)
 }

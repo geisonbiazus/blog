@@ -1,5 +1,4 @@
-{{template "header"}}
-
+{{define "content"}}
 <h1 class="mb-3">All posts</h1>
 
 {{ range . }}
@@ -9,5 +8,4 @@
   <span class="fs-6 text-muted fst-italic">{{ .Author }}</span><br>
 </p>
 {{ end }}
-
-{{template "footer"}}
+{{end}}

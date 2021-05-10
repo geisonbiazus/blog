@@ -1,4 +1,12 @@
-{{template "header"}}
+{{define "head"}}
+<meta property="og:url" content="{{.Path}}" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="{{.Title}}" />
+<meta property="og:description" content="{{.Description}}" />
+<meta property="og:image" content="{{.ImagePath}}" />
+{{end}}
+
+{{define "content"}}
 <h1 class="mb-0">{{ .Title }}</h1>
 <span class="fs-6 text-muted">{{ .Date }} - </span>
 <span class="fs-6 text-muted fst-italic">{{ .Author }}</span><br>
@@ -6,4 +14,4 @@
 <div class="mt-3" id="post-content">
   {{.Content}}
 </div>
-{{template "footer"}}
+{{end}}
