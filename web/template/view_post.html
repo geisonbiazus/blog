@@ -1,9 +1,9 @@
 {{define "head"}}
-<meta property="og:url" content="{{.Path}}" />
+<meta property="og:url" content="{{urlFor .Path}}" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="{{.Title}}" />
 <meta property="og:description" content="{{.Description}}" />
-<meta property="og:image" content="{{.ImagePath}}" />
+<meta property="og:image" content="{{urlFor .ImagePath}}" />
 {{end}}
 
 {{define "content"}}

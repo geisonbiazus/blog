@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"path/filepath"
@@ -8,17 +9,16 @@ import (
 
 type TemplateRenderer struct {
 	basePath        string
-	tmpl            *template.Template
+	baseURL         string
 	cachedTemplates map[string]*template.Template
 }
 
-func NewTemplateRenderer(basePath string) (*TemplateRenderer, error) {
-	tmpl, err := template.ParseFiles(filepath.Join(basePath, "layout.html"))
+func NewTemplateRenderer(basePath, baseURL string) *TemplateRenderer {
 	return &TemplateRenderer{
-		tmpl:            tmpl,
 		basePath:        basePath,
+		baseURL:         baseURL,
 		cachedTemplates: map[string]*template.Template{},
-	}, err
+	}
 }
 
 func (r *TemplateRenderer) Render(writer io.Writer, templateName string, data interface{}) {
@@ -34,11 +34,11 @@ func (r *TemplateRenderer) resolveTemplate(name string) *template.Template {
 		r.cachedTemplates[name] = tmpl
 	}
 
-	return tmpl
+	return tmpl.Lookup("layout.html")
 }
 
 func (r *TemplateRenderer) parseTemplate(name string) *template.Template {
-	tmpl, err := template.ParseFiles(
+	tmpl, err := template.New("template").Funcs(r.templateFuncs()).ParseFiles(
 		filepath.Join(r.basePath, "layout.html"),
 		filepath.Join(r.basePath, name),
 	)
@@ -48,4 +48,14 @@ func (r *TemplateRenderer) parseTemplate(name string) *template.Template {
 	}
 
 	return tmpl
+}
+
+func (r *TemplateRenderer) templateFuncs() template.FuncMap {
+	return template.FuncMap{
+		"urlFor": r.urlFor,
+	}
+}
+
+func (r *TemplateRenderer) urlFor(path string) string {
+	return fmt.Sprintf("%s%s", r.baseURL, path)
 }

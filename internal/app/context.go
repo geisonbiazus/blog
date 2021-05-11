@@ -36,13 +36,7 @@ func (c *Context) WebServer() *web.Server {
 }
 
 func (c *Context) Router() http.Handler {
-	router, err := web.NewRouter(c.TemplatePath, c.StaticPath, c.UseCases(), c.BaseURL)
-
-	if err != nil {
-		panic(err)
-	}
-
-	return router
+	return web.NewRouter(c.TemplatePath, c.StaticPath, c.UseCases(), c.BaseURL)
 }
 
 func (c *Context) UseCases() *web.UseCases {

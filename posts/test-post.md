@@ -1,5 +1,7 @@
 title: Lorem Ipsum
 author: Geison Biazus
+description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+image_path: /static/image/sample-image.jpg
 time: 2021-04-21 22:37
 --
 
