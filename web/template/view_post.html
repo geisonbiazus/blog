@@ -13,26 +13,24 @@
 
 
 <style>
+  #social-media-buttons,
   .social-media-share {
     display: inline-block;
+    /* font-size: initial; */
+    /* line-height: initial; */
   }
 </style>
 
 <div id="social-media-buttons">
-  <div id="facebook-share" class="social-media-share">
-    <div class="fb-share-button" data-href="https://www.your-domain.com/your-page.html" data-layout="button_count">
-    </div>
-  </div>
+  Share on:
 
-  <div id="twitter-share" class="social-media-share">
-    <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button"
-      data-show-count="false">Tweet</a>
-  </div>
-
-  <div id="linkedin-share" class="social-media-share">
-    <script type="IN/Share" data-url="{{urlFor .Path}}"></script>
-  </div>
-
+  <a target="_blank" href="http://www.facebook.com/sharer/sharer.php?u={{urlFor .Path}}&title={{ .Title}}">Facebook</a>
+  |
+  <a target="_blank"
+    href="http://twitter.com/intent/tweet?original_referer={{urlFor .Path}}&text={{ .Title}}&url={{urlFor .Path}}">Twitter</a>
+  |
+  <a target="_blank"
+    href="http://www.linkedin.com/shareArticle?mini=true&url={{urlFor .Path}}&title={{ .Title}}">LinkedIn</a>
 </div>
 
 

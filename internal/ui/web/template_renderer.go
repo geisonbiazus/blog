@@ -31,7 +31,7 @@ func (r *TemplateRenderer) resolveTemplate(name string) *template.Template {
 
 	if !ok {
 		tmpl = r.parseTemplate(name)
-		r.cachedTemplates[name] = tmpl
+		// r.cachedTemplates[name] = tmpl
 	}
 
 	return tmpl.Lookup("layout.html")
