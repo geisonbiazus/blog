@@ -2,6 +2,7 @@ package web_test
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"testing"
@@ -73,10 +74,12 @@ func TestViewPostHandler(t *testing.T) {
 func buildRenderedPost() blog.RenderedPost {
 	return blog.RenderedPost{
 		Post: blog.Post{
-			Title:  "post title",
-			Author: "post author",
-			Path:   "post-path",
-			Time:   testhelper.ParseTime("2021-04-03T00:00:00+00:00"),
+			Title:       "post title",
+			Author:      "post author",
+			Path:        "post-path",
+			Description: "post description",
+			ImagePath:   "/static/image/post.png",
+			Time:        testhelper.ParseTime("2021-04-03T00:00:00+00:00"),
 		},
 		HTML: "<p>Content<p>",
 	}
@@ -85,6 +88,9 @@ func buildRenderedPost() blog.RenderedPost {
 func assertContainsRenderedPost(t *testing.T, body string, renderedPost blog.RenderedPost) {
 	assert.Contains(t, body, renderedPost.Post.Title)
 	assert.Contains(t, body, renderedPost.Post.Author)
+	assert.Contains(t, body, renderedPost.Post.Description)
+	assert.Contains(t, body, fmt.Sprintf("http://example.com%s", renderedPost.Post.ImagePath))
+	assert.Contains(t, body, fmt.Sprintf("http://example.com/posts/%s", renderedPost.Post.Path))
 	assert.Contains(t, body, renderedPost.Post.Time.Format(web.DateFormat))
 	assert.Contains(t, body, renderedPost.HTML)
 }

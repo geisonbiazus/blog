@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -39,16 +40,22 @@ func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 
 func (h *ViewPostHandler) toViewModel(p blog.RenderedPost) postViewModel {
 	return postViewModel{
-		Title:   p.Post.Title,
-		Author:  p.Post.Author,
-		Date:    p.Post.Time.Format(DateFormat),
-		Content: template.HTML(p.HTML),
+		Title:       p.Post.Title,
+		Author:      p.Post.Author,
+		Description: p.Post.Description,
+		ImagePath:   p.Post.ImagePath,
+		Path:        fmt.Sprintf("/posts/%s", p.Post.Path),
+		Date:        p.Post.Time.Format(DateFormat),
+		Content:     template.HTML(p.HTML),
 	}
 }
 
 type postViewModel struct {
-	Title   string
-	Author  string
-	Date    string
-	Content template.HTML
+	Title       string
+	Author      string
+	Date        string
+	Description string
+	ImagePath   string
+	Path        string
+	Content     template.HTML
 }

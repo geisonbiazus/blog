@@ -51,7 +51,7 @@ func TestViewPostUseCase(t *testing.T) {
 
 		assert.Equal(t, "path", f.repo.ReceivedPath)
 		assert.Equal(t, post.Markdown, f.renderer.ReceivedContent)
-		assert.DeepEqual(t, rennderedPost, blog.RenderedPost{
+		assert.Equal(t, rennderedPost, blog.RenderedPost{
 			Post: post,
 			HTML: "Rendered content",
 		})
@@ -65,7 +65,7 @@ func TestViewPostUseCase(t *testing.T) {
 
 		rennderedPost, err := f.usecase.Run("path")
 		assert.Equal(t, "path", f.repo.ReceivedPath)
-		assert.DeepEqual(t, rennderedPost, blog.RenderedPost{})
+		assert.Equal(t, rennderedPost, blog.RenderedPost{})
 		assert.Equal(t, f.renderer.ReturnError, err)
 	})
 }
@@ -74,10 +74,12 @@ func newPost() blog.Post {
 	postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
 
 	return blog.Post{
-		Title:    "Title",
-		Author:   "Author",
-		Time:     postTime,
-		Path:     "path",
-		Markdown: "content",
+		Title:       "Title",
+		Author:      "Author",
+		Time:        postTime,
+		Path:        "path",
+		Description: "Description",
+		ImagePath:   "/image.png",
+		Markdown:    "content",
 	}
 }

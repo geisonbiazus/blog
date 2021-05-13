@@ -10,11 +10,8 @@ import (
 
 func newTestTemplateRenderer() *web.TemplateRenderer {
 	templatePath := filepath.Join("..", "..", "..", "web", "template")
-	templateRenderer, err := web.NewTemplateRenderer(templatePath)
-
-	if err != nil {
-		panic(err)
-	}
+	baseURL := "http://example.com"
+	templateRenderer := web.NewTemplateRenderer(templatePath, baseURL)
 
 	return templateRenderer
 }

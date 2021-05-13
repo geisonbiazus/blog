@@ -4,12 +4,8 @@ import (
 	"net/http"
 )
 
-func NewRouter(templatePath, staticFilesPath string, usecases *UseCases, baseURL string) (http.Handler, error) {
-	templateRenderer, err := NewTemplateRenderer(templatePath)
-
-	if err != nil {
-		return nil, err
-	}
+func NewRouter(templatePath, staticFilesPath string, usecases *UseCases, baseURL string) http.Handler {
+	templateRenderer := NewTemplateRenderer(templatePath, baseURL)
 
 	mux := http.NewServeMux()
 
@@ -19,5 +15,5 @@ func NewRouter(templatePath, staticFilesPath string, usecases *UseCases, baseURL
 	mux.Handle("/feed.atom", NewFeedHandler(usecases.ListPosts, templateRenderer, baseURL))
 	mux.Handle("/", NewTemplateHandler(templateRenderer, "home.html"))
 
-	return mux, nil
+	return mux
 }

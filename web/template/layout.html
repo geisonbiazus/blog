@@ -15,9 +15,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
   <link href="/static/styles.css" rel="stylesheet">
   <link rel="alternate" type="application/atom+xml" title="blog.geisonbiazus.com - Atom Feed"
-    href="https://blog.geisonbiazus.com/feed.atom">
+    href='{{urlFor "/feed.atom"}}'>
 
-  <title>Geison Biazus Blog</title>
+  {{block "title" .}}
+  <title>Geison Biazus</title>
+  {{end}}
+
+  {{block "head" .}}
+  {{end}}
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-6Z73KMVHLK"></script>
@@ -74,7 +79,7 @@
   </nav>
 
   <div class="container blog-container pt-3">
-    {{ . }}
+    {{template "content" .}}
   </div>
 
   <script>
