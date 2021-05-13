@@ -17,7 +17,9 @@
   <link rel="alternate" type="application/atom+xml" title="blog.geisonbiazus.com - Atom Feed"
     href='{{urlFor "/feed.atom"}}'>
 
-  <title>Geison Biazus Blog</title>
+  {{block "title" .}}
+  <title>Geison Biazus</title>
+  {{end}}
 
   {{block "head" .}}
   {{end}}
