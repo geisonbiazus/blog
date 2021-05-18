@@ -8,13 +8,13 @@ import (
 	highlighting "github.com/yuin/goldmark-highlighting"
 )
 
-type GoldmarkRenderer struct{}
+type Renderer struct{}
 
-func NewGoldmarkRenderer() *GoldmarkRenderer {
-	return &GoldmarkRenderer{}
+func NewRenderer() *Renderer {
+	return &Renderer{}
 }
 
-func (r *GoldmarkRenderer) Render(content string) (string, error) {
+func (r *Renderer) Render(content string) (string, error) {
 	var buf bytes.Buffer
 
 	markdown := goldmark.New(

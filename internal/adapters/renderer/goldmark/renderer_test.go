@@ -9,7 +9,7 @@ import (
 
 func TestGoldmarkRenderer(t *testing.T) {
 	t.Run("Given a markdown string, it converts to HTML", func(t *testing.T) {
-		rend := goldmark.NewGoldmarkRenderer()
+		rend := goldmark.NewRenderer()
 
 		html, err := rend.Render(sampleMarkdown)
 		assert.Equal(t, sampleHTML, html)
@@ -17,7 +17,7 @@ func TestGoldmarkRenderer(t *testing.T) {
 	})
 
 	t.Run("Given a code block, it highlights the syntax", func(t *testing.T) {
-		rend := goldmark.NewGoldmarkRenderer()
+		rend := goldmark.NewRenderer()
 
 		html, err := rend.Render(codeMarkdown)
 		assert.Equal(t, highlightedCodeHTML, html)
