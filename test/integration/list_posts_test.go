@@ -13,7 +13,7 @@ func TestListPostsIntegration(t *testing.T) {
 		server := newServer()
 		defer server.Close()
 
-		res, _ := http.Get(server.URL + "/posts")
+		res, _ := http.Get(server.URL + "/")
 
 		body := testhelper.ReadResponseBody(res)
 

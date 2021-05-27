@@ -13,7 +13,7 @@ func TestHomeIntegration(t *testing.T) {
 		server := newServer()
 		defer server.Close()
 
-		res, _ := http.Get(server.URL)
+		res, _ := http.Get(server.URL + "/about")
 
 		body := testhelper.ReadResponseBody(res)
 
