@@ -18,7 +18,7 @@ In this post, I show how I built this [Blog](https://blog.geisonbiazus.com) usin
 
 ![Architecture](/static/image/architecture.png)
 
-There are four main kinds of layers: Core, Adapters, User Interface, and Main. They are reflected as folders inside of the `internal` folder of the application source code. You can see the explanation of each one above.
+There are four main kinds of layers: Core, Adapters, User Interface, and Main. You can see the explanation of each one above.
 
 ### Core
 
@@ -36,7 +36,7 @@ A common behavior found in the core is that a `use case` is called by another la
 
 ### Adapters
 
-Each adapter implements a port interface used by the core. Any external dependency, that being a library, a framework, an external API, or a database, goes to an adapter. The adapter is the low-level detail that the high-level policy (use case) manipulates. This structure allows us to have multiple adapters for the same port, it also allows us to extend the behavior of the adapter by using design patterns like Composite or Decorator patterns.
+Each adapter implements a port interface used by the core. Any external dependency, that being a library, a framework, an external API, or a database, goes to an adapter. The adapter is the low-level detail that the high-level policy (use case) manipulates. This structure allows us to have multiple adapters for the same port, it also allows us to extend the behavior of the adapter by using design patterns like Composite or Decorator.
 
 ### User interface
 
@@ -44,11 +44,11 @@ The UI layer is where the interaction of the user goes. Inside of this layer, yo
 
 ### Main (app)
 
-The "Main" layer is where all the wiring goes. This layer knows everything about the other layers and knows how to initialize all components with the correct dependencies. Due to the `main` package being a reserved package name in go, this layer was called `app` in the blog implementation.
+The "Main" layer is where all the wiring goes. This layer knows everything about the other layers and knows how to initialize all components with the correct dependencies. Due to the `main` package being a reserved package name in Go, this layer was called `app` in the blog implementation.
 
 ## The Blog project
 
-The way the Blog project works is the following: Posts are written in the [Markdown](https://en.wikipedia.org/wiki/Markdown) format and they are stored as text files in the `/posts` directory. Whenever a request for a specific post comes through the web server, the post file is loaded and parsed, the Markdown content is converted to HTML, then the result is returned to the user.
+The way the Blog project works is the following: Posts are written in the [Markdown](https://en.wikipedia.org/wiki/Markdown) format and are stored as text files in the `/posts` directory. Whenever a request for a specific post comes through the web server, the post file is loaded and parsed, the Markdown content is converted to HTML, then the result is returned to the user.
 
 The post file has the following format:
 
@@ -64,7 +64,7 @@ time: 2021-04-21 22:37
 
 ## Implementation
 
-The project has been implemented using Test Driven Development but the tests as well some parts of the code are omitted from this post for the sake of simplicity. You can find the full source code as well as the tests on the [blog repository](https://github.com/geisonbiazus/blog) on GitHub.
+The project has been implemented using Test Driven Development but the tests as well as some parts of the code are omitted from this post for simplicity. You can find the full source code on the [blog repository](https://github.com/geisonbiazus/blog) on GitHub.
 
 In this post, I show you the implementation of the **View Post** use case through all the layers. Other use cases follow a similar structure and the code can be seen in the GitHub repository.
 
@@ -86,7 +86,7 @@ The current folders are:
 
 Whenever I start implementing any feature, I always start with a use case. The use cases go in the core layer inside of the components they belong. As this application is small enough there is only one component called `blog`.
 
-The use case always implements the high-level policy of the feature leaving the low-level details for the adapters plugged in the ports. Every use case has the format of a struct (class) with a Run method. The struct holds the dependencies while the request arguments are passed directly in the Run function. Here is the implementation of the `blog.ViewPostUseCase`:
+The use case always implements the high-level policy of the feature leaving the low-level details for the adapters plugged in the ports. Every use case has the format of a struct (class) with a `Run` method. The struct holds the dependencies while the request arguments are passed directly in the `Run` method. Here is the implementation of the `blog.ViewPostUseCase`:
 
 ```go
 // internal/blog/view_post_use_case.go
@@ -178,7 +178,7 @@ type Renderer interface {
 
 ### Adapters
 
-Adapters are the low-level details controlled by the use cases. They are stored in the following directory structure: `internal/adapters/PORT/ADAPTER_TYPE` where `PORT` is the name of the port it implements and `ADAPTER_TYPE` is the type of adapter for that port. In this case, we have a `FileSystem` adapter for the `PostRepo` port and a `Goldmark` for the `Renderer` adapter, the last being named after the name Markdown library it "adapts".
+Adapters are the low-level details controlled by the use cases. They are stored in the following directory structure: `internal/adapters/PORT/ADAPTER_TYPE` where `PORT` is the name of the port it implements and `ADAPTER_TYPE` is the type of adapter for that port. In this case, we have a `FileSystem` adapter for the `PostRepo` port and a `Goldmark` adapter for the `Renderer` port, the last being named after the name Markdown library it "adapts".
 
 Starting with the `PostRepo` the implementation is the following:
 
@@ -265,7 +265,7 @@ func (r *Renderer) Render(content string) (string, error) {
 }
 ```
 
-Similar to the post repository, the `goldmark.Renderer` module implements the `blog.Renderer` interface. It abstracts away from the use case of how the markdown is converted to HTML. The [goldmark](https://github.com/yuin/goldmark) library is used for that.
+Similar to the post repository, the `goldmark.Renderer` struct implements the `blog.Renderer` interface. It abstracts away from the use case of how the markdown is converted to HTML. The [goldmark](https://github.com/yuin/goldmark) library is used for that.
 
 Note that this file is the only place that the `goldmark` library is used or mentioned. This makes extending the behavior or replacing the library simpler when evolving the project. This is the great benefit of the adapters.
 
@@ -372,7 +372,7 @@ The [template renderer](https://github.com/geisonbiazus/blog/blob/main/internal/
 Having all these layers and components implemented, what is missing is just to put all the pieces together. The goal of the `app` layer is to provide this wiring. This component knows every other component and understands which dependency goes to each component. Here is the implementation:
 
 ```go
-// internal//app/context.go
+// internal/app/context.go
 
 package app
 
