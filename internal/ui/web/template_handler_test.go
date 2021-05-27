@@ -12,7 +12,7 @@ import (
 func TestTemplateHandler(t *testing.T) {
 	t.Run("It renders the template with the given name", func(t *testing.T) {
 		templateRenderer := newTestTemplateRenderer()
-		handler := web.NewTemplateHandler(templateRenderer, "home.html")
+		handler := web.NewTemplateHandler(templateRenderer, "about.html")
 
 		res := doGetRequest(handler, "/")
 		body := testhelper.ReadResponseBody(res)

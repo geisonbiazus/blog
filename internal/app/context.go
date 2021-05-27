@@ -58,8 +58,8 @@ func (c *Context) PostRepo() *filesystem.PostRepo {
 	return filesystem.NewPostRepo(c.PostPath)
 }
 
-func (c *Context) Renderer() *goldmark.GoldmarkRenderer {
-	return goldmark.NewGoldmarkRenderer()
+func (c *Context) Renderer() *goldmark.Renderer {
+	return goldmark.NewRenderer()
 }
 
 func (c *Context) Logger() *log.Logger {
