@@ -1,6 +1,9 @@
 package blog
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type Post struct {
 	Title       string
@@ -16,3 +19,5 @@ type RenderedPost struct {
 	Post Post
 	HTML string
 }
+
+var ErrPostNotFound = errors.New("post not found")

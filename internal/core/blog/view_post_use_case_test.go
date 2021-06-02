@@ -33,10 +33,10 @@ func TestViewPostUseCase(t *testing.T) {
 
 		f.repo.ReturnError = blog.ErrPostNotFound
 
-		body, err := f.usecase.Run("path")
+		renderedPost, err := f.usecase.Run("path")
 
 		assert.Equal(t, "path", f.repo.ReceivedPath)
-		assert.DeepEqual(t, blog.RenderedPost{}, body)
+		assert.DeepEqual(t, blog.RenderedPost{}, renderedPost)
 		assert.Equal(t, blog.ErrPostNotFound, err)
 	})
 
@@ -58,13 +58,14 @@ func TestViewPostUseCase(t *testing.T) {
 		assert.Nil(t, err)
 	})
 
-	t.Run("It returns error when fails to render", func(t *testing.T) {
+	t.Run("It returns error when post fails to render", func(t *testing.T) {
 		f := setup()
 
+		post := newPost()
+		f.repo.ReturnPost = post
 		f.renderer.ReturnError = errors.New("render error")
 
-		rennderedPost, err := f.usecase.Run("path")
-		assert.Equal(t, "path", f.repo.ReceivedPath)
+		rennderedPost, err := f.usecase.Run(post.Path)
 		assert.Equal(t, rennderedPost, blog.RenderedPost{})
 		assert.Equal(t, f.renderer.ReturnError, err)
 	})
