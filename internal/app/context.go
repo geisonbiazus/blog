@@ -47,7 +47,7 @@ func (c *Context) UseCases() *web.UseCases {
 }
 
 func (c *Context) ViewPostUseCase() *blog.ViewPostUseCase {
-	return blog.NewVewPostUseCase(c.PostRepo(), c.Renderer())
+	return blog.NewViewPostUseCase(c.PostRepo(), c.Renderer())
 }
 
 func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {

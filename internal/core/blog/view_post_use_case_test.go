@@ -19,7 +19,7 @@ func TestViewPostUseCase(t *testing.T) {
 	setup := func() *viewPostUseCaseFixture {
 		repo := NewPostRepoSpy()
 		renderer := NewRendererSpy()
-		usecase := blog.NewVewPostUseCase(repo, renderer)
+		usecase := blog.NewViewPostUseCase(repo, renderer)
 
 		return &viewPostUseCaseFixture{
 			usecase:  usecase,

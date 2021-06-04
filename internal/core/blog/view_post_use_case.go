@@ -5,7 +5,7 @@ type ViewPostUseCase struct {
 	renderer Renderer
 }
 
-func NewVewPostUseCase(postRepo PostRepo, renderer Renderer) *ViewPostUseCase {
+func NewViewPostUseCase(postRepo PostRepo, renderer Renderer) *ViewPostUseCase {
 	return &ViewPostUseCase{postRepo: postRepo, renderer: renderer}
 }
 
