@@ -1,6 +1,6 @@
 title: Applying Clean Architecture in Go
 author: Geison Biazus
-description: In this post, I show how I built this Blog using concepts of Clean Architecture to minimize the coupling and build an extensible and maintainable system..
+description: In this post, I show how I built this Blog using concepts of Clean Architecture to minimize the coupling and build an extensible and maintainable system.
 image_path: /static/image/architecture-small.png
 time: 2021-05-27 09:30
 --
