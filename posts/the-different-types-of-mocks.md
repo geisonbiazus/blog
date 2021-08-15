@@ -36,10 +36,6 @@ type CreateUserUseCase struct {
 	UserRepo UserRepo
 }
 
-var ErrInvalidCrendentials = errors.New("invalid credentials")
-var ErrUserAlreadyExists = errors.New("user already exists")
-var ErrUserNotFound = errors.New("user not found")
-
 func (u *CreateUserUseCase) Run(email, password string) (User, error) {
 	if !u.validEmailAndPassword(email, password) {
 		return User{}, ErrInvalidCrendentials
@@ -74,6 +70,10 @@ func (u *CreateUserUseCase) createNewUser(email, password string) (User, error) 
 
 	return user, nil
 }
+
+var ErrInvalidCrendentials = errors.New("invalid credentials")
+var ErrUserAlreadyExists = errors.New("user already exists")
+var ErrUserNotFound = errors.New("user not found")
 ```
 
 The code under test is the `CreateUserUseCase` struct. The use case receives a `UserRepo` as a dependency which is an interface with two methods: `GetUserByEmail` and `CreateUser`. This is the dependency that we are going to replace with test doubles. The use case is executed by calling the `Run` method.
