@@ -14,3 +14,7 @@ type ViewPostUseCase interface {
 type ListPostUseCase interface {
 	Run() ([]blog.RenderedPost, error)
 }
+
+type RequestOauth2UseCase interface {
+	Run() string
+}
