@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 
@@ -15,5 +16,15 @@ func newServer() *httptest.Server {
 	c.TemplatePath = filepath.Join(basePath, "web", "template")
 	c.StaticPath = filepath.Join(basePath, "web", "static")
 	c.PostPath = filepath.Join(basePath, "test", "posts")
+	c.GitHubClientID = "github_client_id"
+	c.GitHubClientSecret = "github_client_secret"
 	return httptest.NewServer(c.Router())
+}
+
+func newNoRedirectClient() *http.Client {
+	return &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 }

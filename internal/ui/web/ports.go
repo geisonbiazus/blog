@@ -3,8 +3,9 @@ package web
 import "github.com/geisonbiazus/blog/internal/core/blog"
 
 type UseCases struct {
-	ViewPost  ViewPostUseCase
-	ListPosts ListPostUseCase
+	ViewPost      ViewPostUseCase
+	ListPosts     ListPostUseCase
+	RequestOauth2 RequestOauth2UseCase
 }
 
 type ViewPostUseCase interface {
