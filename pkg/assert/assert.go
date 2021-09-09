@@ -1,6 +1,7 @@
 package assert
 
 import (
+	"errors"
 	"reflect"
 	"regexp"
 	"strings"
@@ -62,5 +63,13 @@ func Matches(t *testing.T, value, pattern string) {
 
 	if !matched {
 		t.Errorf("\n\"%s\" did not match the regex: %s", value, pattern)
+	}
+}
+
+func Error(t *testing.T, expected, actual error) {
+	t.Helper()
+
+	if !errors.Is(actual, expected) {
+		t.Errorf("\nexpected: %v\n  actual: %v\n", expected, actual)
 	}
 }

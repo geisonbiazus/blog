@@ -54,6 +54,7 @@ func TestRequestOauth2UseCase(t *testing.T) {
 
 		f.usecase.Run()
 
-		assert.True(t, f.stateRepo.StateExists(f.idGen.ReturnID))
+		exists, _ := f.stateRepo.Exists(f.idGen.ReturnID)
+		assert.True(t, exists)
 	})
 }

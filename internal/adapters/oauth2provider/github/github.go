@@ -1,6 +1,9 @@
 package github
 
 import (
+	"context"
+
+	"github.com/geisonbiazus/blog/internal/core/auth"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -21,4 +24,8 @@ func NewProvider(clientID, clientSecret string) *Provider {
 
 func (p *Provider) AuthURL(state string) string {
 	return p.config.AuthCodeURL(state)
+}
+
+func (p *Provider) AuthenticatedUser(ctx context.Context, code string) (auth.ProviderUser, error) {
+	return auth.ProviderUser{}, nil
 }

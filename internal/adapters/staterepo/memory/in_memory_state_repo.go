@@ -10,11 +10,17 @@ func NewInMemoryStateRepo() *InMemoryStateRepo {
 	}
 }
 
-func (r *InMemoryStateRepo) AddState(state string) {
+func (r *InMemoryStateRepo) AddState(state string) error {
 	r.states[state] = true
+	return nil
 }
 
-func (r *InMemoryStateRepo) StateExists(state string) bool {
+func (r *InMemoryStateRepo) Exists(state string) (bool, error) {
 	_, ok := r.states[state]
-	return ok
+	return ok, nil
+}
+
+func (r *InMemoryStateRepo) Remove(state string) error {
+	delete(r.states, state)
+	return nil
 }
