@@ -17,5 +17,5 @@ type ListPostUseCase interface {
 }
 
 type RequestOauth2UseCase interface {
-	Run() string
+	Run() (string, error)
 }

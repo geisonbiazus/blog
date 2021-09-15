@@ -34,7 +34,7 @@ func TestRequestOauth2UseCase(t *testing.T) {
 		f := setup()
 		f.provider.ReturnAuthURL = "https://example.com/oauth"
 
-		url := f.usecase.Run()
+		url, _ := f.usecase.Run()
 
 		assert.Equal(t, url, f.provider.ReturnAuthURL)
 	})

@@ -1,5 +1,7 @@
 package auth
 
+import "fmt"
+
 type RequestOauth2UseCase struct {
 	provider  Oauth2Provider
 	idGen     IDGenerator
@@ -10,9 +12,13 @@ func NewRequestOauth2UseCase(provider Oauth2Provider, idGen IDGenerator, stateRe
 	return &RequestOauth2UseCase{provider: provider, idGen: idGen, stateRepo: stateRepo}
 }
 
-func (u *RequestOauth2UseCase) Run() string {
+func (u *RequestOauth2UseCase) Run() (string, error) {
 	state := u.idGen.Generate()
-	u.stateRepo.AddState(state)
 
-	return u.provider.AuthURL(state)
+	err := u.stateRepo.AddState(state)
+	if err != nil {
+		return "", fmt.Errorf("error saving state on RequestOauth2UseCase: %w", err)
+	}
+
+	return u.provider.AuthURL(state), nil
 }
