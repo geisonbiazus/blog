@@ -27,27 +27,21 @@ func NewConfirmOauth2UseCase(
 }
 
 func (u *ConfirmOauth2UseCase) Run(ctx context.Context, state, code string) (string, error) {
+	providerUser, err := u.processOauth2Authentication(ctx, state, code)
+	if err != nil {
+		return "", err
+	}
+
+	return u.resolveUserAndGetToken(providerUser)
+}
+
+func (u *ConfirmOauth2UseCase) processOauth2Authentication(ctx context.Context, state, code string) (ProviderUser, error) {
 	err := u.validateAndRemoveState(state)
 	if err != nil {
-		return "", err
+		return ProviderUser{}, err
 	}
 
-	providerUser, err := u.getProviderAuthenticatedUser(ctx, code)
-	if err != nil {
-		return "", err
-	}
-
-	user, err := u.createOrUpdateUser(providerUser)
-	if err != nil {
-		return "", err
-	}
-
-	token, err := u.authenticateUser(user)
-	if err != nil {
-		return "", err
-	}
-
-	return token, nil
+	return u.getProviderAuthenticatedUser(ctx, code)
 }
 
 func (u *ConfirmOauth2UseCase) validateAndRemoveState(state string) error {
@@ -77,6 +71,15 @@ func (u *ConfirmOauth2UseCase) getProviderAuthenticatedUser(ctx context.Context,
 	return providerUser, nil
 }
 
+func (u *ConfirmOauth2UseCase) resolveUserAndGetToken(providerUser ProviderUser) (string, error) {
+	user, err := u.createOrUpdateUser(providerUser)
+	if err != nil {
+		return "", err
+	}
+
+	return u.getAuthenticationToken(user)
+}
+
 func (u *ConfirmOauth2UseCase) createOrUpdateUser(providerUser ProviderUser) (User, error) {
 	user, err := u.userRepo.FindUserByProviderUserID(providerUser.ID)
 
@@ -104,6 +107,7 @@ func (u *ConfirmOauth2UseCase) createNewUser(providerUser ProviderUser) (User, e
 	if err != nil {
 		return User{}, fmt.Errorf("error creatinng user on ConfirmOauth2UseCase: %w", err)
 	}
+
 	return user, nil
 }
 
@@ -120,7 +124,7 @@ func (u *ConfirmOauth2UseCase) updateExistingUser(user User, providerUser Provid
 	return user, nil
 }
 
-func (u *ConfirmOauth2UseCase) authenticateUser(user User) (string, error) {
+func (u *ConfirmOauth2UseCase) getAuthenticationToken(user User) (string, error) {
 	token, err := u.tokenManager.Encode(user.ID)
 	if err != nil {
 		return "", fmt.Errorf("error encoding token on ConfirmOauth2UseCase: %w", err)
