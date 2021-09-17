@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/alecthomas/chroma v0.9.1
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/joho/godotenv v1.3.0
