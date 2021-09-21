@@ -17,6 +17,6 @@ func TestRequestOauth2Integration(t *testing.T) {
 		res, _ := client.Get(server.URL + "/login/github/request")
 
 		assert.Equal(t, http.StatusSeeOther, res.StatusCode)
-		assert.Matches(t, res.Header.Get("Location"), `^https://github.com/login/oauth/authorize\?client_id=github_client_id&response_type=code&state=.{36}$`)
+		assert.Matches(t, res.Header.Get("Location"), `^http://localhost:3000/login/github/confirm\?state=.{36}&code=.{36}$`)
 	})
 }

@@ -3,12 +3,14 @@ package integration_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 
 	"github.com/geisonbiazus/blog/internal/app"
 )
 
 func newServer() *httptest.Server {
+	os.Setenv("ENV", "test")
 	c := app.NewContext()
 
 	basePath := filepath.Join("..", "..")
