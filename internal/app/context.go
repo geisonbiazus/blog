@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/geisonbiazus/blog/internal/adapters/idgenerator/uuid"
+	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider/fake"
 	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider/github"
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
@@ -18,6 +19,8 @@ import (
 )
 
 type Context struct {
+	Env string
+
 	Port         int
 	TemplatePath string
 	StaticPath   string
@@ -30,6 +33,8 @@ type Context struct {
 
 func NewContext() *Context {
 	return &Context{
+		Env: env.GetString("ENV", "development"),
+
 		Port:         env.GetInt("PORT", 3000),
 		TemplatePath: env.GetString("TEMPLATE_PATH", filepath.Join("web", "template")),
 		StaticPath:   env.GetString("STATIC_PATH", filepath.Join("web", "static")),
@@ -83,12 +88,19 @@ func (c *Context) Renderer() *goldmark.Renderer {
 	return goldmark.NewRenderer()
 }
 
-func (c *Context) Logger() *log.Logger {
-	return log.New(os.Stdout, "web: ", log.Ldate|log.Ltime|log.LUTC)
+func (c *Context) Oauth2Provider() auth.Oauth2Provider {
+	if c.Env == "test" {
+		return c.FakeOauth2Provider()
+	}
+	return c.GithubOauth2Provider()
 }
 
-func (c *Context) Oauth2Provider() *github.Provider {
+func (c *Context) GithubOauth2Provider() *github.Provider {
 	return github.NewProvider(c.GitHubClientID, c.GitHubClientSecret)
+}
+
+func (c *Context) FakeOauth2Provider() *fake.Provider {
+	return fake.NewProvider(c.BaseURL)
 }
 
 func (c *Context) IDGenerator() *uuid.Generator {
@@ -97,4 +109,8 @@ func (c *Context) IDGenerator() *uuid.Generator {
 
 func (c *Context) StateRepo() *memory.InMemoryStateRepo {
 	return memory.NewInMemoryStateRepo()
+}
+
+func (c *Context) Logger() *log.Logger {
+	return log.New(os.Stdout, "web: ", log.Ldate|log.Ltime|log.LUTC)
 }
