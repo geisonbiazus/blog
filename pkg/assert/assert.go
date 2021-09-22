@@ -57,7 +57,7 @@ func Contains(t *testing.T, content, expected string) {
 	}
 }
 
-func Matches(t *testing.T, value, pattern string) {
+func Matches(t *testing.T, pattern, value string) {
 	t.Helper()
 	matched, _ := regexp.MatchString(pattern, value)
 

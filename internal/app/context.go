@@ -11,7 +11,9 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider/github"
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
-	"github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
+	staterepo "github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
+	"github.com/geisonbiazus/blog/internal/adapters/tokenmanager/jwt"
+	userrepo "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/ui/web"
@@ -29,6 +31,11 @@ type Context struct {
 
 	GitHubClientID     string
 	GitHubClientSecret string
+
+	AuthTokenSecret string
+
+	stateRepo *staterepo.InMemoryStateRepo
+	userRepo  *userrepo.UserRepo
 }
 
 func NewContext() *Context {
@@ -43,6 +50,8 @@ func NewContext() *Context {
 
 		GitHubClientID:     env.GetString("GITHUB_CLIENT_ID", ""),
 		GitHubClientSecret: env.GetString("GITHUB_CLIENT_SECRET", ""),
+
+		AuthTokenSecret: env.GetString("AUTH_TOKEN_SECRET", ""),
 	}
 }
 
@@ -63,6 +72,7 @@ func (c *Context) UseCases() *web.UseCases {
 		ViewPost:      c.ViewPostUseCase(),
 		ListPosts:     c.ListPostsUseCase(),
 		RequestOauth2: c.RequestOauth2UseCase(),
+		ConfirmOauth2: c.ConfirmOauth2UseCase(),
 	}
 }
 
@@ -76,6 +86,10 @@ func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
 
 func (c *Context) RequestOauth2UseCase() *auth.RequestOauth2UseCase {
 	return auth.NewRequestOauth2UseCase(c.Oauth2Provider(), c.IDGenerator(), c.StateRepo())
+}
+
+func (c *Context) ConfirmOauth2UseCase() *auth.ConfirmOauth2UseCase {
+	return auth.NewConfirmOauth2UseCase(c.FakeOauth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenManager())
 }
 
 // Adapters
@@ -107,8 +121,22 @@ func (c *Context) IDGenerator() *uuid.Generator {
 	return uuid.NewGenerator()
 }
 
-func (c *Context) StateRepo() *memory.InMemoryStateRepo {
-	return memory.NewInMemoryStateRepo()
+func (c *Context) StateRepo() *staterepo.InMemoryStateRepo {
+	if c.stateRepo == nil {
+		c.stateRepo = staterepo.NewInMemoryStateRepo()
+	}
+	return c.stateRepo
+}
+
+func (c *Context) UserRepo() *userrepo.UserRepo {
+	if c.userRepo == nil {
+		c.userRepo = userrepo.NewUserRepo()
+	}
+	return c.userRepo
+}
+
+func (c *Context) TokenManager() *jwt.TokenManager {
+	return jwt.NewTokenManager(c.AuthTokenSecret)
 }
 
 func (c *Context) Logger() *log.Logger {

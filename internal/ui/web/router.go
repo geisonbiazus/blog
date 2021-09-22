@@ -15,6 +15,7 @@ func NewRouter(templatePath, staticFilesPath string, usecases *UseCases, baseURL
 	mux.Handle("/feed.atom", NewFeedHandler(usecases.ListPosts, templateRenderer, baseURL))
 	mux.Handle("/about", NewTemplateHandler(templateRenderer, "about.html"))
 	mux.Handle("/login/github/request", NewRequestOauth2Handler(usecases.RequestOauth2, templateRenderer))
+	mux.Handle("/login/github/confirm", NewConfirmOauth2Handler(usecases.ConfirmOauth2, templateRenderer, baseURL))
 
 	return mux
 }

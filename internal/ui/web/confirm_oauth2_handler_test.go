@@ -74,7 +74,7 @@ func TestConfirmOauth2Handler(t *testing.T) {
 
 		assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 		assert.Equal(t, baseURL, res.Header.Get("Location"))
-		assert.Equal(t, "_blog_session=token; Max-Age=86400", res.Cookies()[0].String())
+		assert.Equal(t, "_blog_session=token", res.Cookies()[0].String())
 	})
 }
 

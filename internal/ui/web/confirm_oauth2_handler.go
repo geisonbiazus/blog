@@ -7,8 +7,6 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/auth"
 )
 
-const _24HoursInSeconds = 24 * 60 * 60
-
 type ConfirmOauth2Handler struct {
 	usecase  ConfirmOauth2UseCase
 	template *TemplateRenderer
@@ -53,8 +51,7 @@ func (h *ConfirmOauth2Handler) respondWithError(w http.ResponseWriter, err error
 
 func (h *ConfirmOauth2Handler) newSessionCookie(token string) *http.Cookie {
 	return &http.Cookie{
-		Name:   "_blog_session",
-		Value:  token,
-		MaxAge: _24HoursInSeconds,
+		Name:  "_blog_session",
+		Value: token,
 	}
 }
