@@ -89,7 +89,7 @@ func (c *Context) RequestOauth2UseCase() *auth.RequestOauth2UseCase {
 }
 
 func (c *Context) ConfirmOauth2UseCase() *auth.ConfirmOauth2UseCase {
-	return auth.NewConfirmOauth2UseCase(c.FakeOauth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenManager())
+	return auth.NewConfirmOauth2UseCase(c.Oauth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenManager())
 }
 
 // Adapters
