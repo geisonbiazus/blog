@@ -31,6 +31,6 @@ func TestRequestOauth2Integration(t *testing.T) {
 		res, _ = client.Get(fmt.Sprintf("%s/login/github/confirm?state=%s&code=%s", server.URL, state, code))
 
 		assert.Equal(t, http.StatusSeeOther, res.StatusCode)
-		assert.Matches(t, "_blog_session=.+", res.Cookies()[0].String())
+		assert.Matches(t, "_blog_session=.+; Path=/", res.Cookies()[0].String())
 	})
 }

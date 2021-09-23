@@ -53,5 +53,6 @@ func (h *ConfirmOauth2Handler) newSessionCookie(token string) *http.Cookie {
 	return &http.Cookie{
 		Name:  "_blog_session",
 		Value: token,
+		Path:  "/",
 	}
 }
