@@ -89,9 +89,8 @@ jobs:
           ssh-keyscan -H geisonbiazus.com >> ~/.ssh/known_hosts
 
       - name: Deploy changes
-        run: docker-compose -f deployment/docker-compose/docker-compose.yml up -d
+        run: DOCKER_HOST=ssh://root@geisonbiazus.com docker-compose -f deployment/docker-compose/docker-compose.yml up -d
         env:
-          DOCKER_HOST: ssh://root@geisonbiazus.com
           GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
           GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
           AUTH_TOKEN_SECRET: ${{ secrets.AUTH_TOKEN_SECRET }}
