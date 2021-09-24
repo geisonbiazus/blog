@@ -4,8 +4,12 @@ services:
     image: geisonbiazus/blog:56
     restart: always
     environment:
+      ENV: production
       VIRTUAL_HOST: blog.geisonbiazus.com
       LETSENCRYPT_HOST: blog.geisonbiazus.com
       BASE_URL: https://blog.geisonbiazus.com
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      AUTH_TOKEN_SECRET: ${AUTH_TOKEN_SECRET}
     ports:
       - 5000:3000

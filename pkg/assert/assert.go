@@ -1,7 +1,9 @@
 package assert
 
 import (
+	"errors"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -52,5 +54,22 @@ func Contains(t *testing.T, content, expected string) {
 	t.Helper()
 	if !strings.Contains(content, expected) {
 		t.Errorf("\nExpected to contain \"%s\" but it doesn't. \nContent:\n%s", expected, content)
+	}
+}
+
+func Matches(t *testing.T, pattern, value string) {
+	t.Helper()
+	matched, _ := regexp.MatchString(pattern, value)
+
+	if !matched {
+		t.Errorf("\n\"%s\" did not match the regex: %s", value, pattern)
+	}
+}
+
+func Error(t *testing.T, expected, actual error) {
+	t.Helper()
+
+	if !errors.Is(actual, expected) {
+		t.Errorf("\nexpected: %v\n  actual: %v\n", expected, actual)
 	}
 }

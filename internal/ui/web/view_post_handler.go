@@ -21,20 +21,20 @@ func NewViewPostHandler(usecase ViewPostUseCase, templateRenderer *TemplateRende
 	}
 }
 
-func (h *ViewPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	path := path.Base(req.URL.Path)
+func (h *ViewPostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	path := path.Base(r.URL.Path)
 	renderedPost, err := h.usecase.Run(path)
 
 	switch err {
 	case nil:
-		res.WriteHeader(http.StatusOK)
-		h.template.Render(res, "view_post.html", h.toViewModel(renderedPost))
+		w.WriteHeader(http.StatusOK)
+		h.template.Render(w, "view_post.html", h.toViewModel(renderedPost))
 	case blog.ErrPostNotFound:
-		res.WriteHeader(http.StatusNotFound)
-		h.template.Render(res, "404.html", nil)
+		w.WriteHeader(http.StatusNotFound)
+		h.template.Render(w, "404.html", nil)
 	default:
-		res.WriteHeader(http.StatusInternalServerError)
-		h.template.Render(res, "500.html", nil)
+		w.WriteHeader(http.StatusInternalServerError)
+		h.template.Render(w, "500.html", nil)
 	}
 }
 
