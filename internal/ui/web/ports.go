@@ -9,8 +9,8 @@ import (
 type UseCases struct {
 	ViewPost      ViewPostUseCase
 	ListPosts     ListPostUseCase
-	RequestOauth2 RequestOauth2UseCase
-	ConfirmOauth2 ConfirmOauth2UseCase
+	RequestOAuth2 RequestOAuth2UseCase
+	ConfirmOAuth2 ConfirmOAuth2UseCase
 }
 
 type ViewPostUseCase interface {
@@ -21,10 +21,10 @@ type ListPostUseCase interface {
 	Run() ([]blog.RenderedPost, error)
 }
 
-type RequestOauth2UseCase interface {
+type RequestOAuth2UseCase interface {
 	Run() (string, error)
 }
 
-type ConfirmOauth2UseCase interface {
+type ConfirmOAuth2UseCase interface {
 	Run(ctx context.Context, state, code string) (string, error)
 }

@@ -8,21 +8,21 @@ import (
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
-type requestOauth2UseCaseFixture struct {
-	usecase   *auth.RequestOauth2UseCase
-	provider  *Oauth2ProviderSpy
+type requestOAuth2UseCaseFixture struct {
+	usecase   *auth.RequestOAuth2UseCase
+	provider  *OAuth2ProviderSpy
 	idGen     *IDGeneratorStub
 	stateRepo *memory.InMemoryStateRepo
 }
 
-func TestRequestOauth2UseCase(t *testing.T) {
-	setup := func() *requestOauth2UseCaseFixture {
+func TestRequestOAuth2UseCase(t *testing.T) {
+	setup := func() *requestOAuth2UseCaseFixture {
 		stateRepo := memory.NewInMemoryStateRepo()
 		idGen := NewIDGeneratorStub()
-		provider := NewOauth2ProviderSpy()
-		usecase := auth.NewRequestOauth2UseCase(provider, idGen, stateRepo)
+		provider := NewOAuth2ProviderSpy()
+		usecase := auth.NewRequestOAuth2UseCase(provider, idGen, stateRepo)
 
-		return &requestOauth2UseCaseFixture{
+		return &requestOAuth2UseCaseFixture{
 			usecase:   usecase,
 			provider:  provider,
 			idGen:     idGen,

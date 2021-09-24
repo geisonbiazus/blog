@@ -12,18 +12,18 @@ import (
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
 
-func TestConfirmOauth2Handler(t *testing.T) {
+func TestConfirmOAuth2Handler(t *testing.T) {
 	baseURL := "http://blog.example.com"
 
 	type fixture struct {
-		handler *web.ConfirmOauth2Handler
-		usecase *ConfirmOauth2UseCaseSpy
+		handler *web.ConfirmOAuth2Handler
+		usecase *ConfirmOAuth2UseCaseSpy
 	}
 
 	setup := func() fixture {
-		usecase := &ConfirmOauth2UseCaseSpy{}
+		usecase := &ConfirmOAuth2UseCaseSpy{}
 		templateRenderer := newTestTemplateRenderer()
-		handler := web.NewConfirmOauth2Handler(usecase, templateRenderer, baseURL)
+		handler := web.NewConfirmOAuth2Handler(usecase, templateRenderer, baseURL)
 
 		return fixture{
 			handler: handler,
@@ -78,7 +78,7 @@ func TestConfirmOauth2Handler(t *testing.T) {
 	})
 }
 
-type ConfirmOauth2UseCaseSpy struct {
+type ConfirmOAuth2UseCaseSpy struct {
 	ReceivedContext context.Context
 	ReceivedState   string
 	ReceivedCode    string
@@ -86,7 +86,7 @@ type ConfirmOauth2UseCaseSpy struct {
 	ReturnError     error
 }
 
-func (s *ConfirmOauth2UseCaseSpy) Run(ctx context.Context, state, code string) (string, error) {
+func (s *ConfirmOAuth2UseCaseSpy) Run(ctx context.Context, state, code string) (string, error) {
 	s.ReceivedContext = ctx
 	s.ReceivedState = state
 	s.ReceivedCode = code

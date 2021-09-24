@@ -2,7 +2,7 @@ package auth
 
 import "context"
 
-type Oauth2Provider interface {
+type OAuth2Provider interface {
 	AuthURL(state string) string
 	AuthenticatedUser(ctx context.Context, code string) (ProviderUser, error)
 }

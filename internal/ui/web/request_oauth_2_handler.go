@@ -2,16 +2,16 @@ package web
 
 import "net/http"
 
-type RequestOauth2Handler struct {
-	usecase  RequestOauth2UseCase
+type RequestOAuth2Handler struct {
+	usecase  RequestOAuth2UseCase
 	template *TemplateRenderer
 }
 
-func NewRequestOauth2Handler(usecase RequestOauth2UseCase, template *TemplateRenderer) *RequestOauth2Handler {
-	return &RequestOauth2Handler{usecase: usecase, template: template}
+func NewRequestOAuth2Handler(usecase RequestOAuth2UseCase, template *TemplateRenderer) *RequestOAuth2Handler {
+	return &RequestOAuth2Handler{usecase: usecase, template: template}
 }
 
-func (h *RequestOauth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *RequestOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	redirectURL, err := h.usecase.Run()
 
 	if err != nil {

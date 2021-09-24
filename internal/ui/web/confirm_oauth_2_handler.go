@@ -7,25 +7,25 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/auth"
 )
 
-type ConfirmOauth2Handler struct {
-	usecase  ConfirmOauth2UseCase
+type ConfirmOAuth2Handler struct {
+	usecase  ConfirmOAuth2UseCase
 	template *TemplateRenderer
 	baseURL  string
 }
 
-func NewConfirmOauth2Handler(
-	usecase ConfirmOauth2UseCase,
+func NewConfirmOAuth2Handler(
+	usecase ConfirmOAuth2UseCase,
 	templateRenderer *TemplateRenderer,
 	baseURL string,
-) *ConfirmOauth2Handler {
-	return &ConfirmOauth2Handler{
+) *ConfirmOAuth2Handler {
+	return &ConfirmOAuth2Handler{
 		usecase:  usecase,
 		template: templateRenderer,
 		baseURL:  baseURL,
 	}
 }
 
-func (h *ConfirmOauth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *ConfirmOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	state := r.URL.Query().Get("state")
 	code := r.URL.Query().Get("code")
 
@@ -39,7 +39,7 @@ func (h *ConfirmOauth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, h.baseURL, http.StatusSeeOther)
 }
 
-func (h *ConfirmOauth2Handler) respondWithError(w http.ResponseWriter, err error) {
+func (h *ConfirmOAuth2Handler) respondWithError(w http.ResponseWriter, err error) {
 	if errors.Is(err, auth.ErrInvalidState) {
 		w.WriteHeader(http.StatusNotFound)
 		h.template.Render(w, "404.html", nil)
@@ -49,7 +49,7 @@ func (h *ConfirmOauth2Handler) respondWithError(w http.ResponseWriter, err error
 	}
 }
 
-func (h *ConfirmOauth2Handler) newSessionCookie(token string) *http.Cookie {
+func (h *ConfirmOAuth2Handler) newSessionCookie(token string) *http.Cookie {
 	return &http.Cookie{
 		Name:  "_blog_session",
 		Value: token,

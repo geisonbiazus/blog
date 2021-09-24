@@ -6,18 +6,18 @@ import (
 	"fmt"
 )
 
-type ConfirmOauth2UseCase struct {
-	provider     Oauth2Provider
+type ConfirmOAuth2UseCase struct {
+	provider     OAuth2Provider
 	stateRepo    StateRepo
 	userRepo     UserRepo
 	idGen        IDGenerator
 	tokenManager TokenManager
 }
 
-func NewConfirmOauth2UseCase(
-	provider Oauth2Provider, stateRepo StateRepo, userRepo UserRepo, idGen IDGenerator, tokenManager TokenManager,
-) *ConfirmOauth2UseCase {
-	return &ConfirmOauth2UseCase{
+func NewConfirmOAuth2UseCase(
+	provider OAuth2Provider, stateRepo StateRepo, userRepo UserRepo, idGen IDGenerator, tokenManager TokenManager,
+) *ConfirmOAuth2UseCase {
+	return &ConfirmOAuth2UseCase{
 		provider:     provider,
 		stateRepo:    stateRepo,
 		userRepo:     userRepo,
@@ -26,8 +26,8 @@ func NewConfirmOauth2UseCase(
 	}
 }
 
-func (u *ConfirmOauth2UseCase) Run(ctx context.Context, state, code string) (string, error) {
-	providerUser, err := u.processOauth2Authentication(ctx, state, code)
+func (u *ConfirmOAuth2UseCase) Run(ctx context.Context, state, code string) (string, error) {
+	providerUser, err := u.processOAuth2Authentication(ctx, state, code)
 	if err != nil {
 		return "", err
 	}
@@ -35,7 +35,7 @@ func (u *ConfirmOauth2UseCase) Run(ctx context.Context, state, code string) (str
 	return u.resolveUserAndGetToken(providerUser)
 }
 
-func (u *ConfirmOauth2UseCase) processOauth2Authentication(ctx context.Context, state, code string) (ProviderUser, error) {
+func (u *ConfirmOAuth2UseCase) processOAuth2Authentication(ctx context.Context, state, code string) (ProviderUser, error) {
 	err := u.validateAndRemoveState(state)
 	if err != nil {
 		return ProviderUser{}, err
@@ -44,10 +44,10 @@ func (u *ConfirmOauth2UseCase) processOauth2Authentication(ctx context.Context, 
 	return u.getProviderAuthenticatedUser(ctx, code)
 }
 
-func (u *ConfirmOauth2UseCase) validateAndRemoveState(state string) error {
+func (u *ConfirmOAuth2UseCase) validateAndRemoveState(state string) error {
 	exists, err := u.stateRepo.Exists(state)
 	if err != nil {
-		return fmt.Errorf("error checking state on ConfirmOauth2UseCase: %w", err)
+		return fmt.Errorf("error checking state on ConfirmOAuth2UseCase: %w", err)
 	}
 
 	if !exists {
@@ -56,22 +56,22 @@ func (u *ConfirmOauth2UseCase) validateAndRemoveState(state string) error {
 
 	err = u.stateRepo.Remove(state)
 	if err != nil {
-		return fmt.Errorf("error authenticating user on ConfirmOauth2UseCase: %w", err)
+		return fmt.Errorf("error authenticating user on ConfirmOAuth2UseCase: %w", err)
 	}
 
 	return nil
 }
 
-func (u *ConfirmOauth2UseCase) getProviderAuthenticatedUser(ctx context.Context, code string) (ProviderUser, error) {
+func (u *ConfirmOAuth2UseCase) getProviderAuthenticatedUser(ctx context.Context, code string) (ProviderUser, error) {
 	providerUser, err := u.provider.AuthenticatedUser(ctx, code)
 	if err != nil {
-		return ProviderUser{}, fmt.Errorf("error authenticating user on ConfirmOauth2UseCase: %w", err)
+		return ProviderUser{}, fmt.Errorf("error authenticating user on ConfirmOAuth2UseCase: %w", err)
 	}
 
 	return providerUser, nil
 }
 
-func (u *ConfirmOauth2UseCase) resolveUserAndGetToken(providerUser ProviderUser) (string, error) {
+func (u *ConfirmOAuth2UseCase) resolveUserAndGetToken(providerUser ProviderUser) (string, error) {
 	user, err := u.createOrUpdateUser(providerUser)
 	if err != nil {
 		return "", err
@@ -80,7 +80,7 @@ func (u *ConfirmOauth2UseCase) resolveUserAndGetToken(providerUser ProviderUser)
 	return u.getAuthenticationToken(user)
 }
 
-func (u *ConfirmOauth2UseCase) createOrUpdateUser(providerUser ProviderUser) (User, error) {
+func (u *ConfirmOAuth2UseCase) createOrUpdateUser(providerUser ProviderUser) (User, error) {
 	user, err := u.userRepo.FindUserByProviderUserID(providerUser.ID)
 
 	if errors.Is(err, ErrUserNotFound) {
@@ -88,13 +88,13 @@ func (u *ConfirmOauth2UseCase) createOrUpdateUser(providerUser ProviderUser) (Us
 	}
 
 	if err != nil {
-		return User{}, fmt.Errorf("error finding user on ConfirmOauth2UseCase: %w", err)
+		return User{}, fmt.Errorf("error finding user on ConfirmOAuth2UseCase: %w", err)
 	}
 
 	return u.updateExistingUser(user, providerUser)
 }
 
-func (u *ConfirmOauth2UseCase) createNewUser(providerUser ProviderUser) (User, error) {
+func (u *ConfirmOAuth2UseCase) createNewUser(providerUser ProviderUser) (User, error) {
 	user := User{
 		ID:             u.idGen.Generate(),
 		ProviderUserID: providerUser.ID,
@@ -105,29 +105,29 @@ func (u *ConfirmOauth2UseCase) createNewUser(providerUser ProviderUser) (User, e
 
 	err := u.userRepo.CreateUser(user)
 	if err != nil {
-		return User{}, fmt.Errorf("error creatinng user on ConfirmOauth2UseCase: %w", err)
+		return User{}, fmt.Errorf("error creatinng user on ConfirmOAuth2UseCase: %w", err)
 	}
 
 	return user, nil
 }
 
-func (u *ConfirmOauth2UseCase) updateExistingUser(user User, providerUser ProviderUser) (User, error) {
+func (u *ConfirmOAuth2UseCase) updateExistingUser(user User, providerUser ProviderUser) (User, error) {
 	user.Email = providerUser.Email
 	user.Name = providerUser.Name
 	user.AvatarURL = providerUser.AvatarURL
 
 	err := u.userRepo.UpdateUser(user)
 	if err != nil {
-		return User{}, fmt.Errorf("error updating user on ConfirmOauth2UseCase: %w", err)
+		return User{}, fmt.Errorf("error updating user on ConfirmOAuth2UseCase: %w", err)
 	}
 
 	return user, nil
 }
 
-func (u *ConfirmOauth2UseCase) getAuthenticationToken(user User) (string, error) {
+func (u *ConfirmOAuth2UseCase) getAuthenticationToken(user User) (string, error) {
 	token, err := u.tokenManager.Encode(user.ID)
 	if err != nil {
-		return "", fmt.Errorf("error encoding token on ConfirmOauth2UseCase: %w", err)
+		return "", fmt.Errorf("error encoding token on ConfirmOAuth2UseCase: %w", err)
 	}
 
 	return token, nil

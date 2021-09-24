@@ -11,11 +11,11 @@ import (
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
 
-func TestRequestOauth2Handler(t *testing.T) {
-	t.Run("It requests a new Oauth2 and requiretcs to the returned URL", func(t *testing.T) {
+func TestRequestOAuth2Handler(t *testing.T) {
+	t.Run("It requests a new OAuth2 and requiretcs to the returned URL", func(t *testing.T) {
 		templateRenderer := newTestTemplateRenderer()
-		usecase := &requestOauth2UseCaseStub{}
-		handler := web.NewRequestOauth2Handler(usecase, templateRenderer)
+		usecase := &requestOAuth2UseCaseStub{}
+		handler := web.NewRequestOAuth2Handler(usecase, templateRenderer)
 
 		url := "http://example.com/login"
 
@@ -29,8 +29,8 @@ func TestRequestOauth2Handler(t *testing.T) {
 
 	t.Run("It responds with 500 if an error is returned from the use case", func(t *testing.T) {
 		templateRenderer := newTestTemplateRenderer()
-		usecase := &requestOauth2UseCaseStub{}
-		handler := web.NewRequestOauth2Handler(usecase, templateRenderer)
+		usecase := &requestOAuth2UseCaseStub{}
+		handler := web.NewRequestOAuth2Handler(usecase, templateRenderer)
 
 		usecase.ReturnError = errors.New("error")
 
@@ -42,11 +42,11 @@ func TestRequestOauth2Handler(t *testing.T) {
 	})
 }
 
-type requestOauth2UseCaseStub struct {
+type requestOAuth2UseCaseStub struct {
 	ReturnAuthURL string
 	ReturnError   error
 }
 
-func (u requestOauth2UseCaseStub) Run() (string, error) {
+func (u requestOAuth2UseCaseStub) Run() (string, error) {
 	return u.ReturnAuthURL, u.ReturnError
 }

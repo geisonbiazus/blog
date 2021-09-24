@@ -12,7 +12,7 @@ import (
 var locationPattern = `^http://localhost:3000/login/github/confirm\?state=(.{36})&code=(.{36})$`
 var locationRegex = regexp.MustCompile(locationPattern)
 
-func TestRequestOauth2Integration(t *testing.T) {
+func TestRequestOAuth2Integration(t *testing.T) {
 	t.Run("It redirects to github", func(t *testing.T) {
 		server := newServer()
 		client := newNoRedirectClient()

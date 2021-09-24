@@ -71,8 +71,8 @@ func (c *Context) UseCases() *web.UseCases {
 	return &web.UseCases{
 		ViewPost:      c.ViewPostUseCase(),
 		ListPosts:     c.ListPostsUseCase(),
-		RequestOauth2: c.RequestOauth2UseCase(),
-		ConfirmOauth2: c.ConfirmOauth2UseCase(),
+		RequestOAuth2: c.RequestOAuth2UseCase(),
+		ConfirmOAuth2: c.ConfirmOAuth2UseCase(),
 	}
 }
 
@@ -84,12 +84,12 @@ func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
 	return blog.NewListPostsUseCase(c.PostRepo(), c.Renderer())
 }
 
-func (c *Context) RequestOauth2UseCase() *auth.RequestOauth2UseCase {
-	return auth.NewRequestOauth2UseCase(c.Oauth2Provider(), c.IDGenerator(), c.StateRepo())
+func (c *Context) RequestOAuth2UseCase() *auth.RequestOAuth2UseCase {
+	return auth.NewRequestOAuth2UseCase(c.OAuth2Provider(), c.IDGenerator(), c.StateRepo())
 }
 
-func (c *Context) ConfirmOauth2UseCase() *auth.ConfirmOauth2UseCase {
-	return auth.NewConfirmOauth2UseCase(c.Oauth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenManager())
+func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
+	return auth.NewConfirmOAuth2UseCase(c.OAuth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenManager())
 }
 
 // Adapters
@@ -102,18 +102,18 @@ func (c *Context) Renderer() *goldmark.Renderer {
 	return goldmark.NewRenderer()
 }
 
-func (c *Context) Oauth2Provider() auth.Oauth2Provider {
+func (c *Context) OAuth2Provider() auth.OAuth2Provider {
 	if c.Env == "test" {
-		return c.FakeOauth2Provider()
+		return c.FakeOAuth2Provider()
 	}
-	return c.GithubOauth2Provider()
+	return c.GithubOAuth2Provider()
 }
 
-func (c *Context) GithubOauth2Provider() *github.Provider {
+func (c *Context) GithubOAuth2Provider() *github.Provider {
 	return github.NewProvider(c.GitHubClientID, c.GitHubClientSecret)
 }
 
-func (c *Context) FakeOauth2Provider() *fake.Provider {
+func (c *Context) FakeOAuth2Provider() *fake.Provider {
 	return fake.NewProvider(c.BaseURL)
 }
 

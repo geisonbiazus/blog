@@ -11,9 +11,9 @@ import (
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
-type confirmOauth2UseCaseFixture struct {
-	usecase      *auth.ConfirmOauth2UseCase
-	provider     *Oauth2ProviderSpy
+type confirmOAuth2UseCaseFixture struct {
+	usecase      *auth.ConfirmOAuth2UseCase
+	provider     *OAuth2ProviderSpy
 	stateRepo    *staterepo.InMemoryStateRepo
 	userRepo     *userrepo.UserRepo
 	idGen        *IDGeneratorStub
@@ -21,7 +21,7 @@ type confirmOauth2UseCaseFixture struct {
 	context      context.Context
 }
 
-func TestConfirmOauth2UseCase(t *testing.T) {
+func TestConfirmOAuth2UseCase(t *testing.T) {
 	code := "code"
 	state := "state"
 
@@ -32,14 +32,14 @@ func TestConfirmOauth2UseCase(t *testing.T) {
 		AvatarURL: "http://example.com/avatar.png",
 	}
 
-	setup := func() *confirmOauth2UseCaseFixture {
-		provider := NewOauth2ProviderSpy()
+	setup := func() *confirmOAuth2UseCaseFixture {
+		provider := NewOAuth2ProviderSpy()
 		stateRepo := staterepo.NewInMemoryStateRepo()
 		userRepo := userrepo.NewUserRepo()
 		idGen := NewIDGeneratorStub()
 		tokenManager := NewTokenManagerSpy()
-		usecase := auth.NewConfirmOauth2UseCase(provider, stateRepo, userRepo, idGen, tokenManager)
-		return &confirmOauth2UseCaseFixture{
+		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenManager)
+		return &confirmOAuth2UseCaseFixture{
 			usecase:      usecase,
 			provider:     provider,
 			stateRepo:    stateRepo,

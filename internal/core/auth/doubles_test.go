@@ -6,7 +6,7 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/auth"
 )
 
-type Oauth2ProviderSpy struct {
+type OAuth2ProviderSpy struct {
 	ReturnAuthURL string
 	ReceivedState string
 
@@ -16,16 +16,16 @@ type Oauth2ProviderSpy struct {
 	AuthenticatedUserReceivedCode       string
 }
 
-func NewOauth2ProviderSpy() *Oauth2ProviderSpy {
-	return &Oauth2ProviderSpy{ReturnAuthURL: "https://example.com/oauth"}
+func NewOAuth2ProviderSpy() *OAuth2ProviderSpy {
+	return &OAuth2ProviderSpy{ReturnAuthURL: "https://example.com/oauth"}
 }
 
-func (p *Oauth2ProviderSpy) AuthURL(state string) string {
+func (p *OAuth2ProviderSpy) AuthURL(state string) string {
 	p.ReceivedState = state
 	return p.ReturnAuthURL
 }
 
-func (p *Oauth2ProviderSpy) AuthenticatedUser(ctx context.Context, code string) (auth.ProviderUser, error) {
+func (p *OAuth2ProviderSpy) AuthenticatedUser(ctx context.Context, code string) (auth.ProviderUser, error) {
 	p.AuthenticatedUserReceivedContext = ctx
 	p.AuthenticatedUserReceivedCode = code
 	return p.AuthenticatedUserReturnProviderUser, p.AuthenticatedUserReturnError
