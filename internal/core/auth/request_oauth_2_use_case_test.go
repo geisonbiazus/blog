@@ -12,12 +12,12 @@ type requestOAuth2UseCaseFixture struct {
 	usecase   *auth.RequestOAuth2UseCase
 	provider  *OAuth2ProviderSpy
 	idGen     *IDGeneratorStub
-	stateRepo *memory.InMemoryStateRepo
+	stateRepo *memory.StateRepo
 }
 
 func TestRequestOAuth2UseCase(t *testing.T) {
 	setup := func() *requestOAuth2UseCaseFixture {
-		stateRepo := memory.NewInMemoryStateRepo()
+		stateRepo := memory.NewStateRepo()
 		idGen := NewIDGeneratorStub()
 		provider := NewOAuth2ProviderSpy()
 		usecase := auth.NewRequestOAuth2UseCase(provider, idGen, stateRepo)
