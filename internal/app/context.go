@@ -34,7 +34,7 @@ type Context struct {
 
 	AuthTokenSecret string
 
-	stateRepo *staterepo.InMemoryStateRepo
+	stateRepo *staterepo.StateRepo
 	userRepo  *userrepo.UserRepo
 }
 
@@ -121,9 +121,9 @@ func (c *Context) IDGenerator() *uuid.Generator {
 	return uuid.NewGenerator()
 }
 
-func (c *Context) StateRepo() *staterepo.InMemoryStateRepo {
+func (c *Context) StateRepo() *staterepo.StateRepo {
 	if c.stateRepo == nil {
-		c.stateRepo = staterepo.NewInMemoryStateRepo()
+		c.stateRepo = staterepo.NewStateRepo()
 	}
 	return c.stateRepo
 }

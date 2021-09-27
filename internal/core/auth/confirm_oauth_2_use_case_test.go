@@ -14,7 +14,7 @@ import (
 type confirmOAuth2UseCaseFixture struct {
 	usecase      *auth.ConfirmOAuth2UseCase
 	provider     *OAuth2ProviderSpy
-	stateRepo    *staterepo.InMemoryStateRepo
+	stateRepo    *staterepo.StateRepo
 	userRepo     *userrepo.UserRepo
 	idGen        *IDGeneratorStub
 	tokenManager *TokenManagerSpy
@@ -34,7 +34,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 
 	setup := func() *confirmOAuth2UseCaseFixture {
 		provider := NewOAuth2ProviderSpy()
-		stateRepo := staterepo.NewInMemoryStateRepo()
+		stateRepo := staterepo.NewStateRepo()
 		userRepo := userrepo.NewUserRepo()
 		idGen := NewIDGeneratorStub()
 		tokenManager := NewTokenManagerSpy()
