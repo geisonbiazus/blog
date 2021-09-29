@@ -2,6 +2,7 @@ package auth_test
 
 import (
 	"context"
+	"time"
 
 	"github.com/geisonbiazus/blog/internal/core/auth"
 )
@@ -44,16 +45,18 @@ func (g *IDGeneratorStub) Generate() string {
 }
 
 type TokenManagerSpy struct {
-	EncodeReturnToken    string
-	EncodeReturnError    error
-	EncodeReceivedUserID string
+	EncodeReturnToken       string
+	EncodeReturnError       error
+	EncodeReceivedUserID    string
+	EncodeReceivedExpiresIn time.Duration
 }
 
 func NewTokenManagerSpy() *TokenManagerSpy {
 	return &TokenManagerSpy{}
 }
 
-func (m *TokenManagerSpy) Encode(userID string) (string, error) {
+func (m *TokenManagerSpy) Encode(userID string, expiresIn time.Duration) (string, error) {
 	m.EncodeReceivedUserID = userID
+	m.EncodeReceivedExpiresIn = expiresIn
 	return m.EncodeReturnToken, m.EncodeReturnError
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type ConfirmOAuth2UseCase struct {
@@ -124,8 +125,10 @@ func (u *ConfirmOAuth2UseCase) updateExistingUser(user User, providerUser Provid
 	return user, nil
 }
 
+const TokenExpiration = 24 * time.Hour
+
 func (u *ConfirmOAuth2UseCase) getAuthenticationToken(user User) (string, error) {
-	token, err := u.tokenManager.Encode(user.ID)
+	token, err := u.tokenManager.Encode(user.ID, TokenExpiration)
 	if err != nil {
 		return "", fmt.Errorf("error encoding token on ConfirmOAuth2UseCase: %w", err)
 	}

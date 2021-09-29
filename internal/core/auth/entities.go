@@ -20,3 +20,4 @@ type User struct {
 }
 
 var ErrUserNotFound = errors.New("user not found")
+var ErrTokenExpired = errors.New("token expired")
