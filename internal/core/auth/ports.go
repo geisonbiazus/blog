@@ -1,6 +1,9 @@
 package auth
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type OAuth2Provider interface {
 	AuthURL(state string) string
@@ -24,5 +27,5 @@ type UserRepo interface {
 }
 
 type TokenManager interface {
-	Encode(userID string) (string, error)
+	Encode(userID string, expiresIn time.Duration) (string, error)
 }

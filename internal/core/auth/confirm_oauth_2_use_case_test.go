@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	staterepo "github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
 	userrepo "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
@@ -149,6 +150,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		token, _ := f.usecase.Run(f.context, state, code)
 
 		assert.Equal(t, f.idGen.ReturnID, f.tokenManager.EncodeReceivedUserID)
+		assert.Equal(t, 24*time.Hour, f.tokenManager.EncodeReceivedExpiresIn)
 		assert.Equal(t, f.tokenManager.EncodeReturnToken, token)
 	})
 
