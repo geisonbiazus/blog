@@ -12,18 +12,18 @@ type ConfirmOAuth2UseCase struct {
 	stateRepo    StateRepo
 	userRepo     UserRepo
 	idGen        IDGenerator
-	tokenManager TokenManager
+	tokenEncoder TokenEncoder
 }
 
 func NewConfirmOAuth2UseCase(
-	provider OAuth2Provider, stateRepo StateRepo, userRepo UserRepo, idGen IDGenerator, tokenManager TokenManager,
+	provider OAuth2Provider, stateRepo StateRepo, userRepo UserRepo, idGen IDGenerator, tokenEncoder TokenEncoder,
 ) *ConfirmOAuth2UseCase {
 	return &ConfirmOAuth2UseCase{
 		provider:     provider,
 		stateRepo:    stateRepo,
 		userRepo:     userRepo,
 		idGen:        idGen,
-		tokenManager: tokenManager,
+		tokenEncoder: tokenEncoder,
 	}
 }
 
@@ -128,7 +128,7 @@ func (u *ConfirmOAuth2UseCase) updateExistingUser(user User, providerUser Provid
 const TokenExpiration = 24 * time.Hour
 
 func (u *ConfirmOAuth2UseCase) getAuthenticationToken(user User) (string, error) {
-	token, err := u.tokenManager.Encode(user.ID, TokenExpiration)
+	token, err := u.tokenEncoder.Encode(user.ID, TokenExpiration)
 	if err != nil {
 		return "", fmt.Errorf("error encoding token on ConfirmOAuth2UseCase: %w", err)
 	}

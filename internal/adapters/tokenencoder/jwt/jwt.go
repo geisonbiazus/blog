@@ -10,17 +10,17 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/auth"
 )
 
-type TokenManager struct {
+type TokenEncoder struct {
 	secret []byte
 }
 
-func NewTokenManager(secret string) *TokenManager {
-	return &TokenManager{secret: []byte(secret)}
+func NewTokenEncoder(secret string) *TokenEncoder {
+	return &TokenEncoder{secret: []byte(secret)}
 }
 
-func (m *TokenManager) Encode(userID string, expiresIn time.Duration) (string, error) {
+func (m *TokenEncoder) Encode(value string, expiresIn time.Duration) (string, error) {
 	claims := &userClaims{
-		UserID: userID,
+		UserID: value,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiresAt(expiresIn),
 		},
@@ -40,7 +40,7 @@ func expiresAt(expiresIn time.Duration) int64 {
 	return time.Now().Add(expiresIn).Unix()
 }
 
-func (m *TokenManager) Decode(token string) (string, error) {
+func (m *TokenEncoder) Decode(token string) (string, error) {
 	t, err := jwt.ParseWithClaims(token, &userClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if t.Method.Alg() != jwt.SigningMethodHS512.Alg() {
 			return nil, ErrInvalidSigningAlgorithm
@@ -58,7 +58,7 @@ func (m *TokenManager) Decode(token string) (string, error) {
 	return claims.UserID, nil
 }
 
-func (m *TokenManager) handleDecodingError(err error) error {
+func (m *TokenEncoder) handleDecodingError(err error) error {
 	if strings.Contains(err.Error(), "token is expired") {
 		return auth.ErrTokenExpired
 	}
