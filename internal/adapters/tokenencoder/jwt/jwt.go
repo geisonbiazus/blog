@@ -19,13 +19,7 @@ func NewTokenEncoder(secret string) *TokenEncoder {
 }
 
 func (m *TokenEncoder) Encode(value string, expiresIn time.Duration) (string, error) {
-	claims := &userClaims{
-		UserID: value,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expiresAt(expiresIn),
-		},
-	}
-
+	claims := newClaims(value, expiresIn)
 	t := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
 	signedToken, err := t.SignedString(m.secret)
@@ -36,12 +30,8 @@ func (m *TokenEncoder) Encode(value string, expiresIn time.Duration) (string, er
 	return signedToken, nil
 }
 
-func expiresAt(expiresIn time.Duration) int64 {
-	return time.Now().Add(expiresIn).Unix()
-}
-
 func (m *TokenEncoder) Decode(token string) (string, error) {
-	t, err := jwt.ParseWithClaims(token, &userClaims{}, func(t *jwt.Token) (interface{}, error) {
+	t, err := jwt.ParseWithClaims(token, &jwtClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if t.Method.Alg() != jwt.SigningMethodHS512.Alg() {
 			return nil, ErrInvalidSigningAlgorithm
 		}
@@ -53,9 +43,9 @@ func (m *TokenEncoder) Decode(token string) (string, error) {
 		return "", m.handleDecodingError(err)
 	}
 
-	claims := t.Claims.(*userClaims)
+	claims := t.Claims.(*jwtClaims)
 
-	return claims.UserID, nil
+	return claims.Subject, nil
 }
 
 func (m *TokenEncoder) handleDecodingError(err error) error {
@@ -68,7 +58,19 @@ func (m *TokenEncoder) handleDecodingError(err error) error {
 
 var ErrInvalidSigningAlgorithm = errors.New("invalid JWT signing algorithm")
 
-type userClaims struct {
+type jwtClaims struct {
 	jwt.StandardClaims
-	UserID string
+}
+
+func newClaims(sub string, expiresIn time.Duration) *jwtClaims {
+	return &jwtClaims{
+		StandardClaims: jwt.StandardClaims{
+			Subject:   sub,
+			ExpiresAt: expiresAt(expiresIn),
+		},
+	}
+}
+
+func expiresAt(expiresIn time.Duration) int64 {
+	return time.Now().Add(expiresIn).Unix()
 }
