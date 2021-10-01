@@ -44,19 +44,19 @@ func (g *IDGeneratorStub) Generate() string {
 	return g.ReturnID
 }
 
-type TokenManagerSpy struct {
+type TokenEncoderSpy struct {
 	EncodeReturnToken       string
 	EncodeReturnError       error
-	EncodeReceivedUserID    string
+	EncodeReceivedValue     string
 	EncodeReceivedExpiresIn time.Duration
 }
 
-func NewTokenManagerSpy() *TokenManagerSpy {
-	return &TokenManagerSpy{}
+func NewTokenEncoderSpy() *TokenEncoderSpy {
+	return &TokenEncoderSpy{}
 }
 
-func (m *TokenManagerSpy) Encode(userID string, expiresIn time.Duration) (string, error) {
-	m.EncodeReceivedUserID = userID
+func (m *TokenEncoderSpy) Encode(value string, expiresIn time.Duration) (string, error) {
+	m.EncodeReceivedValue = value
 	m.EncodeReceivedExpiresIn = expiresIn
 	return m.EncodeReturnToken, m.EncodeReturnError
 }

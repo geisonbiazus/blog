@@ -10,22 +10,16 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/auth"
 )
 
-type TokenManager struct {
+type TokenEncoder struct {
 	secret []byte
 }
 
-func NewTokenManager(secret string) *TokenManager {
-	return &TokenManager{secret: []byte(secret)}
+func NewTokenEncoder(secret string) *TokenEncoder {
+	return &TokenEncoder{secret: []byte(secret)}
 }
 
-func (m *TokenManager) Encode(userID string, expiresIn time.Duration) (string, error) {
-	claims := &userClaims{
-		UserID: userID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expiresAt(expiresIn),
-		},
-	}
-
+func (m *TokenEncoder) Encode(value string, expiresIn time.Duration) (string, error) {
+	claims := newClaims(value, expiresIn)
 	t := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
 	signedToken, err := t.SignedString(m.secret)
@@ -36,12 +30,8 @@ func (m *TokenManager) Encode(userID string, expiresIn time.Duration) (string, e
 	return signedToken, nil
 }
 
-func expiresAt(expiresIn time.Duration) int64 {
-	return time.Now().Add(expiresIn).Unix()
-}
-
-func (m *TokenManager) Decode(token string) (string, error) {
-	t, err := jwt.ParseWithClaims(token, &userClaims{}, func(t *jwt.Token) (interface{}, error) {
+func (m *TokenEncoder) Decode(token string) (string, error) {
+	t, err := jwt.ParseWithClaims(token, &jwtClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if t.Method.Alg() != jwt.SigningMethodHS512.Alg() {
 			return nil, ErrInvalidSigningAlgorithm
 		}
@@ -53,12 +43,12 @@ func (m *TokenManager) Decode(token string) (string, error) {
 		return "", m.handleDecodingError(err)
 	}
 
-	claims := t.Claims.(*userClaims)
+	claims := t.Claims.(*jwtClaims)
 
-	return claims.UserID, nil
+	return claims.Subject, nil
 }
 
-func (m *TokenManager) handleDecodingError(err error) error {
+func (m *TokenEncoder) handleDecodingError(err error) error {
 	if strings.Contains(err.Error(), "token is expired") {
 		return auth.ErrTokenExpired
 	}
@@ -68,7 +58,19 @@ func (m *TokenManager) handleDecodingError(err error) error {
 
 var ErrInvalidSigningAlgorithm = errors.New("invalid JWT signing algorithm")
 
-type userClaims struct {
+type jwtClaims struct {
 	jwt.StandardClaims
-	UserID string
+}
+
+func newClaims(sub string, expiresIn time.Duration) *jwtClaims {
+	return &jwtClaims{
+		StandardClaims: jwt.StandardClaims{
+			Subject:   sub,
+			ExpiresAt: expiresAt(expiresIn),
+		},
+	}
+}
+
+func expiresAt(expiresIn time.Duration) int64 {
+	return time.Now().Add(expiresIn).Unix()
 }

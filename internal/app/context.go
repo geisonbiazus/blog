@@ -12,7 +12,7 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
 	staterepo "github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
-	"github.com/geisonbiazus/blog/internal/adapters/tokenmanager/jwt"
+	"github.com/geisonbiazus/blog/internal/adapters/tokenencoder/jwt"
 	userrepo "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/internal/core/blog"
@@ -135,8 +135,8 @@ func (c *Context) UserRepo() *userrepo.UserRepo {
 	return c.userRepo
 }
 
-func (c *Context) TokenManager() *jwt.TokenManager {
-	return jwt.NewTokenManager(c.AuthTokenSecret)
+func (c *Context) TokenManager() *jwt.TokenEncoder {
+	return jwt.NewTokenEncoder(c.AuthTokenSecret)
 }
 
 func (c *Context) Logger() *log.Logger {

@@ -26,6 +26,6 @@ type UserRepo interface {
 	FindUserByProviderUserID(providerUserID string) (User, error)
 }
 
-type TokenManager interface {
-	Encode(userID string, expiresIn time.Duration) (string, error)
+type TokenEncoder interface {
+	Encode(value string, expiresIn time.Duration) (string, error)
 }

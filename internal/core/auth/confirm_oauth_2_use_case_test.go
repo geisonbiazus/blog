@@ -18,7 +18,7 @@ type confirmOAuth2UseCaseFixture struct {
 	stateRepo    *staterepo.StateRepo
 	userRepo     *userrepo.UserRepo
 	idGen        *IDGeneratorStub
-	tokenManager *TokenManagerSpy
+	tokenEncoder *TokenEncoderSpy
 	context      context.Context
 }
 
@@ -38,15 +38,15 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		stateRepo := staterepo.NewStateRepo()
 		userRepo := userrepo.NewUserRepo()
 		idGen := NewIDGeneratorStub()
-		tokenManager := NewTokenManagerSpy()
-		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenManager)
+		tokenEncoder := NewTokenEncoderSpy()
+		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder)
 		return &confirmOAuth2UseCaseFixture{
 			usecase:      usecase,
 			provider:     provider,
 			stateRepo:    stateRepo,
 			userRepo:     userRepo,
 			idGen:        idGen,
-			tokenManager: tokenManager,
+			tokenEncoder: tokenEncoder,
 			context:      context.Background(),
 		}
 	}
@@ -145,13 +145,13 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		f.stateRepo.AddState(state)
 		f.idGen.ReturnID = "generatedID"
 		f.provider.AuthenticatedUserReturnProviderUser = providerUser
-		f.tokenManager.EncodeReturnToken = "expectedToken"
+		f.tokenEncoder.EncodeReturnToken = "expectedToken"
 
 		token, _ := f.usecase.Run(f.context, state, code)
 
-		assert.Equal(t, f.idGen.ReturnID, f.tokenManager.EncodeReceivedUserID)
-		assert.Equal(t, 24*time.Hour, f.tokenManager.EncodeReceivedExpiresIn)
-		assert.Equal(t, f.tokenManager.EncodeReturnToken, token)
+		assert.Equal(t, f.idGen.ReturnID, f.tokenEncoder.EncodeReceivedValue)
+		assert.Equal(t, 24*time.Hour, f.tokenEncoder.EncodeReceivedExpiresIn)
+		assert.Equal(t, f.tokenEncoder.EncodeReturnToken, token)
 	})
 
 	t.Run("It returns error it fails to generate token", func(t *testing.T) {
@@ -160,10 +160,10 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		f.stateRepo.AddState(state)
 		f.idGen.ReturnID = "generatedID"
 		f.provider.AuthenticatedUserReturnProviderUser = providerUser
-		f.tokenManager.EncodeReturnError = errors.New("error encoding")
+		f.tokenEncoder.EncodeReturnError = errors.New("error encoding")
 
 		_, err := f.usecase.Run(f.context, state, code)
 
-		assert.Error(t, f.tokenManager.EncodeReturnError, err)
+		assert.Error(t, f.tokenEncoder.EncodeReturnError, err)
 	})
 }
