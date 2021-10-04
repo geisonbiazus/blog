@@ -27,8 +27,8 @@ jobs:
       - name: Run tests
         run: go test ./...
 
-  build_and_push_image:
-    name: Build and push Docker image
+  deploy:
+    name: Deploy to Heroku
     needs: test
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest

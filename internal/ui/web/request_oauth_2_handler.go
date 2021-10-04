@@ -17,6 +17,7 @@ func (h *RequestOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		h.template.Render(w, "500.html", nil)
+		return
 	}
 
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)

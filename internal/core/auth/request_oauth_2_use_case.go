@@ -8,8 +8,16 @@ type RequestOAuth2UseCase struct {
 	stateRepo StateRepo
 }
 
-func NewRequestOAuth2UseCase(provider OAuth2Provider, idGen IDGenerator, stateRepo StateRepo) *RequestOAuth2UseCase {
-	return &RequestOAuth2UseCase{provider: provider, idGen: idGen, stateRepo: stateRepo}
+func NewRequestOAuth2UseCase(
+	provider OAuth2Provider,
+	idGen IDGenerator,
+	stateRepo StateRepo,
+) *RequestOAuth2UseCase {
+	return &RequestOAuth2UseCase{
+		provider:  provider,
+		idGen:     idGen,
+		stateRepo: stateRepo,
+	}
 }
 
 func (u *RequestOAuth2UseCase) Run() (string, error) {

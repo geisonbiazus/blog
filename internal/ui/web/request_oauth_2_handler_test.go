@@ -21,7 +21,7 @@ func TestRequestOAuth2Handler(t *testing.T) {
 
 		usecase.ReturnAuthURL = url
 
-		res := doGetRequest(handler, "/login/github/request")
+		res := doGetRequest(handler, "/login/github")
 
 		assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 		assert.Equal(t, url, res.Header.Get("Location"))
@@ -34,7 +34,7 @@ func TestRequestOAuth2Handler(t *testing.T) {
 
 		usecase.ReturnError = errors.New("error")
 
-		res := doGetRequest(handler, "/login/github/request")
+		res := doGetRequest(handler, "/login/github")
 
 		body := testhelper.ReadResponseBody(res)
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)

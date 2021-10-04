@@ -29,7 +29,7 @@ func (p *Provider) AuthURL(state string) string {
 }
 
 func (p *Provider) AuthenticatedUser(ctx context.Context, code string) (auth.ProviderUser, error) {
-	httpClient, err := p.exhangeTokenAndGetClient(ctx, code)
+	httpClient, err := p.exchangeTokenAndGetClient(ctx, code)
 	if err != nil {
 		return auth.ProviderUser{}, err
 	}
@@ -37,7 +37,7 @@ func (p *Provider) AuthenticatedUser(ctx context.Context, code string) (auth.Pro
 	return NewClient(httpClient).GetAuthenticatedUser()
 }
 
-func (p *Provider) exhangeTokenAndGetClient(ctx context.Context, code string) (*http.Client, error) {
+func (p *Provider) exchangeTokenAndGetClient(ctx context.Context, code string) (*http.Client, error) {
 	token, err := p.config.Exchange(ctx, code)
 	if err != nil {
 		return nil, fmt.Errorf("error exchanging token on github.Provider: %w", err)
@@ -45,15 +45,4 @@ func (p *Provider) exhangeTokenAndGetClient(ctx context.Context, code string) (*
 
 	tokenSource := p.config.TokenSource(ctx, token)
 	return oauth2.NewClient(ctx, tokenSource), nil
-}
-
-type githubResponse struct {
-	Data struct {
-		Viewer struct {
-			ID        string `json:"id"`
-			Email     string `json:"email"`
-			Name      string `json:"name"`
-			AvatarURL string `json:"avatarUrl"`
-		} `json:"viewer"`
-	} `json:"data"`
 }
