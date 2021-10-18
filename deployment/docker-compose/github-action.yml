@@ -1,0 +1,104 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "deployment/**"
+      - "./README/md"
+  pull_request:
+    paths-ignore:
+      - "deployment/**"
+      - "./README/md"
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    container: golang:1.16.3-alpine
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install build deps
+        run: apk add build-base
+
+      - name: Run tests
+        run: go test ./...
+
+  build_and_push_image:
+    name: Build and push Docker image
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            geisonbiazus/blog:latest
+            geisonbiazus/blog:${{ github.run_number }}
+
+  deploy:
+    name: Deploy app
+    needs: build_and_push_image
+    if: github.ref == 'refs/heads/main'
+    container: docker:20.10.8-git
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install docker compose
+        run: apk add docker-compose
+
+      - name: Update docker-compose file
+        run: "sed -i -e 's|image: geisonbiazus/blog:.*|image: geisonbiazus/blog:${{ github.run_number }}|'  deployment/docker-compose/docker-compose.yml"
+
+      - name: Commit changes
+        run: |
+          echo "${{ github.ref }}"
+          git config --global user.name 'Geison Biazus'
+          git config --global user.email 'geisonbiazus@gmail.com'
+          git commit -am "Update docker-compose image version to ${{ github.run_number }}"
+          git push
+
+      - name: Configure ssh
+        # The containers on run with HOME=/home/github but, for some reason,
+        # openssh doesn't take in consideration the $HOME path when it is changed.
+        # So instead of using "~/.ssh" I use "/root/.ssh".
+        # If this change in the future, revert it back to "~/.ssh"
+        run: |
+          mkdir -p /root/.ssh
+          echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > /root/.ssh/id_rsa
+          echo "${{ secrets.DEPLOY_SSH_PUBLIC_KEY }}" > /root/.ssh/id_rsa.pub
+          ssh-keyscan -H geisonbiazus.com >> /root/.ssh/known_hosts
+          chmod 600 /root/.ssh/id_rsa
+          chmod 644 /root/.ssh/id_rsa.pub
+          chmod 600 /root/.ssh/known_hosts
+
+      - name: Check conn
+        run: ssh root@geisonbiazus.com uptime
+
+      - name: Deploy changes
+        run: DOCKER_HOST=ssh://root@geisonbiazus.com docker-compose -f deployment/docker-compose/docker-compose.yml up -d
+        env:
+          GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
+          AUTH_TOKEN_SECRET: ${{ secrets.AUTH_TOKEN_SECRET }}
