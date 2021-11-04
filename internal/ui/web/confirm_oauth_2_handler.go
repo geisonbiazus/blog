@@ -33,6 +33,7 @@ func (h *ConfirmOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 	if err != nil {
 		h.respondWithError(w, err)
+		return
 	}
 
 	http.SetCookie(w, h.newSessionCookie(token))

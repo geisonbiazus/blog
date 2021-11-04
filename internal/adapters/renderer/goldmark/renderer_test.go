@@ -58,10 +58,10 @@ But now with a line break in the middle.
 Code Block
 ` + "```"
 
-const sampleHTML = `<h1>Title 1</h1>
-<h2>Title 2</h2>
-<h3>Title 3</h3>
-<h4>Title 4</h4>
+const sampleHTML = `<h1 id="title-1">Title 1</h1>
+<h2 id="title-2">Title 2</h2>
+<h3 id="title-3">Title 3</h3>
+<h4 id="title-4">Title 4</h4>
 <p>This is a paragraph</p>
 <p>This is a paragraph.<br>
 But now with a line break in the middle.</p>

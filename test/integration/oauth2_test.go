@@ -19,7 +19,7 @@ func TestRequestOAuth2Integration(t *testing.T) {
 
 		defer server.Close()
 
-		res, _ := client.Get(server.URL + "/login/github/request")
+		res, _ := client.Get(server.URL + "/login/github")
 
 		assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 		assert.Matches(t, locationPattern, res.Header.Get("Location"))

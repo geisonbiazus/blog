@@ -6,6 +6,7 @@ import (
 	"github.com/alecthomas/chroma/formatters/html"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
+	"github.com/yuin/goldmark/parser"
 )
 
 type Renderer struct{}
@@ -25,6 +26,9 @@ func (r *Renderer) Render(content string) (string, error) {
 					html.TabWidth(2),
 				),
 			),
+		),
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
 		),
 	)
 
