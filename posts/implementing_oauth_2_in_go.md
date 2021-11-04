@@ -2,7 +2,7 @@ title: Implementing OAuth 2.0 in Go
 author: Geison Biazus
 description: In this post, I show how to implement the OAuth 2.0 standard in Go to securely authenticate into applications using third-party providers.
 image_path: /static/image/logo-small.png
-time: 2021-10-06 08:30
+time: 2021-11-04 09:00
 --
 User authentication in software development is a big topic. There are many ways to have a user authenticated in an application, and they vary in complexity based on the system's needs. It is a very important aspect of the application being one of the biggest security issues a system might have.
 
