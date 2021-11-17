@@ -3,13 +3,13 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"errors"
+	"fmt"
 
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-type Querier interface {
+type Connection interface {
 	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
 	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
@@ -19,15 +19,11 @@ type TxKeyType string
 
 var TxKey = TxKeyType("tx")
 
-type UserRepo struct {
+type DBRepo struct {
 	db *sql.DB
 }
 
-func NewUserRepo(db *sql.DB) *UserRepo {
-	return &UserRepo{db: db}
-}
-
-func (r *UserRepo) querier(ctx context.Context) Querier {
+func (r *DBRepo) conn(ctx context.Context) Connection {
 	tx := ctx.Value(TxKey)
 
 	if tx == nil {
@@ -41,29 +37,43 @@ func (r *UserRepo) querier(ctx context.Context) Querier {
 	return r.db
 }
 
-func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
-	q := r.querier(ctx)
+type UserRepo struct {
+	DBRepo
+}
 
-	result, err := q.ExecContext(ctx,
+func NewUserRepo(db *sql.DB) *UserRepo {
+	return &UserRepo{DBRepo: DBRepo{db: db}}
+}
+
+func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
+	conn := r.conn(ctx)
+
+	result, err := conn.ExecContext(ctx,
 		"INSERT INTO users (id, name, email, provider_user_id, avatar_url) VALUES ($1, $2, $3, $4, $5)",
 		user.ID, user.Name, user.Email, user.ProviderUserID, user.AvatarURL,
 	)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("error on CreateUser when executing query: %w", err)
 	}
 
-	if rows, _ := result.RowsAffected(); rows != 1 {
-		return errors.New("error inserting user")
+	rows, err := result.RowsAffected()
+
+	if err != nil {
+		return fmt.Errorf("error on CreateUser when executing query: %w", err)
+	}
+
+	if rows != 1 {
+		return fmt.Errorf("error on CreateUser when executing query")
 	}
 
 	return nil
 }
 
-func (r *UserRepo) FindById(ctx context.Context, id string) (auth.User, error) {
-	q := r.querier(ctx)
+func (r *UserRepo) FindUserByID(ctx context.Context, id string) (auth.User, error) {
+	conn := r.conn(ctx)
 
-	row := q.QueryRowContext(ctx, "SELECT id, name, email, provider_user_id, avatar_url FROM users where id = $1", id)
+	row := conn.QueryRowContext(ctx, "SELECT id, name, email, provider_user_id, avatar_url FROM users where id = $1", id)
 
 	user := auth.User{}
 
