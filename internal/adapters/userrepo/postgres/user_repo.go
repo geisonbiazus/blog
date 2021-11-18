@@ -37,6 +37,24 @@ func (r *DBRepo) conn(ctx context.Context) Connection {
 	return r.db
 }
 
+func (r *DBRepo) exec(ctx context.Context, query string, args ...interface{}) (int64, error) {
+	conn := r.conn(ctx)
+
+	result, err := conn.ExecContext(ctx, query, args...)
+
+	if err != nil {
+		return 0, fmt.Errorf("error on exec when executing query: %w", err)
+	}
+
+	rows, err := result.RowsAffected()
+
+	if err != nil {
+		return 0, fmt.Errorf("error on exec when getting affected rows: %w", err)
+	}
+
+	return rows, nil
+}
+
 type UserRepo struct {
 	DBRepo
 }
@@ -46,9 +64,7 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 }
 
 func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
-	conn := r.conn(ctx)
-
-	result, err := conn.ExecContext(ctx,
+	rows, err := r.exec(ctx,
 		"INSERT INTO users (id, name, email, provider_user_id, avatar_url) VALUES ($1, $2, $3, $4, $5)",
 		user.ID, user.Name, user.Email, user.ProviderUserID, user.AvatarURL,
 	)
@@ -57,14 +73,30 @@ func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
 		return fmt.Errorf("error on CreateUser when executing query: %w", err)
 	}
 
-	rows, err := result.RowsAffected()
+	if rows != 1 {
+		return fmt.Errorf("error on CreateUser, no affected rows")
+	}
+
+	return nil
+}
+
+func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
+	rows, err := r.exec(ctx, `
+		UPDATE users set 
+			name = $1, 
+			email = $2, 
+			provider_user_id = $3, 
+			avatar_url = $4
+		WHERE id = $5`,
+		user.Name, user.Email, user.ProviderUserID, user.AvatarURL, user.ID,
+	)
 
 	if err != nil {
-		return fmt.Errorf("error on CreateUser when executing query: %w", err)
+		return fmt.Errorf("error on Update when executing query: %w", err)
 	}
 
 	if rows != 1 {
-		return fmt.Errorf("error on CreateUser when executing query")
+		return auth.ErrUserNotFound
 	}
 
 	return nil
