@@ -1,6 +1,8 @@
 package memory
 
 import (
+	"context"
+
 	"github.com/geisonbiazus/blog/internal/core/auth"
 )
 
@@ -12,12 +14,12 @@ func NewUserRepo() *UserRepo {
 	return &UserRepo{users: []auth.User{}}
 }
 
-func (r *UserRepo) CreateUser(user auth.User) error {
+func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
 	r.users = append(r.users, user)
 	return nil
 }
 
-func (r *UserRepo) UpdateUser(user auth.User) error {
+func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
 	for i, existingUser := range r.users {
 		if existingUser.ID == user.ID {
 			r.users[i] = user
@@ -27,7 +29,7 @@ func (r *UserRepo) UpdateUser(user auth.User) error {
 	return auth.ErrUserNotFound
 }
 
-func (r *UserRepo) FindUserByID(id string) (auth.User, error) {
+func (r *UserRepo) FindUserByID(ctx context.Context, id string) (auth.User, error) {
 	for _, user := range r.users {
 		if user.ID == id {
 			return user, nil
@@ -37,7 +39,7 @@ func (r *UserRepo) FindUserByID(id string) (auth.User, error) {
 	return auth.User{}, auth.ErrUserNotFound
 }
 
-func (r *UserRepo) FindUserByEmail(email string) (auth.User, error) {
+func (r *UserRepo) FindUserByEmail(ctx context.Context, email string) (auth.User, error) {
 	for _, user := range r.users {
 		if user.Email == email {
 			return user, nil
@@ -47,7 +49,7 @@ func (r *UserRepo) FindUserByEmail(email string) (auth.User, error) {
 	return auth.User{}, auth.ErrUserNotFound
 }
 
-func (r *UserRepo) FindUserByProviderUserID(providerUserID string) (auth.User, error) {
+func (r *UserRepo) FindUserByProviderUserID(ctx context.Context, providerUserID string) (auth.User, error) {
 	for _, user := range r.users {
 		if user.ProviderUserID == providerUserID {
 			return user, nil
