@@ -134,4 +134,54 @@ func TestUserRepo(t *testing.T) {
 			})
 		})
 	})
+
+	t.Run("FindUserByID", func(t *testing.T) {
+		t.Run("It returns the user by the given ID", func(t *testing.T) {
+			dbTest(func(ctx context.Context, db *sql.DB) {
+				f := setup(db)
+				f.repo.CreateUser(ctx, f.user)
+
+				user, err := f.repo.FindUserByID(ctx, f.user.ID)
+
+				assert.Nil(t, err)
+				assert.Equal(t, f.user, user)
+			})
+		})
+
+		t.Run("It returns error when user does not exist", func(t *testing.T) {
+			dbTest(func(ctx context.Context, db *sql.DB) {
+				f := setup(db)
+
+				user, err := f.repo.FindUserByID(ctx, f.user.ID)
+
+				assert.Equal(t, err, auth.ErrUserNotFound)
+				assert.Equal(t, auth.User{}, user)
+			})
+		})
+	})
+
+	t.Run("FindUserByProviderUserID", func(t *testing.T) {
+		t.Run("It returns the user by the given provider user ID", func(t *testing.T) {
+			dbTest(func(ctx context.Context, db *sql.DB) {
+				f := setup(db)
+				f.repo.CreateUser(ctx, f.user)
+
+				user, err := f.repo.FindUserByProviderUserID(ctx, f.user.ProviderUserID)
+
+				assert.Nil(t, err)
+				assert.Equal(t, f.user, user)
+			})
+		})
+
+		t.Run("It returns error when user does not exist", func(t *testing.T) {
+			dbTest(func(ctx context.Context, db *sql.DB) {
+				f := setup(db)
+
+				user, err := f.repo.FindUserByProviderUserID(ctx, f.user.ProviderUserID)
+
+				assert.Equal(t, err, auth.ErrUserNotFound)
+				assert.Equal(t, auth.User{}, user)
+			})
+		})
+	})
 }

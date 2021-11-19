@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/geisonbiazus/blog/internal/core/auth"
@@ -64,8 +65,11 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 }
 
 func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
-	rows, err := r.exec(ctx,
-		"INSERT INTO users (id, name, email, provider_user_id, avatar_url) VALUES ($1, $2, $3, $4, $5)",
+	rows, err := r.exec(ctx, `
+		INSERT INTO users 
+			(id, name, email, provider_user_id, avatar_url) 
+		VALUES 
+			($1, $2, $3, $4, $5)`,
 		user.ID, user.Name, user.Email, user.ProviderUserID, user.AvatarURL,
 	)
 
@@ -92,7 +96,7 @@ func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
 	)
 
 	if err != nil {
-		return fmt.Errorf("error on Update when executing query: %w", err)
+		return fmt.Errorf("error on UpdateUser when executing query: %w", err)
 	}
 
 	if rows != 1 {
@@ -103,13 +107,35 @@ func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
 }
 
 func (r *UserRepo) FindUserByID(ctx context.Context, id string) (auth.User, error) {
+	return r.findUserBy(ctx, "id", id)
+}
+
+func (r *UserRepo) FindUserByProviderUserID(ctx context.Context, providerUserID string) (auth.User, error) {
+	return r.findUserBy(ctx, "provider_user_id", providerUserID)
+}
+
+func (r *UserRepo) findUserBy(ctx context.Context, field string, value interface{}) (auth.User, error) {
 	conn := r.conn(ctx)
 
-	row := conn.QueryRowContext(ctx, "SELECT id, name, email, provider_user_id, avatar_url FROM users where id = $1", id)
+	row := conn.QueryRowContext(ctx, `
+		SELECT 
+			id, name, email, provider_user_id, avatar_url 
+		FROM users 
+		WHERE `+field+` = $1`,
+		value,
+	)
 
 	user := auth.User{}
 
 	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.ProviderUserID, &user.AvatarURL)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return auth.User{}, auth.ErrUserNotFound
+	}
+
+	if err != nil {
+		return auth.User{}, fmt.Errorf("error on findUserBy when executing query: %w", err)
+	}
 
 	return user, err
 }
