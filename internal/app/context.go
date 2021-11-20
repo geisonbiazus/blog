@@ -1,6 +1,7 @@
 package app
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -13,7 +14,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
 	staterepo "github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
 	"github.com/geisonbiazus/blog/internal/adapters/tokenencoder/jwt"
-	userrepo "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
+	userrepo_memory "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
+	userrepo_postgres "github.com/geisonbiazus/blog/internal/adapters/userrepo/postgres"
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/ui/web"
@@ -34,8 +36,11 @@ type Context struct {
 
 	AuthTokenSecret string
 
-	stateRepo *staterepo.StateRepo
-	userRepo  *userrepo.UserRepo
+	PostgresURL string
+
+	db        *sql.DB
+	stateRepo auth.StateRepo
+	userRepo  auth.UserRepo
 }
 
 func NewContext() *Context {
@@ -52,6 +57,8 @@ func NewContext() *Context {
 		GitHubClientSecret: env.GetString("GITHUB_CLIENT_SECRET", ""),
 
 		AuthTokenSecret: env.GetString("AUTH_TOKEN_SECRET", ""),
+
+		PostgresURL: env.GetString("POSTGRES_URL", "postgres://postgres:postgres@localhost:5432/blog?sslmode=disable"),
 	}
 }
 
@@ -94,6 +101,17 @@ func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
 
 // Adapters
 
+func (c *Context) DB() *sql.DB {
+	if c.db == nil {
+		db, err := sql.Open("pgx", c.PostgresURL)
+		if err != nil {
+			panic(err)
+		}
+		c.db = db
+	}
+	return c.db
+}
+
 func (c *Context) PostRepo() *filesystem.PostRepo {
 	return filesystem.NewPostRepo(c.PostPath)
 }
@@ -121,16 +139,20 @@ func (c *Context) IDGenerator() *uuid.Generator {
 	return uuid.NewGenerator()
 }
 
-func (c *Context) StateRepo() *staterepo.StateRepo {
+func (c *Context) StateRepo() auth.StateRepo {
 	if c.stateRepo == nil {
 		c.stateRepo = staterepo.NewStateRepo()
 	}
 	return c.stateRepo
 }
 
-func (c *Context) UserRepo() *userrepo.UserRepo {
+func (c *Context) UserRepo() auth.UserRepo {
 	if c.userRepo == nil {
-		c.userRepo = userrepo.NewUserRepo()
+		if c.Env == "test" {
+			c.userRepo = userrepo_memory.NewUserRepo()
+		} else {
+			c.userRepo = userrepo_postgres.NewUserRepo(c.DB())
+		}
 	}
 	return c.userRepo
 }
