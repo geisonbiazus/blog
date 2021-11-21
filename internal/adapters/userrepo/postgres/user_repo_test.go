@@ -9,17 +9,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/userrepo/postgres"
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/geisonbiazus/blog/pkg/dbrepo"
 )
-
-func dbTest(cb func(ctx context.Context, db *sql.DB)) {
-	ctx := context.Background()
-	db, _ := sql.Open("pgx", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable")
-	defer db.Close()
-	tx, _ := db.BeginTx(ctx, nil)
-	ctx = context.WithValue(ctx, postgres.TxKey, tx)
-	cb(ctx, db)
-	tx.Rollback()
-}
 
 type testUserRepoFixture struct {
 	repo    *postgres.UserRepo
@@ -49,7 +40,7 @@ func TestUserRepo(t *testing.T) {
 
 	t.Run("CreateUser", func(t *testing.T) {
 		t.Run("It creates a new user", func(t *testing.T) {
-			dbTest(func(ctx context.Context, db *sql.DB) {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
 				f := setup(db)
 
 				err := f.repo.CreateUser(ctx, f.user)
@@ -64,7 +55,7 @@ func TestUserRepo(t *testing.T) {
 		})
 
 		t.Run("It returns error when user already exists", func(t *testing.T) {
-			dbTest(func(ctx context.Context, db *sql.DB) {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
 				f := setup(db)
 
 				f.repo.CreateUser(ctx, f.user)
@@ -77,7 +68,7 @@ func TestUserRepo(t *testing.T) {
 
 	t.Run("UpdateUser", func(t *testing.T) {
 		t.Run("It updates the user values", func(t *testing.T) {
-			dbTest(func(ctx context.Context, db *sql.DB) {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
 				f := setup(db)
 				user := f.user
 
@@ -100,7 +91,7 @@ func TestUserRepo(t *testing.T) {
 		})
 
 		t.Run("It returns error when user does not exist", func(t *testing.T) {
-			dbTest(func(ctx context.Context, db *sql.DB) {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
 				f := setup(db)
 
 				err := f.repo.UpdateUser(ctx, f.user)
@@ -110,7 +101,7 @@ func TestUserRepo(t *testing.T) {
 		})
 
 		t.Run("It returns error when update is not possible", func(t *testing.T) {
-			dbTest(func(ctx context.Context, db *sql.DB) {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
 				f := setup(db)
 
 				user := f.user
@@ -137,7 +128,7 @@ func TestUserRepo(t *testing.T) {
 
 	t.Run("FindUserByID", func(t *testing.T) {
 		t.Run("It returns the user by the given ID", func(t *testing.T) {
-			dbTest(func(ctx context.Context, db *sql.DB) {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
 				f := setup(db)
 				f.repo.CreateUser(ctx, f.user)
 
@@ -149,7 +140,7 @@ func TestUserRepo(t *testing.T) {
 		})
 
 		t.Run("It returns error when user does not exist", func(t *testing.T) {
-			dbTest(func(ctx context.Context, db *sql.DB) {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
 				f := setup(db)
 
 				user, err := f.repo.FindUserByID(ctx, f.user.ID)
@@ -162,7 +153,7 @@ func TestUserRepo(t *testing.T) {
 
 	t.Run("FindUserByProviderUserID", func(t *testing.T) {
 		t.Run("It returns the user by the given provider user ID", func(t *testing.T) {
-			dbTest(func(ctx context.Context, db *sql.DB) {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
 				f := setup(db)
 				f.repo.CreateUser(ctx, f.user)
 
@@ -174,7 +165,7 @@ func TestUserRepo(t *testing.T) {
 		})
 
 		t.Run("It returns error when user does not exist", func(t *testing.T) {
-			dbTest(func(ctx context.Context, db *sql.DB) {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
 				f := setup(db)
 
 				user, err := f.repo.FindUserByProviderUserID(ctx, f.user.ProviderUserID)

@@ -7,65 +7,20 @@ import (
 	"fmt"
 
 	"github.com/geisonbiazus/blog/internal/core/auth"
+	"github.com/geisonbiazus/blog/pkg/dbrepo"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-type Connection interface {
-	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
-	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
-	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
-}
-
-type TxKeyType string
-
-var TxKey = TxKeyType("tx")
-
-type DBRepo struct {
-	db *sql.DB
-}
-
-func (r *DBRepo) conn(ctx context.Context) Connection {
-	tx := ctx.Value(TxKey)
-
-	if tx == nil {
-		return r.db
-	}
-
-	if tx, ok := tx.(*sql.Tx); ok {
-		return tx
-	}
-
-	return r.db
-}
-
-func (r *DBRepo) exec(ctx context.Context, query string, args ...interface{}) (int64, error) {
-	conn := r.conn(ctx)
-
-	result, err := conn.ExecContext(ctx, query, args...)
-
-	if err != nil {
-		return 0, fmt.Errorf("error on exec when executing query: %w", err)
-	}
-
-	rows, err := result.RowsAffected()
-
-	if err != nil {
-		return 0, fmt.Errorf("error on exec when getting affected rows: %w", err)
-	}
-
-	return rows, nil
-}
-
 type UserRepo struct {
-	DBRepo
+	*dbrepo.Base
 }
 
 func NewUserRepo(db *sql.DB) *UserRepo {
-	return &UserRepo{DBRepo: DBRepo{db: db}}
+	return &UserRepo{Base: dbrepo.NewBase(db)}
 }
 
 func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
-	rows, err := r.exec(ctx, `
+	rows, err := r.Exec(ctx, `
 		INSERT INTO users 
 			(id, name, email, provider_user_id, avatar_url) 
 		VALUES 
@@ -85,7 +40,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
 }
 
 func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
-	rows, err := r.exec(ctx, `
+	rows, err := r.Exec(ctx, `
 		UPDATE users set 
 			name = $1, 
 			email = $2, 
@@ -115,7 +70,7 @@ func (r *UserRepo) FindUserByProviderUserID(ctx context.Context, providerUserID 
 }
 
 func (r *UserRepo) findUserBy(ctx context.Context, field string, value interface{}) (auth.User, error) {
-	conn := r.conn(ctx)
+	conn := r.Conn(ctx)
 
 	row := conn.QueryRowContext(ctx, `
 		SELECT 
