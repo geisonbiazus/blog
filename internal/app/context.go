@@ -20,6 +20,7 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/ui/web"
 	"github.com/geisonbiazus/blog/pkg/env"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type Context struct {

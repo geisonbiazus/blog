@@ -8,7 +8,6 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
-	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type UserRepo struct {

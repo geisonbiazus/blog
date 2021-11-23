@@ -3,6 +3,8 @@ package dbrepo
 import (
 	"context"
 	"database/sql"
+
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 // Test connects to the database, starts a transaction and puts it
@@ -12,10 +14,7 @@ import (
 // the database to the initial state.
 func Test(cb func(ctx context.Context, db *sql.DB)) {
 	ctx := context.Background()
-	db, err := sql.Open("pgx", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable")
-	if err != nil {
-		panic(err)
-	}
+	db := ConnectoToTestDB()
 	defer db.Close()
 
 	tx, err := db.BeginTx(ctx, nil)
@@ -26,4 +25,12 @@ func Test(cb func(ctx context.Context, db *sql.DB)) {
 	ctx = context.WithValue(ctx, TxKey, tx)
 	cb(ctx, db)
 	tx.Rollback()
+}
+
+func ConnectoToTestDB() *sql.DB {
+	db, err := sql.Open("pgx", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable")
+	if err != nil {
+		panic(err)
+	}
+	return db
 }
