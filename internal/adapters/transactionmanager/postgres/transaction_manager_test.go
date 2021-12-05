@@ -1,4 +1,4 @@
-package dbrepo_test
+package postgres_test
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager/postgres"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -17,7 +18,7 @@ func TestTransactionManager(t *testing.T) {
 			db := dbrepo.ConnectoToTestDB()
 			defer db.Close()
 
-			manager := dbrepo.NewTransactionManager(db)
+			manager := postgres.NewTransactionManager(db)
 			var ctx context.Context
 			manager.Transaction(context.Background(), func(c context.Context) error {
 				ctx = c
@@ -35,7 +36,7 @@ func TestTransactionManager(t *testing.T) {
 
 			createTestTable(db)
 
-			manager := dbrepo.NewTransactionManager(db)
+			manager := postgres.NewTransactionManager(db)
 			manager.Transaction(context.Background(), func(ctx context.Context) error {
 				tx := dbrepo.TxFromContext(ctx)
 				insertValue(tx)
@@ -53,7 +54,7 @@ func TestTransactionManager(t *testing.T) {
 
 			createTestTable(db)
 
-			manager := dbrepo.NewTransactionManager(db)
+			manager := postgres.NewTransactionManager(db)
 			manager.Transaction(context.Background(), func(ctx context.Context) error {
 				tx := dbrepo.TxFromContext(ctx)
 				insertValue(tx)
@@ -65,13 +66,13 @@ func TestTransactionManager(t *testing.T) {
 			dropTestTable(db)
 		})
 
-		t.Run("It rollbacks the transaction the callack panics", func(t *testing.T) {
+		t.Run("It rollbacks the transaction if the callack panics", func(t *testing.T) {
 			db := dbrepo.ConnectoToTestDB()
 			defer db.Close()
 
 			createTestTable(db)
 
-			manager := dbrepo.NewTransactionManager(db)
+			manager := postgres.NewTransactionManager(db)
 			manager.Transaction(context.Background(), func(ctx context.Context) error {
 				tx := dbrepo.TxFromContext(ctx)
 				insertValue(tx)

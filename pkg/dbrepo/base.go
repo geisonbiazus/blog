@@ -12,10 +12,6 @@ type Connection interface {
 	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
 }
 
-type TxKeyType string
-
-var TxKey = TxKeyType("tx")
-
 type Base struct {
 	db *sql.DB
 }
@@ -25,13 +21,9 @@ func NewBase(db *sql.DB) *Base {
 }
 
 func (r *Base) Conn(ctx context.Context) Connection {
-	tx := ctx.Value(TxKey)
+	tx := TxFromContext(ctx)
 
-	if tx == nil {
-		return r.db
-	}
-
-	if tx, ok := tx.(*sql.Tx); ok {
+	if tx != nil {
 		return tx
 	}
 
