@@ -4,7 +4,7 @@ import "context"
 
 type TransactionManager struct{}
 
-func NewFakeTransactionManager() *TransactionManager {
+func NewTransactionManager() *TransactionManager {
 	return &TransactionManager{}
 }
 

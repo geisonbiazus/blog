@@ -7,6 +7,7 @@ import (
 	"time"
 
 	staterepo "github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
+	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager/fake"
 	userrepo "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/pkg/assert"
@@ -39,7 +40,8 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		userRepo := userrepo.NewUserRepo()
 		idGen := NewIDGeneratorStub()
 		tokenEncoder := NewTokenEncoderSpy()
-		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder)
+		txManager := fake.NewTransactionManager()
+		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder, txManager)
 		return &confirmOAuth2UseCaseFixture{
 			usecase:      usecase,
 			provider:     provider,
