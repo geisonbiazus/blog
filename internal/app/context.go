@@ -7,17 +7,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geisonbiazus/blog/internal/adapters/idgenerator/uuid"
-	oauth2provider_fake "github.com/geisonbiazus/blog/internal/adapters/oauth2provider/fake"
-	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider/github"
-	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
-	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
-	staterepo "github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
-	"github.com/geisonbiazus/blog/internal/adapters/tokenencoder/jwt"
-	transactionmanager_fake "github.com/geisonbiazus/blog/internal/adapters/transactionmanager/fake"
-	transactionmanager_postgres "github.com/geisonbiazus/blog/internal/adapters/transactionmanager/postgres"
-	userrepo_memory "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
-	userrepo_postgres "github.com/geisonbiazus/blog/internal/adapters/userrepo/postgres"
+	"github.com/geisonbiazus/blog/internal/adapters/idgenerator"
+	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider"
+	"github.com/geisonbiazus/blog/internal/adapters/postrepo"
+	"github.com/geisonbiazus/blog/internal/adapters/renderer"
+	"github.com/geisonbiazus/blog/internal/adapters/staterepo"
+	"github.com/geisonbiazus/blog/internal/adapters/tokenencoder"
+	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager"
+	"github.com/geisonbiazus/blog/internal/adapters/userrepo"
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/core/shared"
@@ -100,7 +97,7 @@ func (c *Context) RequestOAuth2UseCase() *auth.RequestOAuth2UseCase {
 }
 
 func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
-	return auth.NewConfirmOAuth2UseCase(c.OAuth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenManager(), c.TransactionManager())
+	return auth.NewConfirmOAuth2UseCase(c.OAuth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenEncoder(), c.TransactionManager())
 }
 
 // Adapters
@@ -118,17 +115,17 @@ func (c *Context) DB() *sql.DB {
 
 func (c *Context) TransactionManager() shared.TransactionManager {
 	if c.isTest() {
-		return transactionmanager_fake.NewTransactionManager()
+		return transactionmanager.NewFakeTransactionManager()
 	}
-	return transactionmanager_postgres.NewTransactionManager(c.DB())
+	return transactionmanager.NewPostgresTransactionManager(c.DB())
 }
 
-func (c *Context) PostRepo() *filesystem.PostRepo {
-	return filesystem.NewPostRepo(c.PostPath)
+func (c *Context) PostRepo() blog.PostRepo {
+	return postrepo.NewFileSystemPostRepo(c.PostPath)
 }
 
-func (c *Context) Renderer() *goldmark.Renderer {
-	return goldmark.NewRenderer()
+func (c *Context) Renderer() blog.Renderer {
+	return renderer.NewGoldmarkRenderer()
 }
 
 func (c *Context) OAuth2Provider() auth.OAuth2Provider {
@@ -138,21 +135,21 @@ func (c *Context) OAuth2Provider() auth.OAuth2Provider {
 	return c.GithubOAuth2Provider()
 }
 
-func (c *Context) GithubOAuth2Provider() *github.Provider {
-	return github.NewProvider(c.GitHubClientID, c.GitHubClientSecret)
+func (c *Context) GithubOAuth2Provider() auth.OAuth2Provider {
+	return oauth2provider.NewGithubProvider(c.GitHubClientID, c.GitHubClientSecret)
 }
 
-func (c *Context) FakeOAuth2Provider() *oauth2provider_fake.Provider {
-	return oauth2provider_fake.NewProvider(c.BaseURL)
+func (c *Context) FakeOAuth2Provider() auth.OAuth2Provider {
+	return oauth2provider.NewFakeProvider(c.BaseURL)
 }
 
-func (c *Context) IDGenerator() *uuid.Generator {
-	return uuid.NewGenerator()
+func (c *Context) IDGenerator() auth.IDGenerator {
+	return idgenerator.NewUUIDGenerator()
 }
 
 func (c *Context) StateRepo() auth.StateRepo {
 	if c.stateRepo == nil {
-		c.stateRepo = staterepo.NewStateRepo()
+		c.stateRepo = staterepo.NewMemoryStateRepo()
 	}
 	return c.stateRepo
 }
@@ -160,16 +157,16 @@ func (c *Context) StateRepo() auth.StateRepo {
 func (c *Context) UserRepo() auth.UserRepo {
 	if c.userRepo == nil {
 		if c.isTest() {
-			c.userRepo = userrepo_memory.NewUserRepo()
+			c.userRepo = userrepo.NewMemoryUserRepo()
 		} else {
-			c.userRepo = userrepo_postgres.NewUserRepo(c.DB())
+			c.userRepo = userrepo.NewPostgresUserRepo(c.DB())
 		}
 	}
 	return c.userRepo
 }
 
-func (c *Context) TokenManager() *jwt.TokenEncoder {
-	return jwt.NewTokenEncoder(c.AuthTokenSecret)
+func (c *Context) TokenEncoder() auth.TokenEncoder {
+	return tokenencoder.NewJWTTokenEncoder(c.AuthTokenSecret)
 }
 
 func (c *Context) Logger() *log.Logger {
