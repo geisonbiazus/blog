@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/geisonbiazus/blog/pkg/env"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
@@ -28,7 +29,8 @@ func Test(cb func(ctx context.Context, db *sql.DB)) {
 }
 
 func ConnectoToTestDB() *sql.DB {
-	db, err := sql.Open("pgx", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable")
+	url := env.GetString("DB_TEST_URL", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable")
+	db, err := sql.Open("pgx", url)
 	if err != nil {
 		panic(err)
 	}
