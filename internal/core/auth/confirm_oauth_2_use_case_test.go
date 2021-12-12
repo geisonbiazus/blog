@@ -7,6 +7,7 @@ import (
 	"time"
 
 	staterepo "github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
+	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager/fake"
 	userrepo "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/pkg/assert"
@@ -19,7 +20,7 @@ type confirmOAuth2UseCaseFixture struct {
 	userRepo     *userrepo.UserRepo
 	idGen        *IDGeneratorStub
 	tokenEncoder *TokenEncoderSpy
-	context      context.Context
+	ctx          context.Context
 }
 
 func TestConfirmOAuth2UseCase(t *testing.T) {
@@ -39,7 +40,8 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		userRepo := userrepo.NewUserRepo()
 		idGen := NewIDGeneratorStub()
 		tokenEncoder := NewTokenEncoderSpy()
-		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder)
+		txManager := fake.NewTransactionManager()
+		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder, txManager)
 		return &confirmOAuth2UseCaseFixture{
 			usecase:      usecase,
 			provider:     provider,
@@ -47,14 +49,14 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 			userRepo:     userRepo,
 			idGen:        idGen,
 			tokenEncoder: tokenEncoder,
-			context:      context.Background(),
+			ctx:          context.Background(),
 		}
 	}
 
 	t.Run("It returns error when state is not found", func(t *testing.T) {
 		f := setup()
 
-		_, err := f.usecase.Run(f.context, state, code)
+		_, err := f.usecase.Run(f.ctx, state, code)
 
 		assert.Equal(t, err, auth.ErrInvalidState)
 	})
@@ -64,7 +66,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 
 		f.stateRepo.AddState(state)
 
-		f.usecase.Run(f.context, state, code)
+		f.usecase.Run(f.ctx, state, code)
 
 		exists, _ := f.stateRepo.Exists(state)
 		assert.False(t, exists)
@@ -78,9 +80,9 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		authError := errors.New("authentication error")
 		f.provider.AuthenticatedUserReturnError = authError
 
-		_, err := f.usecase.Run(f.context, state, code)
+		_, err := f.usecase.Run(f.ctx, state, code)
 
-		assert.Equal(t, f.context, f.provider.AuthenticatedUserReceivedContext)
+		assert.Equal(t, f.ctx, f.provider.AuthenticatedUserReceivedContext)
 		assert.Equal(t, code, f.provider.AuthenticatedUserReceivedCode)
 		assert.Error(t, authError, err)
 	})
@@ -92,7 +94,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		f.idGen.ReturnID = "generatedID"
 		f.provider.AuthenticatedUserReturnProviderUser = providerUser
 
-		f.usecase.Run(f.context, state, code)
+		f.usecase.Run(f.ctx, state, code)
 
 		user := auth.User{
 			ID:             f.idGen.ReturnID,
@@ -102,7 +104,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 			AvatarURL:      providerUser.AvatarURL,
 		}
 
-		createdUser, _ := f.userRepo.FindUserByEmail(providerUser.Email)
+		createdUser, _ := f.userRepo.FindUserByEmail(f.ctx, providerUser.Email)
 
 		assert.Equal(t, user, createdUser)
 	})
@@ -122,9 +124,9 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 			AvatarURL:      "http://example.com/previous_avatar.png",
 		}
 
-		f.userRepo.CreateUser(user)
+		f.userRepo.CreateUser(f.ctx, user)
 
-		f.usecase.Run(f.context, state, code)
+		f.usecase.Run(f.ctx, state, code)
 
 		expctedUser := auth.User{
 			ID:             user.ID,
@@ -134,7 +136,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 			AvatarURL:      providerUser.AvatarURL,
 		}
 
-		createdUser, _ := f.userRepo.FindUserByEmail(providerUser.Email)
+		createdUser, _ := f.userRepo.FindUserByEmail(f.ctx, providerUser.Email)
 
 		assert.Equal(t, expctedUser, createdUser)
 	})
@@ -147,7 +149,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		f.provider.AuthenticatedUserReturnProviderUser = providerUser
 		f.tokenEncoder.EncodeReturnToken = "expectedToken"
 
-		token, _ := f.usecase.Run(f.context, state, code)
+		token, _ := f.usecase.Run(f.ctx, state, code)
 
 		assert.Equal(t, f.idGen.ReturnID, f.tokenEncoder.EncodeReceivedValue)
 		assert.Equal(t, 24*time.Hour, f.tokenEncoder.EncodeReceivedExpiresIn)
@@ -162,7 +164,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		f.provider.AuthenticatedUserReturnProviderUser = providerUser
 		f.tokenEncoder.EncodeReturnError = errors.New("error encoding")
 
-		_, err := f.usecase.Run(f.context, state, code)
+		_, err := f.usecase.Run(f.ctx, state, code)
 
 		assert.Error(t, f.tokenEncoder.EncodeReturnError, err)
 	})

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/geisonbiazus/blog/internal/core/shared"
 )
 
 type ConfirmOAuth2UseCase struct {
@@ -13,10 +15,16 @@ type ConfirmOAuth2UseCase struct {
 	userRepo     UserRepo
 	idGen        IDGenerator
 	tokenEncoder TokenEncoder
+	txManager    shared.TransactionManager
 }
 
 func NewConfirmOAuth2UseCase(
-	provider OAuth2Provider, stateRepo StateRepo, userRepo UserRepo, idGen IDGenerator, tokenEncoder TokenEncoder,
+	provider OAuth2Provider,
+	stateRepo StateRepo,
+	userRepo UserRepo,
+	idGen IDGenerator,
+	tokenEncoder TokenEncoder,
+	txManager shared.TransactionManager,
 ) *ConfirmOAuth2UseCase {
 	return &ConfirmOAuth2UseCase{
 		provider:     provider,
@@ -24,16 +32,25 @@ func NewConfirmOAuth2UseCase(
 		userRepo:     userRepo,
 		idGen:        idGen,
 		tokenEncoder: tokenEncoder,
+		txManager:    txManager,
 	}
 }
 
-func (u *ConfirmOAuth2UseCase) Run(ctx context.Context, state, code string) (string, error) {
+func (u *ConfirmOAuth2UseCase) Run(ctx context.Context, state, code string) (token string, err error) {
+	err = u.txManager.Transaction(ctx, func(ctx context.Context) error {
+		token, err = u.run(ctx, state, code)
+		return err
+	})
+	return
+}
+
+func (u *ConfirmOAuth2UseCase) run(ctx context.Context, state, code string) (string, error) {
 	providerUser, err := u.processOAuth2Authentication(ctx, state, code)
 	if err != nil {
 		return "", err
 	}
 
-	return u.resolveUserAndGetToken(providerUser)
+	return u.resolveUserAndGetToken(ctx, providerUser)
 }
 
 func (u *ConfirmOAuth2UseCase) processOAuth2Authentication(ctx context.Context, state, code string) (ProviderUser, error) {
@@ -72,8 +89,8 @@ func (u *ConfirmOAuth2UseCase) getProviderAuthenticatedUser(ctx context.Context,
 	return providerUser, nil
 }
 
-func (u *ConfirmOAuth2UseCase) resolveUserAndGetToken(providerUser ProviderUser) (string, error) {
-	user, err := u.createOrUpdateUser(providerUser)
+func (u *ConfirmOAuth2UseCase) resolveUserAndGetToken(ctx context.Context, providerUser ProviderUser) (string, error) {
+	user, err := u.createOrUpdateUser(ctx, providerUser)
 	if err != nil {
 		return "", err
 	}
@@ -81,21 +98,21 @@ func (u *ConfirmOAuth2UseCase) resolveUserAndGetToken(providerUser ProviderUser)
 	return u.getAuthenticationToken(user)
 }
 
-func (u *ConfirmOAuth2UseCase) createOrUpdateUser(providerUser ProviderUser) (User, error) {
-	user, err := u.userRepo.FindUserByProviderUserID(providerUser.ID)
+func (u *ConfirmOAuth2UseCase) createOrUpdateUser(ctx context.Context, providerUser ProviderUser) (User, error) {
+	user, err := u.userRepo.FindUserByProviderUserID(ctx, providerUser.ID)
 
 	if errors.Is(err, ErrUserNotFound) {
-		return u.createNewUser(providerUser)
+		return u.createNewUser(ctx, providerUser)
 	}
 
 	if err != nil {
 		return User{}, fmt.Errorf("error finding user on ConfirmOAuth2UseCase: %w", err)
 	}
 
-	return u.updateExistingUser(user, providerUser)
+	return u.updateExistingUser(ctx, user, providerUser)
 }
 
-func (u *ConfirmOAuth2UseCase) createNewUser(providerUser ProviderUser) (User, error) {
+func (u *ConfirmOAuth2UseCase) createNewUser(ctx context.Context, providerUser ProviderUser) (User, error) {
 	user := User{
 		ID:             u.idGen.Generate(),
 		ProviderUserID: providerUser.ID,
@@ -104,7 +121,7 @@ func (u *ConfirmOAuth2UseCase) createNewUser(providerUser ProviderUser) (User, e
 		AvatarURL:      providerUser.AvatarURL,
 	}
 
-	err := u.userRepo.CreateUser(user)
+	err := u.userRepo.CreateUser(ctx, user)
 	if err != nil {
 		return User{}, fmt.Errorf("error creatinng user on ConfirmOAuth2UseCase: %w", err)
 	}
@@ -112,12 +129,12 @@ func (u *ConfirmOAuth2UseCase) createNewUser(providerUser ProviderUser) (User, e
 	return user, nil
 }
 
-func (u *ConfirmOAuth2UseCase) updateExistingUser(user User, providerUser ProviderUser) (User, error) {
+func (u *ConfirmOAuth2UseCase) updateExistingUser(ctx context.Context, user User, providerUser ProviderUser) (User, error) {
 	user.Email = providerUser.Email
 	user.Name = providerUser.Name
 	user.AvatarURL = providerUser.AvatarURL
 
-	err := u.userRepo.UpdateUser(user)
+	err := u.userRepo.UpdateUser(ctx, user)
 	if err != nil {
 		return User{}, fmt.Errorf("error updating user on ConfirmOAuth2UseCase: %w", err)
 	}

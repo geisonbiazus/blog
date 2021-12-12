@@ -18,14 +18,37 @@ jobs:
     runs-on: ubuntu-latest
     container: golang:1.16.3-alpine
 
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: blog_test
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_TEST_URL: postgres://postgres:postgres@postgres:5432/blog_test?sslmode=disable
+
     steps:
       - uses: actions/checkout@v2
 
       - name: Install build deps
         run: apk add build-base
 
+      - name: Install migrate
+        run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+      - name: Run migrations
+        run: make db_migrate db_url=$DB_TEST_URL
+
       - name: Run tests
-        run: go test ./...
+        run: make test
 
   deploy:
     name: Deploy to Heroku
@@ -34,9 +57,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12 
+      - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "blog-geisonbiazus" 
+          heroku_app_name: "blog-geisonbiazus"
           heroku_email: "geisonbiazus@gmail.com"
           usedocker: true

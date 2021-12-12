@@ -21,9 +21,9 @@ type StateRepo interface {
 }
 
 type UserRepo interface {
-	CreateUser(user User) error
-	UpdateUser(user User) error
-	FindUserByProviderUserID(providerUserID string) (User, error)
+	CreateUser(ctx context.Context, user User) error
+	UpdateUser(ctx context.Context, user User) error
+	FindUserByProviderUserID(ctx context.Context, providerUserID string) (User, error)
 }
 
 type TokenEncoder interface {

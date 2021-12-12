@@ -2,16 +2,93 @@
 
 Blog source code
 
-# Commands
+# Running locally
+
+Start database
+
+```
+docker compose up -d
+```
+
+Install `migrate` CLI
+
+```
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
+
+Migrate database
+
+```
+make db_migrate
+make db_test_migrate
+```
 
 Run tests
 
 ```
-go test ./...
+make test
 ```
 
 Start the project locally
 
 ```
-go run cmd/web/main.go
+make run
+```
+
+## Migrations
+
+Create migration
+
+```
+make generate_migration name=migration_name
+```
+
+Run migrations on dev database
+
+```
+make db_migrate
+```
+
+Run migrations on test database
+
+```
+make db_test_migrate
+```
+
+Run migration on a custom database
+
+```
+make db_migrate db_url='DATABASE_URL'
+```
+
+Rollback 1 migration on dev database
+
+```
+make db_rollback
+```
+
+Rollback 1 migration on test database
+
+```
+make db_test_rollback
+```
+
+Rollback 1 migration on a custom database
+
+```
+make db_rollback db_url='DATABASE_URL'
+```
+
+Force migration version on dev database
+
+In case there is a migration error and you receive the message `Dirty database version 20211109080746. Fix and force version.`. You can fix it by running the following command. Be sure to pass the previous version and not the one specified in the error.
+
+```
+make db_force version=20211108120029
+```
+
+Force migration version on test database
+
+```
+make db_test_force version=20211108120029
 ```
