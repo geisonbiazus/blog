@@ -7,6 +7,7 @@ import (
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
 	"github.com/yuin/goldmark/parser"
+	htmloptions "github.com/yuin/goldmark/renderer/html"
 )
 
 type Renderer struct{}
@@ -29,6 +30,9 @@ func (r *Renderer) Render(content string) (string, error) {
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
+		),
+		goldmark.WithRendererOptions(
+			htmloptions.WithUnsafe(),
 		),
 	)
 
