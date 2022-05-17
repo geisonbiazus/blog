@@ -2,21 +2,23 @@ package memory_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/geisonbiazus/blog/internal/adapters/cache/memory"
+	"github.com/geisonbiazus/blog/internal/core/shared"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
 func TestCache(t *testing.T) {
-	t.Run("With", func(t *testing.T) {
+	t.Run("Do", func(t *testing.T) {
 		t.Run("It executes the resolve fn and return its value first time it's called", func(t *testing.T) {
 			cache := memory.NewCache[int]()
 			calls := 0
 
-			result := cache.With("key", func() int {
+			result := cache.Do("key", func() int {
 				calls++
 				return calls
-			})
+			}, shared.NeverExpire)
 
 			assert.Equal(t, 1, result)
 			assert.Equal(t, 1, calls)
@@ -31,8 +33,8 @@ func TestCache(t *testing.T) {
 				return calls
 			}
 
-			cache.With("key", resolve)
-			result := cache.With("key", resolve)
+			cache.Do("key", resolve, shared.NeverExpire)
+			result := cache.Do("key", resolve, shared.NeverExpire)
 
 			assert.Equal(t, 1, result)
 			assert.Equal(t, 1, calls)
@@ -41,9 +43,9 @@ func TestCache(t *testing.T) {
 		t.Run("It returns any value type", func(t *testing.T) {
 			cache := memory.NewCache[string]()
 
-			result := cache.With("key", func() string {
+			result := cache.Do("key", func() string {
 				return "value"
-			})
+			}, shared.NeverExpire)
 
 			assert.Equal(t, "value", result)
 		})
@@ -61,16 +63,31 @@ func TestCache(t *testing.T) {
 				return "value2"
 			}
 
-			cache.With("key1", resolve1)
-			result1 := cache.With("key1", resolve1)
+			cache.Do("key1", resolve1, shared.NeverExpire)
+			result1 := cache.Do("key1", resolve1, shared.NeverExpire)
 
-			cache.With("key2", resolve2)
-			result2 := cache.With("key2", resolve2)
+			cache.Do("key2", resolve2, shared.NeverExpire)
+			result2 := cache.Do("key2", resolve2, shared.NeverExpire)
 
 			assert.Equal(t, "value1", result1)
 			assert.Equal(t, "value2", result2)
 			assert.Equal(t, 1, calls1)
 			assert.Equal(t, 1, calls2)
+		})
+
+		t.Run("It expires the cache based on the given interval", func(t *testing.T) {
+			cache := memory.NewCache[int]()
+			calls := 0
+
+			resolve := func() int {
+				calls++
+				return calls
+			}
+
+			cache.Do("key", resolve, -1*time.Minute)
+			cache.Do("key", resolve, -1*time.Minute)
+
+			assert.Equal(t, 2, calls)
 		})
 	})
 }
