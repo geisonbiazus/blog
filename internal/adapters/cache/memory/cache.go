@@ -16,13 +16,22 @@ func NewCache[T any]() *Cache[T] {
 	}
 }
 
-func (c *Cache[T]) Do(key string, resolve func() T, expiresIn time.Duration) T {
+func (c *Cache[T]) Do(key string, resolve func() (T, error), expiresIn time.Duration) (T, error) {
 	item, ok := c.storage[key]
 	if !ok || item.isExpired() {
-		item = newCachedItem(resolve(), expiresIn)
-		c.storage[key] = item
+		return c.resolveAndStoreValue(key, resolve, expiresIn)
 	}
-	return item.value
+	return item.value, nil
+}
+
+func (c *Cache[T]) resolveAndStoreValue(key string, resolve func() (T, error), expiresIn time.Duration) (T, error) {
+	value, err := resolve()
+
+	if err == nil {
+		c.storage[key] = newCachedItem(value, expiresIn)
+	}
+
+	return value, err
 }
 
 type cachedItem[T any] struct {

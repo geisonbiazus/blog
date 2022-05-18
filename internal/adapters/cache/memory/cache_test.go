@@ -1,6 +1,7 @@
 package memory_test
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -11,63 +12,92 @@ import (
 
 func TestCache(t *testing.T) {
 	t.Run("Do", func(t *testing.T) {
-		t.Run("It executes the resolve fn and return its value first time it's called", func(t *testing.T) {
+		t.Run("It executes the resolve fn and return its value", func(t *testing.T) {
 			cache := memory.NewCache[int]()
-			calls := 0
 
-			result := cache.Do("key", func() int {
-				calls++
-				return calls
+			result, err := cache.Do("key", func() (int, error) {
+				return 1, nil
 			}, shared.NeverExpire)
 
 			assert.Equal(t, 1, result)
-			assert.Equal(t, 1, calls)
+			assert.Nil(t, err)
+		})
+
+		t.Run("It returns error when resolve fn returns it", func(t *testing.T) {
+			cache := memory.NewCache[int]()
+			err := errors.New("error")
+
+			_, retunedErr := cache.Do("key", func() (int, error) {
+				return 1, err
+			}, shared.NeverExpire)
+
+			assert.Equal(t, err, retunedErr)
 		})
 
 		t.Run("It caches the value and returns it on consecutive calls", func(t *testing.T) {
 			cache := memory.NewCache[int]()
 			calls := 0
 
-			resolve := func() int {
+			resolve := func() (int, error) {
 				calls++
-				return calls
+				return calls, nil
 			}
 
 			cache.Do("key", resolve, shared.NeverExpire)
-			result := cache.Do("key", resolve, shared.NeverExpire)
+			result, err := cache.Do("key", resolve, shared.NeverExpire)
 
 			assert.Equal(t, 1, result)
 			assert.Equal(t, 1, calls)
+			assert.Nil(t, err)
+		})
+
+		t.Run("It does not cache the value when an error is returned", func(t *testing.T) {
+			cache := memory.NewCache[int]()
+			err := errors.New("error")
+			calls := 0
+
+			resolve := func() (int, error) {
+				calls++
+				return calls, err
+			}
+
+			cache.Do("key", resolve, shared.NeverExpire)
+			result, returnedErr := cache.Do("key", resolve, shared.NeverExpire)
+
+			assert.Equal(t, 2, result)
+			assert.Equal(t, 2, calls)
+			assert.Equal(t, err, returnedErr)
 		})
 
 		t.Run("It returns any value type", func(t *testing.T) {
 			cache := memory.NewCache[string]()
 
-			result := cache.Do("key", func() string {
-				return "value"
+			result, err := cache.Do("key", func() (string, error) {
+				return "value", nil
 			}, shared.NeverExpire)
 
 			assert.Equal(t, "value", result)
+			assert.Nil(t, err)
 		})
 
 		t.Run("It caches different values independently based on the key", func(t *testing.T) {
 			cache := memory.NewCache[string]()
 			calls1 := 0
 			calls2 := 0
-			resolve1 := func() string {
+			resolve1 := func() (string, error) {
 				calls1++
-				return "value1"
+				return "value1", nil
 			}
-			resolve2 := func() string {
+			resolve2 := func() (string, error) {
 				calls2++
-				return "value2"
+				return "value2", nil
 			}
 
 			cache.Do("key1", resolve1, shared.NeverExpire)
-			result1 := cache.Do("key1", resolve1, shared.NeverExpire)
+			result1, _ := cache.Do("key1", resolve1, shared.NeverExpire)
 
 			cache.Do("key2", resolve2, shared.NeverExpire)
-			result2 := cache.Do("key2", resolve2, shared.NeverExpire)
+			result2, _ := cache.Do("key2", resolve2, shared.NeverExpire)
 
 			assert.Equal(t, "value1", result1)
 			assert.Equal(t, "value2", result2)
@@ -79,9 +109,9 @@ func TestCache(t *testing.T) {
 			cache := memory.NewCache[int]()
 			calls := 0
 
-			resolve := func() int {
+			resolve := func() (int, error) {
 				calls++
-				return calls
+				return calls, nil
 			}
 
 			cache.Do("key", resolve, -1*time.Minute)
