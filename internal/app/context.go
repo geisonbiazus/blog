@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/geisonbiazus/blog/internal/adapters/cache"
 	"github.com/geisonbiazus/blog/internal/adapters/idgenerator"
 	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider"
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo"
@@ -42,6 +43,8 @@ type Context struct {
 	db        *sql.DB
 	stateRepo auth.StateRepo
 	userRepo  auth.UserRepo
+
+	renderedPostCache shared.Cache[blog.RenderedPost]
 }
 
 func NewContext() *Context {
@@ -85,7 +88,7 @@ func (c *Context) UseCases() *web.UseCases {
 }
 
 func (c *Context) ViewPostUseCase() *blog.ViewPostUseCase {
-	return blog.NewViewPostUseCase(c.PostRepo(), c.Renderer())
+	return blog.NewViewPostUseCase(c.PostRepo(), c.Renderer(), c.RenderedPostCache())
 }
 
 func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
@@ -126,6 +129,13 @@ func (c *Context) PostRepo() blog.PostRepo {
 
 func (c *Context) Renderer() blog.Renderer {
 	return renderer.NewGoldmarkRenderer()
+}
+
+func (c *Context) RenderedPostCache() shared.Cache[blog.RenderedPost] {
+	if c.renderedPostCache == nil {
+		c.renderedPostCache = cache.NewMemoryCache[blog.RenderedPost]()
+	}
+	return c.renderedPostCache
 }
 
 func (c *Context) OAuth2Provider() auth.OAuth2Provider {

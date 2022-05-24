@@ -10,7 +10,7 @@ type TransactionManager interface {
 }
 
 type Cache[T any] interface {
-	Do(key string, resolve func() (T, error), expiresAt time.Time) (T, error)
+	Do(key string, resolve func() (T, error), expiresIn time.Duration) (T, error)
 }
 
 var NeverExpire time.Duration = 0
