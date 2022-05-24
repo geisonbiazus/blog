@@ -91,7 +91,7 @@ func (c *Context) ViewPostUseCase() *blog.ViewPostUseCase {
 }
 
 func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
-	return blog.NewListPostsUseCase(c.PostRepo(), c.Renderer())
+	return blog.NewListPostsUseCase(c.PostRepo(), c.Renderer(), c.Cache())
 }
 
 func (c *Context) RequestOAuth2UseCase() *auth.RequestOAuth2UseCase {
