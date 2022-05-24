@@ -5,13 +5,13 @@ import "github.com/geisonbiazus/blog/internal/core/shared"
 type ViewPostUseCase struct {
 	postRepo PostRepo
 	renderer Renderer
-	cache    shared.Cache[RenderedPost]
+	cache    shared.Cache
 }
 
 func NewViewPostUseCase(
 	postRepo PostRepo,
 	renderer Renderer,
-	cache shared.Cache[RenderedPost],
+	cache shared.Cache,
 ) *ViewPostUseCase {
 	return &ViewPostUseCase{
 		postRepo: postRepo,
@@ -21,9 +21,11 @@ func NewViewPostUseCase(
 }
 
 func (u *ViewPostUseCase) Run(path string) (RenderedPost, error) {
-	return u.cache.Do(path, func() (RenderedPost, error) {
+	result, err := u.cache.Do(path, func() (interface{}, error) {
 		return u.run(path)
 	}, shared.NeverExpire)
+
+	return result.(RenderedPost), err
 }
 
 func (u *ViewPostUseCase) run(path string) (RenderedPost, error) {

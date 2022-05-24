@@ -6,17 +6,21 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/shared"
 )
 
-type Cache[T any] struct {
-	storage map[string]cachedItem[T]
+type Cache struct {
+	storage map[string]cachedItem
 }
 
-func NewCache[T any]() *Cache[T] {
-	return &Cache[T]{
-		storage: map[string]cachedItem[T]{},
+func NewCache() *Cache {
+	return &Cache{
+		storage: map[string]cachedItem{},
 	}
 }
 
-func (c *Cache[T]) Do(key string, resolve func() (T, error), expiresIn time.Duration) (T, error) {
+func (c *Cache) Do(
+	key string,
+	resolve shared.ResolveFn,
+	expiresIn time.Duration,
+) (interface{}, error) {
 	item, ok := c.storage[key]
 	if !ok || item.isExpired() {
 		return c.resolveAndStoreValue(key, resolve, expiresIn)
@@ -24,7 +28,11 @@ func (c *Cache[T]) Do(key string, resolve func() (T, error), expiresIn time.Dura
 	return item.value, nil
 }
 
-func (c *Cache[T]) resolveAndStoreValue(key string, resolve func() (T, error), expiresIn time.Duration) (T, error) {
+func (c *Cache) resolveAndStoreValue(
+	key string,
+	resolve shared.ResolveFn,
+	expiresIn time.Duration,
+) (interface{}, error) {
 	value, err := resolve()
 
 	if err == nil {
@@ -34,21 +42,21 @@ func (c *Cache[T]) resolveAndStoreValue(key string, resolve func() (T, error), e
 	return value, err
 }
 
-type cachedItem[T any] struct {
-	value     T
+type cachedItem struct {
+	value     interface{}
 	createdAt time.Time
 	expiresIn time.Duration
 }
 
-func newCachedItem[T any](value T, expiresIn time.Duration) cachedItem[T] {
-	return cachedItem[T]{
+func newCachedItem(value interface{}, expiresIn time.Duration) cachedItem {
+	return cachedItem{
 		value:     value,
 		createdAt: time.Now(),
 		expiresIn: expiresIn,
 	}
 }
 
-func (i cachedItem[T]) isExpired() bool {
+func (i cachedItem) isExpired() bool {
 	if i.expiresIn == shared.NeverExpire {
 		return false
 	}
@@ -56,6 +64,6 @@ func (i cachedItem[T]) isExpired() bool {
 	return i.expiresAt().Before(time.Now())
 }
 
-func (i cachedItem[T]) expiresAt() time.Time {
+func (i cachedItem) expiresAt() time.Time {
 	return i.createdAt.Add(i.expiresIn)
 }

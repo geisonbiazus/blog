@@ -20,7 +20,7 @@ func TestViewPostUseCase(t *testing.T) {
 	setup := func() *viewPostUseCaseFixture {
 		repo := NewPostRepoSpy()
 		renderer := NewRendererSpy()
-		cache := memory.NewCache[blog.RenderedPost]()
+		cache := memory.NewCache()
 		usecase := blog.NewViewPostUseCase(repo, renderer, cache)
 
 		return &viewPostUseCaseFixture{

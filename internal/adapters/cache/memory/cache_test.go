@@ -13,9 +13,9 @@ import (
 func TestCache(t *testing.T) {
 	t.Run("Do", func(t *testing.T) {
 		t.Run("It executes the resolve fn and return its value", func(t *testing.T) {
-			cache := memory.NewCache[int]()
+			cache := memory.NewCache()
 
-			result, err := cache.Do("key", func() (int, error) {
+			result, err := cache.Do("key", func() (interface{}, error) {
 				return 1, nil
 			}, shared.NeverExpire)
 
@@ -24,10 +24,10 @@ func TestCache(t *testing.T) {
 		})
 
 		t.Run("It returns error when resolve fn returns it", func(t *testing.T) {
-			cache := memory.NewCache[int]()
+			cache := memory.NewCache()
 			err := errors.New("error")
 
-			_, retunedErr := cache.Do("key", func() (int, error) {
+			_, retunedErr := cache.Do("key", func() (interface{}, error) {
 				return 1, err
 			}, shared.NeverExpire)
 
@@ -35,10 +35,10 @@ func TestCache(t *testing.T) {
 		})
 
 		t.Run("It caches the value and returns it on consecutive calls", func(t *testing.T) {
-			cache := memory.NewCache[int]()
+			cache := memory.NewCache()
 			calls := 0
 
-			resolve := func() (int, error) {
+			resolve := func() (interface{}, error) {
 				calls++
 				return calls, nil
 			}
@@ -52,11 +52,11 @@ func TestCache(t *testing.T) {
 		})
 
 		t.Run("It does not cache the value when an error is returned", func(t *testing.T) {
-			cache := memory.NewCache[int]()
+			cache := memory.NewCache()
 			err := errors.New("error")
 			calls := 0
 
-			resolve := func() (int, error) {
+			resolve := func() (interface{}, error) {
 				calls++
 				return calls, err
 			}
@@ -70,9 +70,9 @@ func TestCache(t *testing.T) {
 		})
 
 		t.Run("It returns any value type", func(t *testing.T) {
-			cache := memory.NewCache[string]()
+			cache := memory.NewCache()
 
-			result, err := cache.Do("key", func() (string, error) {
+			result, err := cache.Do("key", func() (interface{}, error) {
 				return "value", nil
 			}, shared.NeverExpire)
 
@@ -81,14 +81,14 @@ func TestCache(t *testing.T) {
 		})
 
 		t.Run("It caches different values independently based on the key", func(t *testing.T) {
-			cache := memory.NewCache[string]()
+			cache := memory.NewCache()
 			calls1 := 0
 			calls2 := 0
-			resolve1 := func() (string, error) {
+			resolve1 := func() (interface{}, error) {
 				calls1++
 				return "value1", nil
 			}
-			resolve2 := func() (string, error) {
+			resolve2 := func() (interface{}, error) {
 				calls2++
 				return "value2", nil
 			}
@@ -106,10 +106,10 @@ func TestCache(t *testing.T) {
 		})
 
 		t.Run("It expires the cache based on the given interval", func(t *testing.T) {
-			cache := memory.NewCache[int]()
+			cache := memory.NewCache()
 			calls := 0
 
-			resolve := func() (int, error) {
+			resolve := func() (interface{}, error) {
 				calls++
 				return calls, nil
 			}

@@ -9,8 +9,10 @@ type TransactionManager interface {
 	Transaction(ctx context.Context, callback func(ctx context.Context) error) error
 }
 
-type Cache[T any] interface {
-	Do(key string, resolve func() (T, error), expiresIn time.Duration) (T, error)
+type ResolveFn func() (interface{}, error)
+
+type Cache interface {
+	Do(key string, resolve ResolveFn, expiresIn time.Duration) (interface{}, error)
 }
 
 var NeverExpire time.Duration = 0

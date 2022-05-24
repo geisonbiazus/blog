@@ -41,10 +41,9 @@ type Context struct {
 	PostgresURL string
 
 	db        *sql.DB
+	cache     shared.Cache
 	stateRepo auth.StateRepo
 	userRepo  auth.UserRepo
-
-	renderedPostCache shared.Cache[blog.RenderedPost]
 }
 
 func NewContext() *Context {
@@ -88,7 +87,7 @@ func (c *Context) UseCases() *web.UseCases {
 }
 
 func (c *Context) ViewPostUseCase() *blog.ViewPostUseCase {
-	return blog.NewViewPostUseCase(c.PostRepo(), c.Renderer(), c.RenderedPostCache())
+	return blog.NewViewPostUseCase(c.PostRepo(), c.Renderer(), c.Cache())
 }
 
 func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
@@ -104,6 +103,13 @@ func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
 }
 
 // Adapters
+
+func (c *Context) Cache() shared.Cache {
+	if c.cache == nil {
+		c.cache = cache.NewMemoryCache()
+	}
+	return c.cache
+}
 
 func (c *Context) DB() *sql.DB {
 	if c.db == nil {
@@ -129,13 +135,6 @@ func (c *Context) PostRepo() blog.PostRepo {
 
 func (c *Context) Renderer() blog.Renderer {
 	return renderer.NewGoldmarkRenderer()
-}
-
-func (c *Context) RenderedPostCache() shared.Cache[blog.RenderedPost] {
-	if c.renderedPostCache == nil {
-		c.renderedPostCache = cache.NewMemoryCache[blog.RenderedPost]()
-	}
-	return c.renderedPostCache
 }
 
 func (c *Context) OAuth2Provider() auth.OAuth2Provider {
