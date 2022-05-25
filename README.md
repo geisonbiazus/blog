@@ -13,7 +13,7 @@ docker compose up -d
 Install `migrate` CLI
 
 ```
-go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+make install_golang_migrate
 ```
 
 Migrate database

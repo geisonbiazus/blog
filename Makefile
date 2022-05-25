@@ -6,6 +6,9 @@ test:
 
 db_url ?= postgres://postgres:postgres@localhost:5432/blog?sslmode=disable
 
+install_golang_migrate:
+	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
 generate_migration:
 	migrate create -ext sql -dir db/migrations $(name)
 
