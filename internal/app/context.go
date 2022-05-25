@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/geisonbiazus/blog/internal/adapters/cache"
 	"github.com/geisonbiazus/blog/internal/adapters/idgenerator"
 	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider"
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo"
@@ -40,6 +41,7 @@ type Context struct {
 	PostgresURL string
 
 	db        *sql.DB
+	cache     shared.Cache
 	stateRepo auth.StateRepo
 	userRepo  auth.UserRepo
 }
@@ -85,11 +87,11 @@ func (c *Context) UseCases() *web.UseCases {
 }
 
 func (c *Context) ViewPostUseCase() *blog.ViewPostUseCase {
-	return blog.NewViewPostUseCase(c.PostRepo(), c.Renderer())
+	return blog.NewViewPostUseCase(c.PostRepo(), c.Renderer(), c.Cache())
 }
 
 func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
-	return blog.NewListPostsUseCase(c.PostRepo(), c.Renderer())
+	return blog.NewListPostsUseCase(c.PostRepo(), c.Renderer(), c.Cache())
 }
 
 func (c *Context) RequestOAuth2UseCase() *auth.RequestOAuth2UseCase {
@@ -101,6 +103,13 @@ func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
 }
 
 // Adapters
+
+func (c *Context) Cache() shared.Cache {
+	if c.cache == nil {
+		c.cache = cache.NewMemoryCache()
+	}
+	return c.cache
+}
 
 func (c *Context) DB() *sql.DB {
 	if c.db == nil {

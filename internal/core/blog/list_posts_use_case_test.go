@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/geisonbiazus/blog/internal/adapters/cache"
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
@@ -18,7 +19,8 @@ func TestTestListPostsUseCase(t *testing.T) {
 	setup := func() *listPostsUseCaseFixture {
 		repo := NewPostRepoSpy()
 		renderer := NewRendererSpy()
-		usecase := blog.NewListPostsUseCase(repo, renderer)
+		cache := cache.NewMemoryCache()
+		usecase := blog.NewListPostsUseCase(repo, renderer, cache)
 		return &listPostsUseCaseFixture{
 			usecase:  usecase,
 			repo:     repo,

@@ -1,15 +1,34 @@
 package blog
 
+import "github.com/geisonbiazus/blog/internal/core/shared"
+
 type ViewPostUseCase struct {
 	postRepo PostRepo
 	renderer Renderer
+	cache    shared.Cache
 }
 
-func NewViewPostUseCase(postRepo PostRepo, renderer Renderer) *ViewPostUseCase {
-	return &ViewPostUseCase{postRepo: postRepo, renderer: renderer}
+func NewViewPostUseCase(
+	postRepo PostRepo,
+	renderer Renderer,
+	cache shared.Cache,
+) *ViewPostUseCase {
+	return &ViewPostUseCase{
+		postRepo: postRepo,
+		renderer: renderer,
+		cache:    cache,
+	}
 }
 
 func (u *ViewPostUseCase) Run(path string) (RenderedPost, error) {
+	result, err := u.cache.Do(path, func() (interface{}, error) {
+		return u.run(path)
+	}, shared.NeverExpire)
+
+	return result.(RenderedPost), err
+}
+
+func (u *ViewPostUseCase) run(path string) (RenderedPost, error) {
 	post, err := u.postRepo.GetPostByPath(path)
 
 	if err != nil {

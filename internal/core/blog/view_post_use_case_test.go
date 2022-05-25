@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/geisonbiazus/blog/internal/adapters/cache/memory"
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
@@ -19,7 +20,8 @@ func TestViewPostUseCase(t *testing.T) {
 	setup := func() *viewPostUseCaseFixture {
 		repo := NewPostRepoSpy()
 		renderer := NewRendererSpy()
-		usecase := blog.NewViewPostUseCase(repo, renderer)
+		cache := memory.NewCache()
+		usecase := blog.NewViewPostUseCase(repo, renderer, cache)
 
 		return &viewPostUseCaseFixture{
 			usecase:  usecase,
