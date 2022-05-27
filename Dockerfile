@@ -13,6 +13,7 @@ WORKDIR /app
 COPY --from=builder /app/blog .
 COPY --from=builder /app/web ./web
 COPY --from=builder /app/posts ./posts
+COPY --from=builder /app/db ./db
 
 EXPOSE 3000
 
