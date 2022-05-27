@@ -21,17 +21,19 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/shared"
 	"github.com/geisonbiazus/blog/internal/ui/web"
 	"github.com/geisonbiazus/blog/pkg/env"
+	"github.com/geisonbiazus/blog/pkg/migration"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type Context struct {
 	Env string
 
-	Port         int
-	TemplatePath string
-	StaticPath   string
-	PostPath     string
-	BaseURL      string
+	Port           int
+	TemplatePath   string
+	StaticPath     string
+	PostPath       string
+	MigrationsPath string
+	BaseURL        string
 
 	GitHubClientID     string
 	GitHubClientSecret string
@@ -50,11 +52,12 @@ func NewContext() *Context {
 	return &Context{
 		Env: env.GetString("ENV", "development"),
 
-		Port:         env.GetInt("PORT", 3000),
-		TemplatePath: env.GetString("TEMPLATE_PATH", filepath.Join("web", "template")),
-		StaticPath:   env.GetString("STATIC_PATH", filepath.Join("web", "static")),
-		PostPath:     env.GetString("POST_PATH", filepath.Join("posts")),
-		BaseURL:      env.GetString("BASE_URL", "http://localhost:3000"),
+		Port:           env.GetInt("PORT", 3000),
+		TemplatePath:   env.GetString("TEMPLATE_PATH", filepath.Join("web", "template")),
+		StaticPath:     env.GetString("STATIC_PATH", filepath.Join("web", "static")),
+		PostPath:       env.GetString("POST_PATH", filepath.Join("posts")),
+		MigrationsPath: env.GetString("MIGRATIONS_PATH", "file://"+filepath.Join("db", "migrations")),
+		BaseURL:        env.GetString("BASE_URL", "http://localhost:3000"),
 
 		GitHubClientID:     env.GetString("GITHUB_CLIENT_ID", ""),
 		GitHubClientSecret: env.GetString("GITHUB_CLIENT_SECRET", ""),
@@ -120,6 +123,10 @@ func (c *Context) DB() *sql.DB {
 		c.db = db
 	}
 	return c.db
+}
+
+func (c *Context) Migration() *migration.Migration {
+	return migration.New(c.DB(), c.MigrationsPath)
 }
 
 func (c *Context) TransactionManager() shared.TransactionManager {
