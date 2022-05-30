@@ -29,7 +29,7 @@ This is the first post in a series of posts about algorithms and data structures
 
 ## What is the Big O Notation
 
-Big O is part of a family of mathematical notations invented by Paul Bachmann and Edmund Landau. [Wikipedia](https://en.wikipedia.org/wiki/Big_O_notation#Related_asymptotic_notations) states that _"...big O notation is used to classify algorithms according to how their run time or space requirements grow as the input size grows..."_. In other words, it is a way to classify the complexity and scalability of the code based on how the number of operations increases when the input size grows.
+Big O is part of a family of mathematical notations invented by Paul Bachmann and Edmund Landau. [Wikipedia](https://en.wikipedia.org/wiki/Big_O_notation) states that _"...big O notation is used to classify algorithms according to how their run time or space requirements grow as the input size grows..."_. In other words, it is a way to classify the complexity and scalability of the code based on how the number of operations increases when the input size grows.
 
 Big O is expressed in a simple and common notation that makes it easier for developers to discuss the algorithm complexities and find the optimal solutions for both the implementation and the choice of the best fitting data structure for a specific problem. The following figure visually shows how each of the most common complexities compares to each other:
 
@@ -372,7 +372,7 @@ My intention with this post is to give you a basic understanding of the differen
 
 ## Sources
 
-- [Big O notation - Wikipedia](https://en.wikipedia.org/wiki/Big_O_notation#Related_asymptotic_notations)
+- [Big O notation - Wikipedia](https://en.wikipedia.org/wiki/Big_O_notation)
 - [Big-O Algorithm Complexity Cheat Sheet (Know Thy Complexities!) @ericdrowell](https://www.bigocheatsheet.com)
 - [8 time complexities that every programmer should know](https://adrianmejia.com/most-popular-algorithms-time-complexity-every-programmer-should-know-free-online-tutorial-course/)
 - [Master the Coding Interview: Data Structures + Algorithms](https://www.udemy.com/course/master-the-coding-interview-data-structures-algorithms/)
