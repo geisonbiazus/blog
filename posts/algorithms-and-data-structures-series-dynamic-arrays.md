@@ -2,7 +2,7 @@ title: Algorithms and Data Structures Series: Dynamic Arrays
 author: Geison Biazus
 description: This post is part of the algorithms and data structures series, a series of posts where I present the most common data structures and algorithms used in software engineering. In this post, I explain the basics of Arrays, the first data structure in the series.
 image_path: /static/image/logo-small.png
-time: 2022-05-30 09:00
+time: 2022-06-22 09:00
 --
 
 This post is part of the algorithms and data structures series, a series of posts where I present the most common data structures and algorithms used in software engineering. In this post, I explain the basics of Arrays, the first data structure in the series.
