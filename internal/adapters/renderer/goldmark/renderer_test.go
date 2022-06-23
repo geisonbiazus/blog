@@ -54,6 +54,12 @@ But now with a line break in the middle.
 
 ![Image](http://example.com/image.png)
 
+Table:
+
+| foo | bar |
+| --- | --- |
+| baz | bim |
+
 ` + "```" + `
 Code Block
 ` + "```"
@@ -79,6 +85,21 @@ But now with a line break in the middle.</p>
 </ol>
 <p><a href="http://example.com">Link</a></p>
 <p><img src="http://example.com/image.png" alt="Image"></p>
+<p>Table:</p>
+<table>
+<thead>
+<tr>
+<th>foo</th>
+<th>bar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baz</td>
+<td>bim</td>
+</tr>
+</tbody>
+</table>
 <pre><code>Code Block
 </code></pre>
 `
