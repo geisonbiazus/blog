@@ -18,7 +18,7 @@ In this post, I show how I built this [Blog](https://blog.geisonbiazus.com) usin
 
 ![Architecture](/static/image/architecture.png)
 
-There are four main kinds of layers: Core, Adapters, User Interface, and Main. You can see the explanation of each one above.
+There are four main kinds of layers: Core, Adapters, User Interface, and Main. You can see the explanation for each one below.
 
 ### Core
 
@@ -180,7 +180,7 @@ type Renderer interface {
 
 Adapters are the low-level details controlled by the use cases. They are stored in the following directory structure: `internal/adapters/PORT/ADAPTER_TYPE` where `PORT` is the name of the port it implements and `ADAPTER_TYPE` is the type of adapter for that port. In this case, we have a `FileSystem` adapter for the `PostRepo` port and a `Goldmark` adapter for the `Renderer` port, the last being named after the name Markdown library it "adapts".
 
-Starting with the `PostRepo` the implementation is the following:
+Starting with the `PostRepo`, the implementation is the following:
 
 ```go
 // internal/adapters/postrepo/filesystem/post_repo.go
@@ -292,7 +292,7 @@ In other languages such as Java or C# where you need to explicitly mention the i
 With the use case port in place, the handler implementation is done as follows:
 
 ```go
-// internal/ui/web/view_post_hander.go
+// internal/ui/web/view_post_handler.go
 
 package web
 
