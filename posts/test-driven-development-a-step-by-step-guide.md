@@ -10,7 +10,7 @@ TDD was brought by Kent Back as part of the Extreme Programming (XP) practices. 
 
 ## But why test first?
 
-If you first write your production code, then you write your test, there is no guarantee that you tested everything your production code does. Also, there is no guarantee that your test will fail if you have a bug in the code. By following the TDD cycle and laws, explained below, you make sure that every behavior of your code has is covered by a test, and you can refactor with total confidence.
+If you first write your production code, then you write your test, there is no guarantee that you tested everything your production code does. Also, there is no guarantee that your test will fail if you have a bug in the code. By following the TDD cycle and laws, explained below, you make sure that every behavior of your code is covered by a test, and you can refactor with total confidence.
 
 ## TDD Cycle
 
@@ -53,7 +53,7 @@ Usually, you can find TDD examples of some [Code Kata](<https://en.wikipedia.org
 
 The `View Post` use case works as follows: A user accesses a post URL from the browser. Based on the path we try to load a post file in the file system written in Markdown. If the post is not found, we display a "not found" error. If the post is found, we convert the Markdown to HTML and present the post to the user in the browser.
 
-As we are talking about the use case here, we are going to ignore the low-level details completely, so no web server, no storage, no file system. Instead, we will focus on the high-level policy using TDD to drive this code and design, creating "ports" where the low-level details can be plugged in as "adapters".
+As we are talking about the use case here, we are going to ignore the low-level details completely, so no web server, no storage, and no file system. Instead, we will focus on the high-level policy using TDD to drive this code and design, creating "ports" where the low-level details can be plugged in as "adapters".
 
 If you are interested in how this blog is architectured, I wrote a post about it and you can see it here: [Applying Clean Architecture in Go](https://blog.geisonbiazus.com/posts/applying-clean-architecture-in-go).
 
@@ -71,15 +71,15 @@ The first thing we need is a module to hold our use case code, so let's create a
 package blog_test
 
 import (
-	"testing"
+  "testing"
 
-	"github.com/geisonbiazus/blog/internal/core/blog"
+  "github.com/geisonbiazus/blog/internal/core/blog"
 )
 
 func TestViewPostUseCase(t *testing.T) {
-	t.Run("It initializes", func(t *testing.T) {
-		var _ *blog.ViewPostUseCase = blog.NewViewPostUseCase()
-	})
+  t.Run("It initializes", func(t *testing.T) {
+    var _ *blog.ViewPostUseCase = blog.NewViewPostUseCase()
+  })
 }
 ```
 
@@ -107,7 +107,7 @@ package blog
 type ViewPostUseCase struct{}
 
 func NewViewPostUseCase() *ViewPostUseCase {
-	return &ViewPostUseCase{}
+  return &ViewPostUseCase{}
 }
 
 ```
@@ -131,16 +131,16 @@ import "github.com/geisonbiazus/blog/pkg/assert"
 // ...
 
 func TestViewPostUseCase(t *testing.T) {
-	// ...
+  // ...
 
-	t.Run("It runs", func(t *testing.T) {
-		usecase := blog.NewViewPostUseCase()
-		path := "path"
-		renderedPost, err := usecase.Run(path)
+  t.Run("It runs", func(t *testing.T) {
+    usecase := blog.NewViewPostUseCase()
+    path := "path"
+    renderedPost, err := usecase.Run(path)
 
-		assert.Equal(t, blog.RenderedPost{}, renderedPost)
-		assert.Nil(t, err)
-	})
+    assert.Equal(t, blog.RenderedPost{}, renderedPost)
+    assert.Nil(t, err)
+  })
 })
 
 ```
@@ -165,7 +165,7 @@ Again we have a failure due to a compilation error, so to make this scenario pas
 // ...
 
 func (u *ViewPostUseCase) Run(path string) (RenderedPost, error) {
-	return RenderedPost{}, nil
+  return RenderedPost{}, nil
 }
 ```
 
@@ -197,30 +197,30 @@ Now it is time for our first refactor. There's still not much in the production 
 // ...
 
 type viewPostUseCaseFixture struct {
-	usecase *blog.ViewPostUseCase
+  usecase *blog.ViewPostUseCase
 }
 
 func TestViewPostUseCase(t *testing.T) {
-	setup := func() *viewPostUseCaseFixture {
-		usecase := blog.NewViewPostUseCase()
-		return &viewPostUseCaseFixture{
-			usecase: usecase,
-		}
-	}
+  setup := func() *viewPostUseCaseFixture {
+    usecase := blog.NewViewPostUseCase()
+    return &viewPostUseCaseFixture{
+      usecase: usecase,
+    }
+  }
 
-	t.Run("It initializes", func(t *testing.T) {
-		setup()
-	})
+  t.Run("It initializes", func(t *testing.T) {
+    setup()
+  })
 
-	t.Run("It runs", func(t *testing.T) {
-		f := setup()
+  t.Run("It runs", func(t *testing.T) {
+    f := setup()
 
-		path := "path"
-		renderedPost, err := f.usecase.Run(path)
+    path := "path"
+    renderedPost, err := f.usecase.Run(path)
 
-		assert.Equal(t, blog.RenderedPost{}, renderedPost)
-		assert.Nil(t, err)
-	})
+    assert.Equal(t, blog.RenderedPost{}, renderedPost)
+    assert.Nil(t, err)
+  })
 }
 ```
 
@@ -241,13 +241,13 @@ Still on this refactor phase, you can notice that the scenario `It initializes`,
 // ...
 
 func TestViewPostUseCase(t *testing.T) {
-	setup := func() *viewPostUseCaseFixture {
-		// ...
-	}
+  setup := func() *viewPostUseCaseFixture {
+    // ...
+  }
 
-	t.Run("It runs", func(t *testing.T) {
-		// ...
-	})
+  t.Run("It runs", func(t *testing.T) {
+    // ...
+  })
 }
 ```
 
@@ -260,23 +260,23 @@ Now let's start implementing the behavior of the `Run` method. The first simples
 
 // ...
 func TestViewPostUseCase(t *testing.T) {
-	// ...
+  // ...
 
-	t.Run("It returns error when post is not found", func(t *testing.T) {
-		f := setup()
+  t.Run("It returns error when post is not found", func(t *testing.T) {
+    f := setup()
 
-		f.repo.ReturnError = blog.ErrPostNotFound
+    f.repo.ReturnError = blog.ErrPostNotFound
 
-		renderedPost, err := f.usecase.Run("path")
+    renderedPost, err := f.usecase.Run("path")
 
-		assert.Equal(t, "path", f.repo.ReceivedPath)
-		assert.Equal(t, blog.RenderedPost{}, renderedPost)
-		assert.Equal(t, blog.ErrPostNotFound, err)
-	})
+    assert.Equal(t, "path", f.repo.ReceivedPath)
+    assert.Equal(t, blog.RenderedPost{}, renderedPost)
+    assert.Equal(t, blog.ErrPostNotFound, err)
+  })
 }
 ```
 
-Again some new things here. Fist is the `f.repo.ReturnError`. This is a new dependency that will be added to the setup function and will return a test spy. Here we are saying that this spy should return the error `blog.ErrPostNotFound`. This is also a new type we need to create. Then, after calling the `Run` method, we again go to the repo spy to check if the "received path" is the same path given in the `Run` method. Finally, we check the method response and if the returned error is the same error returned by the `repo` spy. This will become more clear with the spy implementation.
+Again some new things here. First is the `f.repo.ReturnError`. This is a new dependency that will be added to the setup function and will return a test spy. Here we are saying that this spy should return the error `blog.ErrPostNotFound`. This is also a new type we need to create. Then, after calling the `Run` method, we again go to the repo spy to check if the "received path" is the same path given in the `Run` method. Finally, we check the method response and if the returned error is the same error returned by the `repo` spy. This will become more clear with the spy implementation.
 
 Running the tests now, they will fail by compilation due to the lack of these new things:
 
@@ -297,35 +297,35 @@ Still on the red phase, let's make it compile by creating the new required types
 
 // ...
 type viewPostUseCaseFixture struct {
-	usecase *blog.ViewPostUseCase
-	repo    *PostRepoSpy
+  usecase *blog.ViewPostUseCase
+  repo    *PostRepoSpy
 }
 
 func TestViewPostUseCase(t *testing.T) {
-	setup := func() *viewPostUseCaseFixture {
-		repo := NewPostRepoSpy()
-		usecase := blog.NewViewPostUseCase()
+  setup := func() *viewPostUseCaseFixture {
+    repo := NewPostRepoSpy()
+    usecase := blog.NewViewPostUseCase()
 
-		return &viewPostUseCaseFixture{
-			usecase: usecase,
-			repo:    repo,
-		}
-	}
-	// ...
+    return &viewPostUseCaseFixture{
+      usecase: usecase,
+      repo:    repo,
+    }
+  }
+  // ...
 }
 
 type PostRepoSpy struct {
-	ReturnError  error
-	ReceivedPath string
+  ReturnError  error
+  ReceivedPath string
 }
 
 func NewPostRepoSpy() *PostRepoSpy {
-	return &PostRepoSpy{}
+  return &PostRepoSpy{}
 }
 
 func (r *PostRepoSpy) GetPostByPath(path string) error {
-	r.ReceivedPath = path
-	return r.ReturnError
+  r.ReceivedPath = path
+  return r.ReturnError
 }
 ```
 
@@ -369,7 +369,7 @@ Now to make our test pass we need to try loading the post from a repository. In 
 package blog
 
 type PostRepo interface {
-	GetPostByPath(path string) error
+  GetPostByPath(path string) error
 }
 ```
 
@@ -382,20 +382,20 @@ And now we can do the changes in the `ViewPostUseCase` to satisfy the tests:
 
 // ...
 type ViewPostUseCase struct {
-	postRepo PostRepo
+  postRepo PostRepo
 }
 
 func NewViewPostUseCase(postRepo PostRepo) *ViewPostUseCase {
-	return &ViewPostUseCase{postRepo: postRepo}
+  return &ViewPostUseCase{postRepo: postRepo}
 }
 
 func (u *ViewPostUseCase) Run(path string) (RenderedPost, error) {
-	err := u.postRepo.GetPostByPath(path)
-	return RenderedPost{}, err
+  err := u.postRepo.GetPostByPath(path)
+  return RenderedPost{}, err
 }
 ```
 
-First, we added the `PostRepo` interface to the struct and as a parameter in the constructor function. Then in the `Run` method, we call the `GetPostByPath` to get the error back and return it.
+First, we added the `PostRepo` interface to the struct and as a parameter in the constructor function. Then in the `Run` method, we call `GetPostByPath` to get the error back and return it.
 
 The last thing missing is to adjust the test setup function to pass the `PostRepoSpy` to the `blog.NewViewPostUseCase` constructor:
 
@@ -404,12 +404,12 @@ The last thing missing is to adjust the test setup function to pass the `PostRep
 
 // ...
 func TestViewPostUseCase(t *testing.T) {
-	setup := func() *viewPostUseCaseFixture {
-		repo := NewPostRepoSpy()
-		usecase := blog.NewViewPostUseCase(repo)
-		//...
-	}
-	// ...
+  setup := func() *viewPostUseCaseFixture {
+    repo := NewPostRepoSpy()
+    usecase := blog.NewViewPostUseCase(repo)
+    //...
+  }
+  // ...
 }
 ```
 
@@ -430,13 +430,13 @@ The same thing we did before with the `It initializes` test scenario, we can do 
 // ...
 
 func TestViewPostUseCase(t *testing.T) {
-	setup := func() *viewPostUseCaseFixture {
-		// ...
-	}
+  setup := func() *viewPostUseCaseFixture {
+    // ...
+  }
 
-	t.Run("It returns error when post is not found", func(t *testing.T) {
-		// ...
-	})
+  t.Run("It returns error when post is not found", func(t *testing.T) {
+    // ...
+  })
 }
 ```
 
@@ -452,32 +452,32 @@ import "time"
 // ...
 
 func TestViewPostUseCase(t *testing.T) {
-	// ...
-	t.Run("It returns a rendered post when post is found", func(t *testing.T) {
-		f := setup()
+  // ...
+  t.Run("It returns a rendered post when post is found", func(t *testing.T) {
+    f := setup()
 
-		postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
-		post := blog.Post{
-			Title:    "Title",
-			Author:   "Author",
-			Time:     postTime,
-			Path:     "path",
-			Markdown: "content",
-		}
+    postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
+    post := blog.Post{
+      Title:    "Title",
+      Author:   "Author",
+      Time:     postTime,
+      Path:     "path",
+      Markdown: "content",
+    }
 
-		f.repo.ReturnPost = post
-		f.renderer.ReturnRenderedContent = "Rendered content"
+    f.repo.ReturnPost = post
+    f.renderer.ReturnRenderedContent = "Rendered content"
 
-		renderedPost, err := f.usecase.Run(post.Path)
+    renderedPost, err := f.usecase.Run(post.Path)
 
-		assert.Equal(t, post.Path, f.repo.ReceivedPath)
-		assert.Equal(t, post.Markdown, f.renderer.ReceivedContent)
-		assert.Nil(t, err)
-		assert.Equal(t, blog.RenderedPost{
-			Post: post,
-			HTML: "Rendered content",
-		}, renderedPost)
-	})
+    assert.Equal(t, post.Path, f.repo.ReceivedPath)
+    assert.Equal(t, post.Markdown, f.renderer.ReceivedContent)
+    assert.Nil(t, err)
+    assert.Equal(t, blog.RenderedPost{
+      Post: post,
+      HTML: "Rendered content",
+    }, renderedPost)
+  })
 }
 ```
 
@@ -491,16 +491,16 @@ So to make it compile, let's first add the new `Post` entity and update the `Ren
 import "time"
 
 type Post struct {
-	Title    string
-	Author   string
-	Time     time.Time
-	Path     string
-	Markdown string
+  Title    string
+  Author   string
+  Time     time.Time
+  Path     string
+  Markdown string
 }
 
 type RenderedPost struct {
-	Post Post
-	HTML string
+  Post Post
+  HTML string
 }
 
 // ...
@@ -514,9 +514,9 @@ In the `view_post_use_case_test.go` file, let's update the `PostRepoSpy` with th
 // ...
 
 type PostRepoSpy struct {
-	ReturnPost   blog.Post
-	ReturnError  error
-	ReceivedPath string
+  ReturnPost   blog.Post
+  ReturnError  error
+  ReceivedPath string
 }
 
 // ...
@@ -529,24 +529,24 @@ Still on the same file, we add the new `renderer` field to the text fixture and 
 
 // ...
 type viewPostUseCaseFixture struct {
-	usecase  *blog.ViewPostUseCase
-	repo     *PostRepoSpy
-	renderer *RendererSpy
+  usecase  *blog.ViewPostUseCase
+  repo     *PostRepoSpy
+  renderer *RendererSpy
 }
 
 func TestViewPostUseCase(t *testing.T) {
-	setup := func() *viewPostUseCaseFixture {
-		repo := NewPostRepoSpy()
-		renderer := NewRendererSpy()
-		usecase := blog.NewViewPostUseCase(repo)
+  setup := func() *viewPostUseCaseFixture {
+    repo := NewPostRepoSpy()
+    renderer := NewRendererSpy()
+    usecase := blog.NewViewPostUseCase(repo)
 
-		return &viewPostUseCaseFixture{
-			usecase:  usecase,
-			repo:     repo,
-			renderer: renderer,
-		}
-	}
-	// ...
+    return &viewPostUseCaseFixture{
+      usecase:  usecase,
+      repo:     repo,
+      renderer: renderer,
+    }
+  }
+  // ...
 }
 ```
 
@@ -558,18 +558,18 @@ At the end of the file, let's add the `RendererSpy` implementation. It contains 
 // ...
 
 type RendererSpy struct {
-	ReturnRenderedContent string
-	ReturnError           error
-	ReceivedContent       string
+  ReturnRenderedContent string
+  ReturnError           error
+  ReceivedContent       string
 }
 
 func NewRendererSpy() *RendererSpy {
-	return &RendererSpy{}
+  return &RendererSpy{}
 }
 
 func (r *RendererSpy) Render(content string) (string, error) {
-	r.ReceivedContent = content
-	return r.ReturnRenderedContent, r.ReturnError
+  r.ReceivedContent = content
+  return r.ReturnRenderedContent, r.ReturnError
 }
 ```
 
@@ -597,27 +597,27 @@ Now to make this test pass we do the following changes in the `ViewPostUseCase`:
 // internal/core/blog/view_post_use_case.go
 
 type ViewPostUseCase struct {
-	postRepo PostRepo
-	renderer Renderer
+  postRepo PostRepo
+  renderer Renderer
 }
 
 func NewViewPostUseCase(postRepo PostRepo, renderer Renderer) *ViewPostUseCase {
-	return &ViewPostUseCase{postRepo: postRepo, renderer: renderer}
+  return &ViewPostUseCase{postRepo: postRepo, renderer: renderer}
 }
 
 func (u *ViewPostUseCase) Run(path string) (RenderedPost, error) {
-	post, err := u.postRepo.GetPostByPath(path)
+  post, err := u.postRepo.GetPostByPath(path)
 
-	if err != nil {
-		return RenderedPost{}, err
-	}
+  if err != nil {
+    return RenderedPost{}, err
+  }
 
-	html, _ := u.renderer.Render(post.Markdown)
+  html, _ := u.renderer.Render(post.Markdown)
 
-	return RenderedPost{
-		Post: post,
-		HTML: html,
-	}, nil
+  return RenderedPost{
+    Post: post,
+    HTML: html,
+  }, nil
 }
 ```
 
@@ -629,11 +629,11 @@ These changes broke the compilation again, since we added a new dependency to th
 // internal/core/blog/ports.go
 
 type PostRepo interface {
-	GetPostByPath(path string) (Post, error)
+  GetPostByPath(path string) (Post, error)
 }
 
 type Renderer interface {
-	Render(content string) (string, error)
+  Render(content string) (string, error)
 }
 ```
 
@@ -646,20 +646,20 @@ Next, we need to do some fixes in the tests too:
 
 // ...
 func TestViewPostUseCase(t *testing.T) {
-	setup := func() *viewPostUseCaseFixture {
-		repo := NewPostRepoSpy()
-		renderer := NewRendererSpy()
-		usecase := blog.NewViewPostUseCase(repo, renderer)
+  setup := func() *viewPostUseCaseFixture {
+    repo := NewPostRepoSpy()
+    renderer := NewRendererSpy()
+    usecase := blog.NewViewPostUseCase(repo, renderer)
 
-		// ...
-	}
-	// ...
+    // ...
+  }
+  // ...
 }
 // ...
 
 func (r *PostRepoSpy) GetPostByPath(path string) (blog.Post, error) {
-	r.ReceivedPath = path
-	return r.ReturnPost, r.ReturnError
+  r.ReceivedPath = path
+  return r.ReturnPost, r.ReturnError
 }
 
 // ...
@@ -683,22 +683,22 @@ Now it is the refactor phase again. First, for the production code, we can make 
 
 // ...
 func (u *ViewPostUseCase) Run(path string) (RenderedPost, error) {
-	post, err := u.postRepo.GetPostByPath(path)
+  post, err := u.postRepo.GetPostByPath(path)
 
-	if err != nil {
-		return RenderedPost{}, err
-	}
+  if err != nil {
+    return RenderedPost{}, err
+  }
 
-	return u.renderPost(post)
+  return u.renderPost(post)
 }
 
 func (u *ViewPostUseCase) renderPost(post Post) (RenderedPost, error) {
-	html, _ := u.renderer.Render(post.Markdown)
+  html, _ := u.renderer.Render(post.Markdown)
 
-	return RenderedPost{
-		Post: post,
-		HTML: html,
-	}, nil
+  return RenderedPost{
+    Post: post,
+    HTML: html,
+  }, nil
 }
 ```
 
@@ -709,36 +709,36 @@ In the tests we can also make the test code shorter by extracting the building o
 
 // ...
 func TestViewPostUseCase(t *testing.T) {
-	// ...
-	t.Run("It returns a rendered post when post is found", func(t *testing.T) {
-		f := setup()
+  // ...
+  t.Run("It returns a rendered post when post is found", func(t *testing.T) {
+    f := setup()
 
-		post := newPost()
+    post := newPost()
 
-		f.repo.ReturnPost = post
-		f.renderer.ReturnRenderedContent = "Rendered content"
+    f.repo.ReturnPost = post
+    f.renderer.ReturnRenderedContent = "Rendered content"
 
-		renderedPost, err := f.usecase.Run(post.Path)
+    renderedPost, err := f.usecase.Run(post.Path)
 
-		assert.Equal(t, post.Path, f.repo.ReceivedPath)
-		assert.Equal(t, post.Markdown, f.renderer.ReceivedContent)
-		assert.Nil(t, err)
-		assert.Equal(t, blog.RenderedPost{
-			Post: post,
-			HTML: "Rendered content",
-		}, renderedPost)
-	})
+    assert.Equal(t, post.Path, f.repo.ReceivedPath)
+    assert.Equal(t, post.Markdown, f.renderer.ReceivedContent)
+    assert.Nil(t, err)
+    assert.Equal(t, blog.RenderedPost{
+      Post: post,
+      HTML: "Rendered content",
+    }, renderedPost)
+  })
 }
 
 func newPost() blog.Post {
-	postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
-	return blog.Post{
-		Title:    "Title",
-		Author:   "Author",
-		Time:     postTime,
-		Path:     "path",
-		Markdown: "content",
-	}
+  postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
+  return blog.Post{
+    Title:    "Title",
+    Author:   "Author",
+    Time:     postTime,
+    Path:     "path",
+    Markdown: "content",
+  }
 }
 // ...
 ```
@@ -759,19 +759,19 @@ There is still one error we are ignoring. That is when the markdown content fail
 
 // ...
 func TestViewPostUseCase(t *testing.T) {
-	// ...
-	t.Run("It returns error when post fails to render", func(t *testing.T) {
-		f := setup()
+  // ...
+  t.Run("It returns error when post fails to render", func(t *testing.T) {
+    f := setup()
 
-		post := newPost()
-		f.repo.ReturnPost = post
-		f.renderer.ReturnError = errors.New("render error")
+    post := newPost()
+    f.repo.ReturnPost = post
+    f.renderer.ReturnError = errors.New("render error")
 
-		renderedPost, err := f.usecase.Run(post.Path)
+    renderedPost, err := f.usecase.Run(post.Path)
 
-		assert.Equal(t, f.renderer.ReturnError, err)
-		assert.Equal(t, blog.RenderedPost{}, renderedPost)
-	})
+    assert.Equal(t, f.renderer.ReturnError, err)
+    assert.Equal(t, blog.RenderedPost{}, renderedPost)
+  })
 }
 // ...
 ```
@@ -801,16 +801,16 @@ We make this test pass by simply checking for an error and returning it in the `
 
 // ...
 func (u *ViewPostUseCase) renderPost(post Post) (RenderedPost, error) {
-	html, err := u.renderer.Render(post.Markdown)
+  html, err := u.renderer.Render(post.Markdown)
 
-	if err != nil {
-		return RenderedPost{}, err
-	}
+  if err != nil {
+    return RenderedPost{}, err
+  }
 
-	return RenderedPost{
-		Post: post,
-		HTML: html,
-	}, nil
+  return RenderedPost{
+    Post: post,
+    HTML: html,
+  }, nil
 }
 ```
 
@@ -833,35 +833,35 @@ The first file is the `view_post_use_case.go` where the `ViewPostUseCase` is imp
 package blog
 
 type ViewPostUseCase struct {
-	postRepo PostRepo
-	renderer Renderer
+  postRepo PostRepo
+  renderer Renderer
 }
 
 func NewViewPostUseCase(postRepo PostRepo, renderer Renderer) *ViewPostUseCase {
-	return &ViewPostUseCase{postRepo: postRepo, renderer: renderer}
+  return &ViewPostUseCase{postRepo: postRepo, renderer: renderer}
 }
 
 func (u *ViewPostUseCase) Run(path string) (RenderedPost, error) {
-	post, err := u.postRepo.GetPostByPath(path)
+  post, err := u.postRepo.GetPostByPath(path)
 
-	if err != nil {
-		return RenderedPost{}, err
-	}
+  if err != nil {
+    return RenderedPost{}, err
+  }
 
-	return u.renderPost(post)
+  return u.renderPost(post)
 }
 
 func (u *ViewPostUseCase) renderPost(post Post) (RenderedPost, error) {
-	html, err := u.renderer.Render(post.Markdown)
+  html, err := u.renderer.Render(post.Markdown)
 
-	if err != nil {
-		return RenderedPost{}, err
-	}
+  if err != nil {
+    return RenderedPost{}, err
+  }
 
-	return RenderedPost{
-		Post: post,
-		HTML: html,
-	}, nil
+  return RenderedPost{
+    Post: post,
+    HTML: html,
+  }, nil
 }
 ```
 
@@ -872,21 +872,21 @@ The next file is `entities.go`. Here are the entities that represent the post an
 package blog
 
 import (
-	"errors"
-	"time"
+  "errors"
+  "time"
 )
 
 type Post struct {
-	Title    string
-	Author   string
-	Time     time.Time
-	Path     string
-	Markdown string
+  Title    string
+  Author   string
+  Time     time.Time
+  Path     string
+  Markdown string
 }
 
 type RenderedPost struct {
-	Post Post
-	HTML string
+  Post Post
+  HTML string
 }
 
 var ErrPostNotFound = errors.New("post not found")
@@ -900,11 +900,11 @@ The `ports.go` file contains the interfaces where adapters are plugged in. These
 package blog
 
 type PostRepo interface {
-	GetPostByPath(path string) (Post, error)
+  GetPostByPath(path string) (Post, error)
 }
 
 type Renderer interface {
-	Render(content string) (string, error)
+  Render(content string) (string, error)
 }
 ```
 
@@ -916,117 +916,117 @@ And the last file is the `view_post_use_case_test.go` which contains all the tes
 package blog_test
 
 import (
-	"errors"
-	"testing"
-	"time"
+  "errors"
+  "testing"
+  "time"
 
-	"github.com/geisonbiazus/blog/internal/core/blog"
-	"github.com/geisonbiazus/blog/pkg/assert"
+  "github.com/geisonbiazus/blog/internal/core/blog"
+  "github.com/geisonbiazus/blog/pkg/assert"
 )
 
 type viewPostUseCaseFixture struct {
-	usecase  *blog.ViewPostUseCase
-	repo     *PostRepoSpy
-	renderer *RendererSpy
+  usecase  *blog.ViewPostUseCase
+  repo     *PostRepoSpy
+  renderer *RendererSpy
 }
 
 func TestViewPostUseCase(t *testing.T) {
-	setup := func() *viewPostUseCaseFixture {
-		repo := NewPostRepoSpy()
-		renderer := NewRendererSpy()
-		usecase := blog.NewViewPostUseCase(repo, renderer)
+  setup := func() *viewPostUseCaseFixture {
+    repo := NewPostRepoSpy()
+    renderer := NewRendererSpy()
+    usecase := blog.NewViewPostUseCase(repo, renderer)
 
-		return &viewPostUseCaseFixture{
-			usecase:  usecase,
-			repo:     repo,
-			renderer: renderer,
-		}
-	}
+    return &viewPostUseCaseFixture{
+      usecase:  usecase,
+      repo:     repo,
+      renderer: renderer,
+    }
+  }
 
-	t.Run("It returns error when post is not found", func(t *testing.T) {
-		f := setup()
+  t.Run("It returns error when post is not found", func(t *testing.T) {
+    f := setup()
 
-		f.repo.ReturnError = blog.ErrPostNotFound
+    f.repo.ReturnError = blog.ErrPostNotFound
 
-		renderedPost, err := f.usecase.Run("path")
+    renderedPost, err := f.usecase.Run("path")
 
-		assert.Equal(t, "path", f.repo.ReceivedPath)
-		assert.Equal(t, blog.RenderedPost{}, renderedPost)
-		assert.Equal(t, blog.ErrPostNotFound, err)
-	})
+    assert.Equal(t, "path", f.repo.ReceivedPath)
+    assert.Equal(t, blog.RenderedPost{}, renderedPost)
+    assert.Equal(t, blog.ErrPostNotFound, err)
+  })
 
-	t.Run("It returns a rendered post when post is found", func(t *testing.T) {
-		f := setup()
+  t.Run("It returns a rendered post when post is found", func(t *testing.T) {
+    f := setup()
 
-		post := newPost()
+    post := newPost()
 
-		f.repo.ReturnPost = post
-		f.renderer.ReturnRenderedContent = "Rendered content"
+    f.repo.ReturnPost = post
+    f.renderer.ReturnRenderedContent = "Rendered content"
 
-		renderedPost, err := f.usecase.Run(post.Path)
+    renderedPost, err := f.usecase.Run(post.Path)
 
-		assert.Equal(t, post.Path, f.repo.ReceivedPath)
-		assert.Equal(t, post.Markdown, f.renderer.ReceivedContent)
-		assert.Nil(t, err)
-		assert.Equal(t, blog.RenderedPost{
-			Post: post,
-			HTML: "Rendered content",
-		}, renderedPost)
-	})
+    assert.Equal(t, post.Path, f.repo.ReceivedPath)
+    assert.Equal(t, post.Markdown, f.renderer.ReceivedContent)
+    assert.Nil(t, err)
+    assert.Equal(t, blog.RenderedPost{
+      Post: post,
+      HTML: "Rendered content",
+    }, renderedPost)
+  })
 
-	t.Run("It returns error when post fails to render", func(t *testing.T) {
-		f := setup()
+  t.Run("It returns error when post fails to render", func(t *testing.T) {
+    f := setup()
 
-		post := newPost()
-		f.repo.ReturnPost = post
-		f.renderer.ReturnError = errors.New("render error")
+    post := newPost()
+    f.repo.ReturnPost = post
+    f.renderer.ReturnError = errors.New("render error")
 
-		renderedPost, err := f.usecase.Run(post.Path)
+    renderedPost, err := f.usecase.Run(post.Path)
 
-		assert.Equal(t, f.renderer.ReturnError, err)
-		assert.Equal(t, blog.RenderedPost{}, renderedPost)
-	})
+    assert.Equal(t, f.renderer.ReturnError, err)
+    assert.Equal(t, blog.RenderedPost{}, renderedPost)
+  })
 }
 
 func newPost() blog.Post {
-	postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
-	return blog.Post{
-		Title:    "Title",
-		Author:   "Author",
-		Time:     postTime,
-		Path:     "path",
-		Markdown: "content",
-	}
+  postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
+  return blog.Post{
+    Title:    "Title",
+    Author:   "Author",
+    Time:     postTime,
+    Path:     "path",
+    Markdown: "content",
+  }
 }
 
 type PostRepoSpy struct {
-	ReturnPost   blog.Post
-	ReturnError  error
-	ReceivedPath string
+  ReturnPost   blog.Post
+  ReturnError  error
+  ReceivedPath string
 }
 
 func NewPostRepoSpy() *PostRepoSpy {
-	return &PostRepoSpy{}
+  return &PostRepoSpy{}
 }
 
 func (r *PostRepoSpy) GetPostByPath(path string) (blog.Post, error) {
-	r.ReceivedPath = path
-	return r.ReturnPost, r.ReturnError
+  r.ReceivedPath = path
+  return r.ReturnPost, r.ReturnError
 }
 
 type RendererSpy struct {
-	ReturnRenderedContent string
-	ReturnError           error
-	ReceivedContent       string
+  ReturnRenderedContent string
+  ReturnError           error
+  ReceivedContent       string
 }
 
 func NewRendererSpy() *RendererSpy {
-	return &RendererSpy{}
+  return &RendererSpy{}
 }
 
 func (r *RendererSpy) Render(content string) (string, error) {
-	r.ReceivedContent = content
-	return r.ReturnRenderedContent, r.ReturnError
+  r.ReceivedContent = content
+  return r.ReturnRenderedContent, r.ReturnError
 }
 ```
 
