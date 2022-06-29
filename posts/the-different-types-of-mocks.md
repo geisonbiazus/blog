@@ -14,61 +14,61 @@ To exemplify each kind of test double, I'm going to use the following use case. 
 - **Use case:** Create user
 - **Arguments:** `email` and `password`
 - **Return:** `User`, `ErrInvalidCrendentials`, or `ErrUserAlreadyExists`
-- **Busines rules:**
+- **Business rules:**
   - If `email` or `password` are invalid, it returns `ErrInvalidCrendentials`
   - If there is already a user with the given `email`, it returns `ErrUserAlreadyExists`
-  - Otherwise it creates, persists and returns the `User`
+  - Otherwise, it creates, persists, and returns the `User`
 
 Here is the use case implementation. I used the Go programming language, but these concepts can be applied in any language:
 
 ```go
 type User struct {
-	Email    string
-	Password string
+  Email    string
+  Password string
 }
 
 type UserRepo interface {
-	GetUserByEmail(email string) (User, error)
-	CreateUser(user User) error
+  GetUserByEmail(email string) (User, error)
+  CreateUser(user User) error
 }
 
 type CreateUserUseCase struct {
-	UserRepo UserRepo
+  UserRepo UserRepo
 }
 
 func (u *CreateUserUseCase) Run(email, password string) (User, error) {
-	if !u.validEmailAndPassword(email, password) {
-		return User{}, ErrInvalidCrendentials
-	}
+  if !u.validEmailAndPassword(email, password) {
+    return User{}, ErrInvalidCrendentials
+  }
 
-	if u.userExists(email) {
-		return User{}, ErrUserAlreadyExists
-	}
+  if u.userExists(email) {
+    return User{}, ErrUserAlreadyExists
+  }
 
-	return u.createNewUser(email, password)
+  return u.createNewUser(email, password)
 }
 
 func (u *CreateUserUseCase) validEmailAndPassword(email, password string) bool {
-	return email != "" && password != ""
+  return email != "" && password != ""
 }
 
 func (u *CreateUserUseCase) userExists(email string) bool {
-	_, err := u.UserRepo.GetUserByEmail(email)
-	return err == nil
+  _, err := u.UserRepo.GetUserByEmail(email)
+  return err == nil
 }
 
 func (u *CreateUserUseCase) createNewUser(email, password string) (User, error) {
-	user := User{
-		Email:    email,
-		Password: password,
-	}
+  user := User{
+    Email:    email,
+    Password: password,
+  }
 
-	err := u.UserRepo.CreateUser(user)
-	if err != nil {
-		return User{}, err
-	}
+  err := u.UserRepo.CreateUser(user)
+  if err != nil {
+    return User{}, err
+  }
 
-	return user, nil
+  return user, nil
 }
 
 var ErrInvalidCrendentials = errors.New("invalid credentials")
@@ -88,24 +88,24 @@ Here is how to implement it:
 
 ```go
 func TestInvalidEmailAndPasswordWithDummy(t *testing.T) {
-	repo := UserRepoDummy{}
-	usecase := &CreateUserUseCase{UserRepo: repo}
+  repo := UserRepoDummy{}
+  usecase := &CreateUserUseCase{UserRepo: repo}
 
-	_, err := usecase.Run("", "")
+  _, err := usecase.Run("", "")
 
-	if err != ErrInvalidCrendentials {
-		t.Errorf("Did not return correct error: %v", err)
-	}
+  if err != ErrInvalidCrendentials {
+    t.Errorf("Did not return correct error: %v", err)
+  }
 }
 
 type UserRepoDummy struct{}
 
 func (r UserRepoDummy) GetUserByEmail(email string) (User, error) {
-	return User{}, nil
+  return User{}, nil
 }
 
 func (r UserRepoDummy) CreateUser(user User) error {
-	return nil
+  return nil
 }
 ```
 
@@ -119,24 +119,24 @@ Here is how to implement it:
 
 ```go
 func TestUserAlreadyExistsWithStub(t *testing.T) {
-	repo := UserRepoStub{}
-	usecase := &CreateUserUseCase{UserRepo: repo}
+  repo := UserRepoStub{}
+  usecase := &CreateUserUseCase{UserRepo: repo}
 
-	_, err := usecase.Run("user@example.com", "password")
+  _, err := usecase.Run("user@example.com", "password")
 
-	if err != ErrUserAlreadyExists {
-		t.Errorf("Did not return correct error: %v", err)
-	}
+  if err != ErrUserAlreadyExists {
+    t.Errorf("Did not return correct error: %v", err)
+  }
 }
 
 type UserRepoStub struct{}
 
 func (r UserRepoStub) GetUserByEmail(email string) (User, error) {
-	return User{Email: "user@example.com", Password: "password"}, nil
+  return User{Email: "user@example.com", Password: "password"}, nil
 }
 
 func (r UserRepoStub) CreateUser(user User) error {
-	return nil
+  return nil
 }
 ```
 
@@ -150,49 +150,49 @@ The spy is a very complete type of test double, and it can easily replace the pr
 
 ```go
 func TestCreateNewUserWithSpy(t *testing.T) {
-	repo := &UserRepoSpy{}
-	usecase := &CreateUserUseCase{UserRepo: repo}
+  repo := &UserRepoSpy{}
+  usecase := &CreateUserUseCase{UserRepo: repo}
 
-	repo.GetUserByEmailReturnError = ErrUserNotFound
-	repo.CreateUserReturnError = nil
+  repo.GetUserByEmailReturnError = ErrUserNotFound
+  repo.CreateUserReturnError = nil
 
-	email := "user@example.com"
-	password := "password"
+  email := "user@example.com"
+  password := "password"
 
-	returnedUser, err := usecase.Run(email, password)
+  returnedUser, err := usecase.Run(email, password)
 
-	expectedUser := User{Email: email, Password: password}
+  expectedUser := User{Email: email, Password: password}
 
-	if returnedUser != expectedUser {
-		t.Errorf("Did not return correct user: %v", returnedUser)
-	}
+  if returnedUser != expectedUser {
+    t.Errorf("Did not return correct user: %v", returnedUser)
+  }
 
-	if repo.CreateUserReceivedUser != expectedUser {
-		t.Errorf("UserRepo.CreateUser did not receive correct user: %v", repo.CreateUserReceivedUser)
-	}
+  if repo.CreateUserReceivedUser != expectedUser {
+    t.Errorf("UserRepo.CreateUser did not receive correct user: %v", repo.CreateUserReceivedUser)
+  }
 
-	if err != nil {
-		t.Errorf("Returned error is not nil: %v", err)
-	}
+  if err != nil {
+    t.Errorf("Returned error is not nil: %v", err)
+  }
 }
 
 type UserRepoSpy struct {
-	GetUserByEmailReceivedEmail string
-	GetUserByEmailReturnUser    User
-	GetUserByEmailReturnError   error
+  GetUserByEmailReceivedEmail string
+  GetUserByEmailReturnUser    User
+  GetUserByEmailReturnError   error
 
-	CreateUserReceivedUser User
-	CreateUserReturnError  error
+  CreateUserReceivedUser User
+  CreateUserReturnError  error
 }
 
 func (r *UserRepoSpy) GetUserByEmail(email string) (User, error) {
-	r.GetUserByEmailReceivedEmail = email
-	return r.GetUserByEmailReturnUser, r.GetUserByEmailReturnError
+  r.GetUserByEmailReceivedEmail = email
+  return r.GetUserByEmailReturnUser, r.GetUserByEmailReturnError
 }
 
 func (r *UserRepoSpy) CreateUser(user User) error {
-	r.CreateUserReceivedUser = user
-	return r.CreateUserReturnError
+  r.CreateUserReceivedUser = user
+  return r.CreateUserReturnError
 }
 ```
 
@@ -206,81 +206,81 @@ Here is how it can be implemented:
 
 ```go
 func TestCreateNewUserWithMock(t *testing.T) {
-	repo := &UserRepoMock{}
-	usecase := &CreateUserUseCase{UserRepo: repo}
+  repo := &UserRepoMock{}
+  usecase := &CreateUserUseCase{UserRepo: repo}
 
-	email := "user@example.com"
-	password := "password"
-	expectedUser := User{Email: email, Password: password}
+  email := "user@example.com"
+  password := "password"
+  expectedUser := User{Email: email, Password: password}
 
-	repo.MockGetUserByEmail(email, User{}, ErrUserNotFound)
-	repo.MockCreateUser(expectedUser, nil)
+  repo.MockGetUserByEmail(email, User{}, ErrUserNotFound)
+  repo.MockCreateUser(expectedUser, nil)
 
-	returnedUser, _ := usecase.Run(email, password)
+  returnedUser, _ := usecase.Run(email, password)
 
-	if returnedUser != expectedUser {
-		t.Errorf("Did not return correct user: %v", returnedUser)
-	}
+  if returnedUser != expectedUser {
+    t.Errorf("Did not return correct user: %v", returnedUser)
+  }
 
-	repo.Verify(t)
+  repo.Verify(t)
 }
 
 type UserRepoMock struct {
-	isGetUserByEmailMocked      bool
-	getUserByEmailReceiveEmail  string
-	getUserByEmailReceivedEmail string
-	getUserByEmailReturnUser    User
-	getUserByEmailReturnError   error
+  isGetUserByEmailMocked      bool
+  getUserByEmailReceiveEmail  string
+  getUserByEmailReceivedEmail string
+  getUserByEmailReturnUser    User
+  getUserByEmailReturnError   error
 
-	isCreateUserMocked     bool
-	createUserReceiveUser  User
-	createUserReceivedUser User
-	createUserReturnError  error
+  isCreateUserMocked     bool
+  createUserReceiveUser  User
+  createUserReceivedUser User
+  createUserReturnError  error
 }
 
 func (r *UserRepoMock) MockGetUserByEmail(
-	receiveEmail string, returnUser User, returnError error,
+  receiveEmail string, returnUser User, returnError error,
 ) {
-	r.isGetUserByEmailMocked = true
-	r.getUserByEmailReceiveEmail = receiveEmail
-	r.getUserByEmailReturnUser = returnUser
-	r.getUserByEmailReturnError = returnError
+  r.isGetUserByEmailMocked = true
+  r.getUserByEmailReceiveEmail = receiveEmail
+  r.getUserByEmailReturnUser = returnUser
+  r.getUserByEmailReturnError = returnError
 }
 
 func (r *UserRepoMock) GetUserByEmail(email string) (User, error) {
-	r.getUserByEmailReceivedEmail = email
-	return r.getUserByEmailReturnUser, r.getUserByEmailReturnError
+  r.getUserByEmailReceivedEmail = email
+  return r.getUserByEmailReturnUser, r.getUserByEmailReturnError
 }
 
 func (r *UserRepoMock) MockCreateUser(receiveUser User, returnError error) {
-	r.isCreateUserMocked = true
-	r.createUserReceiveUser = receiveUser
-	r.createUserReturnError = returnError
+  r.isCreateUserMocked = true
+  r.createUserReceiveUser = receiveUser
+  r.createUserReturnError = returnError
 }
 
 func (r *UserRepoMock) CreateUser(user User) error {
-	r.createUserReceivedUser = user
-	return r.createUserReturnError
+  r.createUserReceivedUser = user
+  return r.createUserReturnError
 }
 
 func (r *UserRepoMock) Verify(t *testing.T) {
-	if r.isGetUserByEmailMocked {
-		if r.getUserByEmailReceiveEmail != r.getUserByEmailReceivedEmail {
-			t.Errorf(
-				"Did not receive the correct email on GetUserByEmail\nExpected: %v\nReceived: %v",
-				r.getUserByEmailReceiveEmail, r.getUserByEmailReceivedEmail,
-			)
-		}
-	}
+  if r.isGetUserByEmailMocked {
+    if r.getUserByEmailReceiveEmail != r.getUserByEmailReceivedEmail {
+      t.Errorf(
+        "Did not receive the correct email on GetUserByEmail\nExpected: %v\nReceived: %v",
+        r.getUserByEmailReceiveEmail, r.getUserByEmailReceivedEmail,
+      )
+    }
+  }
 
-	if r.isCreateUserMocked {
-		if r.createUserReceiveUser != r.createUserReceivedUser {
-			t.Errorf(
-				"Did not receive the correct user on CreateUser\nExpected: %v\nReceived: %v",
-				r.createUserReceiveUser, r.createUserReceivedUser,
-			)
-		}
-	}
+  if r.isCreateUserMocked {
+    if r.createUserReceiveUser != r.createUserReceivedUser {
+      t.Errorf(
+        "Did not receive the correct user on CreateUser\nExpected: %v\nReceived: %v",
+        r.createUserReceiveUser, r.createUserReceivedUser,
+      )
+    }
+  }
 }
 ```
 
@@ -296,49 +296,49 @@ Here is how it can be implemented:
 
 ```go
 func TestCreateNewUserWithFake(t *testing.T) {
-	repo := NewFakeUserRepo()
-	usecase := &CreateUserUseCase{UserRepo: repo}
+  repo := NewFakeUserRepo()
+  usecase := &CreateUserUseCase{UserRepo: repo}
 
-	email := "user@example.com"
-	password := "password"
+  email := "user@example.com"
+  password := "password"
 
-	returnedUser, _ := usecase.Run(email, password)
+  returnedUser, _ := usecase.Run(email, password)
 
-	expectedUser := User{Email: email, Password: password}
+  expectedUser := User{Email: email, Password: password}
 
-	if returnedUser != expectedUser {
-		t.Errorf("Did not return correct user: %v", returnedUser)
-	}
+  if returnedUser != expectedUser {
+    t.Errorf("Did not return correct user: %v", returnedUser)
+  }
 
-	createdUser, _ := repo.GetUserByEmail(email)
+  createdUser, _ := repo.GetUserByEmail(email)
 
-	if returnedUser != expectedUser {
-		t.Errorf("Did not return create user: %v", createdUser)
-	}
+  if returnedUser != expectedUser {
+    t.Errorf("Did not return create user: %v", createdUser)
+  }
 }
 
 type FakeUserRepo struct {
-	users map[string]User
+  users map[string]User
 }
 
 func NewFakeUserRepo() *FakeUserRepo {
-	return &FakeUserRepo{
-		users: map[string]User{},
-	}
+  return &FakeUserRepo{
+    users: map[string]User{},
+  }
 }
 
 func (r *FakeUserRepo) GetUserByEmail(email string) (User, error) {
-	user, ok := r.users[email]
-	if !ok {
-		return User{}, ErrUserNotFound
-	}
+  user, ok := r.users[email]
+  if !ok {
+    return User{}, ErrUserNotFound
+  }
 
-	return user, nil
+  return user, nil
 }
 
 func (r *FakeUserRepo) CreateUser(user User) error {
-	r.users[user.Email] = user
-	return nil
+  r.users[user.Email] = user
+  return nil
 }
 ```
 
