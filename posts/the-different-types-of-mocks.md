@@ -146,7 +146,7 @@ In this scenario, a stub is given to the use case. This stub will always return 
 
 Here is where things start getting more interesting. The spy is again one step ahead of the stub. It is a configurable type of test double where you can specify what each method will return. It also records the calls to its methods and saves the received arguments allowing you to later verify if they were called with the correct arguments.
 
-The spy is a very complete type of test double, and it can easily replace the previous types. The only downside is that it requires a little bit more code to implement it. Here is how it looks like:
+The spy is a very complete type of test double, and it can easily replace the previous types. The only downside is that it requires a little bit more code to implement. Here is how it looks like:
 
 ```go
 func TestCreateNewUserWithSpy(t *testing.T) {
