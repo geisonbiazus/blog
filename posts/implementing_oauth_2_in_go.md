@@ -839,7 +839,7 @@ func (r *UserRepo) FindUserByProviderUserID(providerUserID string) (auth.User, e
 
 ##### TokenEncoder
 
-The last atapter is the `TokenEncoder`. For this adapter, we have a JWT implementation to sign and encode the user reference to be kept in the user session. You can see the implementation below:
+The last adapter is the `TokenEncoder`. For this adapter, we have a JWT implementation to sign and encode the user reference to be kept in the user session. You can see the implementation below:
 
 ```go
 // internal/adapters/tokenencoder/jwt/jwt.go
