@@ -17,13 +17,13 @@ This is the first post in a series of posts about algorithms and data structures
     - [O(n^2) - Quadratic](#on2---quadratic)
     - [O(n \* m)](#on--m-1)
     - [O(log n) - Logarithmic](#olog-n---logarithmic)
-    - [O(n log n) - Log linear](#on-log-n---log-linear)
+    - [O(n log n) - Log-linear](#on-log-n---log-linear)
     - [O(2^n), O(n!), and beyond](#o2n-on-and-beyond)
 - [Identifying the space complexity](#identifying-the-space-complexity)
-  - [Examples of common time complexities](#examples-of-common-time-complexities-1)
-  - [O(1) - Constant](#o1---constant-1)
-  - [O(n) - Linear](#on---linear-1)
-  - [O(n^2) and beyond](#on2-and-beyond)
+  - [Examples of common space complexities](#examples-of-common-space-complexities)
+    - [O(1) - Constant](#o1---constant-1)
+    - [O(n) - Linear](#on---linear-1)
+    - [O(n^2) and beyond](#on2-and-beyond)
 - [Final thoughts](#final-thoughts)
 - [Sources](#sources)
 
@@ -288,13 +288,13 @@ To find a value in a list of 8 elements, three splits happen. The number of oper
 
 The result of the log function is not always exact. For example `Log 7` is `2.80`. A list with 7 elements still does 3 operations, but we still classify the algorithm as `O(log n)` because the number of operations grows accordingly to the input in a logarithmic proportion.
 
-#### O(n log n) - Log linear
+#### O(n log n) - Log-linear
 
 The `O(n log n)` complexity happens when we have `log n` interactions, but for every interaction, we traverse the whole list with an additional `n` complexity. This is the complexity of the sorting algorithms Merge Sort, Quick Sort, and Heap Sort. I'll bring some examples of algorithms with this complexity in a future post when I write about sorting algorithms.
 
 #### O(2^n), O(n!), and beyond
 
-There are complexities worse than `O(n^2)` like `O(2^n)` and `O(n!)`. We won't get into details on those here. If you're interested in knowing more about these complexities, as well as seeing some examples, you can check the article [8 time complexities that every programmer should know](https://adrianmejia.com/most-popular-algorithms-time-complexity-every-programmer-should-know-free-online-tutorial-course/) from Adrian Mejia.
+There are complexities worse than `O(n^2)` like `O(2^n)` and `O(n!)`. We won't get into details on those here. If you're interested in knowing more about these complexities, as well as seeing some examples, you can check the article [8 time complexities that every programmer should know](https://adrianmejia.com/most-popular-algorithms-time-complexity-every-programmer-should-know-free-online-tutorial-course/) by Adrian Mejia.
 
 In summary, except in cases where the input is known to be small we should try not to exceed the `O(n)` complexity, with some exceptions of `O(n log n)`. Many times we can decrease time complexity by increasing space complexity using techniques like Divide and Conquer and Dynamic Programming, and if we have the memory to spare, they are worth the trade-off.
 
@@ -302,7 +302,7 @@ In summary, except in cases where the input is known to be small we should try n
 
 The space complexity can also be classified using the Big O notation. It measures the amount of extra memory an algorithm needs to complete its execution. We can identify the space complexity by looking at new variables, data structures and function calls inside of the algorithm.
 
-### Examples of common time complexities
+### Examples of common space complexities
 
 #### O(1) - Constant
 
