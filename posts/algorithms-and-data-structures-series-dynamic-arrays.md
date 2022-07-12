@@ -47,7 +47,7 @@ A static array is a sequence of elements of the same type. This sequence contain
 var ints [5]int
 ```
 
-An array has a fixed size for its entire lifecycle. When it is created, the required memory to hold all of its values is allocated. The only operations supported by arrays are assigning to a position and reading from a position. These operations are referred as update and lookup.
+An array has a fixed size for its entire lifecycle. When it is created, the required memory to hold all of its values is allocated. The only operations supported by arrays are assigning to a position and reading from a position. These operations are referred to as update and lookup.
 
 ```go
 ints[2] = 3 // update
@@ -68,16 +68,16 @@ Let's start with the dynamic array struct and constructor function:
 
 ```go
 type DynamicArray[T comparable] struct {
-	data     []T
-	capacity int
-	Length   int
+  data     []T
+  capacity int
+  Length   int
 }
 
 func NewDynamicArray[T comparable]() *DynamicArray[T] {
-	return &DynamicArray[T]{
-		data:     make([]T, 1),
-		capacity: 1,
-	}
+  return &DynamicArray[T]{
+    data:     make([]T, 1),
+    capacity: 1,
+  }
 }
 ```
 
@@ -95,24 +95,24 @@ The `Push` method, is used to add new items to a dynamic array. This method is t
 
 ```go
 func (a *DynamicArray[T]) Push(item T) {
-	if a.Length == a.capacity {
-		a.expandData()
-	}
+  if a.Length == a.capacity {
+    a.expandData()
+  }
 
-	a.data[a.Length] = item
-	a.Length++
+  a.data[a.Length] = item
+  a.Length++
 }
 
 func (a *DynamicArray[T]) expandData() {
-	newCapacity := a.capacity * 2
-	newData := make([]T, newCapacity)
+  newCapacity := a.capacity * 2
+  newData := make([]T, newCapacity)
 
-	for i, item := range a.data {
-		newData[i] = item
-	}
+  for i, item := range a.data {
+    newData[i] = item
+  }
 
-	a.capacity = newCapacity
-	a.data = newData
+  a.capacity = newCapacity
+  a.data = newData
 }
 ```
 
@@ -120,40 +120,40 @@ If we ignore the conditional part at the beginning of the `Push` method for now,
 
 Now, back to the conditional path, to avoid setting a value in a position that goes beyond its capacity, the `data` slice needs to be expanded. That is what this conditional at the beginning of the method does. If the `data` reached its maximum capacity, a new slice having twice the previous capacity is created. Then all the values from the previous `data` are copied to the new extended slice that is replaced in the struct. This operation has an `O(n)` time complexity but subsequent pushes to the dynamic array will have an `O(1)` complexity until the `data` reaches its capacity again.
 
-When the dynamic array length is small, we have frequent expansions. But as there are not much data in the array yet, these expansions do not take much time. As the array gets bigger, the frequency of expansions decreases. So we say that the push operation to a dynamic array has and average time complexity of `O(1)`, having a worst-case of `O(n)`.
+When the dynamic array length is small, we have frequent expansions. But as there are not much data in the array yet, these expansions do not take much time. As the array gets bigger, the frequency of expansions decreases. So we say that the push operation to a dynamic array has an average time complexity of `O(1)`, having a worst-case of `O(n)`.
 
 ### Insert
 
-Dynamic arrays allow inserting data at any position. This operation not only inserts the new item at the given position, but also moves all subsequent items one position up:
+Dynamic arrays allow inserting data at any position. This operation not only inserts the new item at the given position but also moves all subsequent items one position up:
 
 ```go
 func (a *DynamicArray[T]) Insert(index int, item T) error {
-	if index < 0 || index > a.Length {
-		return ErrIndexOutOfBounds
-	}
+  if index < 0 || index > a.Length {
+    return ErrIndexOutOfBounds
+  }
 
-	if a.Length == a.capacity {
-		a.expandData()
-	}
+  if a.Length == a.capacity {
+    a.expandData()
+  }
 
-	a.shiftDataUp(index)
+  a.shiftDataUp(index)
 
-	a.Length++
-	a.data[index] = item
+  a.Length++
+  a.data[index] = item
 
-	return nil
+  return nil
 }
 
 func (a *DynamicArray[T]) shiftDataUp(index int) {
-	for i := a.Length; i > index; i-- {
-		a.data[i] = a.data[i-1]
-	}
+  for i := a.Length; i > index; i-- {
+    a.data[i] = a.data[i-1]
+  }
 }
 ```
 
 In the `Insert` method, we first check if the given index is valid. The `ErrIndexOutOfBounds` error is returned in case it is invalid. Then we check whether the array length is at its capacity and expand it as we did on the `Push` method. Next, the `shifDataUp` method is called. This method loops through the array moving every subsequent item one index up to give space to the newly inserted item. Last, the `Length` is incremented and the new value is inserted at the appropriated position.
 
-The shifting of values makes the `Insert` method have a complexity of `O(n)`.
+The shifting of values makes the `Insert` method has a complexity of `O(n)`.
 
 ### Update
 
@@ -161,16 +161,16 @@ Updating a value of a dynamic array is no different than updating a value of a s
 
 ```go
 func (a *DynamicArray[T]) Set(index int, value T) error {
-	if !a.isIndexWithinBounds(index) {
-		return ErrIndexOutOfBounds
-	}
+  if !a.isIndexWithinBounds(index) {
+    return ErrIndexOutOfBounds
+  }
 
-	a.data[index] = value
-	return nil
+  a.data[index] = value
+  return nil
 }
 
 func (a *DynamicArray[T]) isIndexWithinBounds(index int) bool {
-	return index >= 0 && index < a.Length
+  return index >= 0 && index < a.Length
 }
 ```
 
@@ -178,20 +178,20 @@ The `Set` method first validates if the given index is valid, then it replaces t
 
 ### Lookup
 
-Similarly to updating, getting an item from the array by its index, is no different from getting it from a static array:
+Similarly to updating, getting an item from the array by its index is no different from getting it from a static array:
 
 ```go
 func (a *DynamicArray[T]) Get(index int) (T, error) {
-	if !a.isIndexWithinBounds(index) {
-		return a.emptyValue(), ErrIndexOutOfBounds
-	}
+  if !a.isIndexWithinBounds(index) {
+    return a.emptyValue(), ErrIndexOutOfBounds
+  }
 
-	return a.data[index], nil
+  return a.data[index], nil
 }
 
 func (a *DynamicArray[T]) emptyValue() T {
-	var value T
-	return value
+  var value T
+  return value
 }
 ```
 
@@ -201,29 +201,29 @@ If the index is valid, it returns the appropriate item from the `data` slice. Th
 
 ### Delete
 
-Static arrays do not support deleting values, only replacing values with null or something similar can be done to "delete" a value, but that would keep the subsequent values on their original position. In a dynamic array, as we have the possibility of pushing new items, removing items is also desirable.
+Static arrays do not support deleting values, only replacing values with null or something similar can be done to "delete" a value, but that would keep the subsequent values in their original position. In a dynamic array, as we have the possibility of pushing new items, removing items is also desirable.
 
 ```go
 func (a *DynamicArray[T]) Delete(index int) error {
-	if !a.isIndexWithinBounds(index) {
-		return ErrIndexOutOfBounds
-	}
+  if !a.isIndexWithinBounds(index) {
+    return ErrIndexOutOfBounds
+  }
 
-	a.shiftDataDown(index)
-	a.Length--
-	a.data[a.Length] = a.emptyValue()
+  a.shiftDataDown(index)
+  a.Length--
+  a.data[a.Length] = a.emptyValue()
 
-	return nil
+  return nil
 }
 
 func (a *DynamicArray[T]) shiftDataDown(index int) {
-	for i := index + 1; i < a.Length; i++ {
-		a.data[i-1] = a.data[i]
-	}
+  for i := index + 1; i < a.Length; i++ {
+    a.data[i-1] = a.data[i]
+  }
 }
 ```
 
-The `Delete` method starts with our habitual index validation. Next, it calls the `shiftDataDown` method. This method loops from the index being removed until the end of the array moving all of its elements one index down. In this process, the item being removed gets overriden with the next item in the array. To finish the process, the length gets decremented and the last item, which got duplicated after the shifiting, is overriden with an empty value.
+The `Delete` method starts with our habitual index validation. Next, it calls the `shiftDataDown` method. This method loops from the index being removed until the end of the array moving all of its elements one index down. In this process, the item being removed gets overridden with the next item in the array. To finish the process, the length gets decremented and the last item, which got duplicated after the shifting, is overridden with an empty value.
 
 The `Delete` operation of a dynamic array has an `O(n)` complexity, but there is a catch here. Although the method has an `O(n)` complexity, knowing that we always shift the elements from the given index until the end of the array, we can assume that removing the last element has a complexity of `O(1)`.
 
@@ -233,13 +233,13 @@ The last operation that a dynamic array might have is searching. This can be sea
 
 ```go
 func (a *DynamicArray[T]) Contains(item T) bool {
-	for i := 0; i < a.Length; i++ {
-		if a.data[i] == item {
-			return true
-		}
-	}
+  for i := 0; i < a.Length; i++ {
+    if a.data[i] == item {
+      return true
+    }
+  }
 
-	return false
+  return false
 }
 ```
 
@@ -284,7 +284,7 @@ Here is the time complexity table for the operations we just saw:
   </tbody>
 </table>
 
-By analysing this table, we can see that dynamic arrays are very fast for adding new items to the end and updating and retrieving items based on their indexes. However, inserting, deleting or searching for items are slow operations on this data structure.
+By analyzing this table, we can see that dynamic arrays are very fast for adding new items to the end and updating and retrieving items based on their indexes. However, inserting, deleting, or searching for items are slow operations on this data structure.
 
 ## Choosing dynamic arrays over other data structures
 
@@ -318,114 +318,114 @@ I hope you enjoyed this post and learned something new. The next article in the 
 var ErrIndexOutOfBounds = errors.New("array index out of bounds")
 
 type DynamicArray[T comparable] struct {
-	data     []T
-	capacity int
-	Length   int
+  data     []T
+  capacity int
+  Length   int
 }
 
 func NewDynamicArray[T comparable]() *DynamicArray[T] {
-	return &DynamicArray[T]{
-		data:     make([]T, 1),
-		capacity: 1,
-	}
+  return &DynamicArray[T]{
+    data:     make([]T, 1),
+    capacity: 1,
+  }
 }
 
 func (a *DynamicArray[T]) Push(item T) {
-	if a.Length == a.capacity {
-		a.expandData()
-	}
+  if a.Length == a.capacity {
+    a.expandData()
+  }
 
-	a.data[a.Length] = item
-	a.Length++
+  a.data[a.Length] = item
+  a.Length++
 }
 
 func (a *DynamicArray[T]) Insert(index int, item T) error {
-	if index < 0 || index > a.Length {
-		return ErrIndexOutOfBounds
-	}
+  if index < 0 || index > a.Length {
+    return ErrIndexOutOfBounds
+  }
 
-	if a.Length == a.capacity {
-		a.expandData()
-	}
+  if a.Length == a.capacity {
+    a.expandData()
+  }
 
-	a.shiftDataUp(index)
+  a.shiftDataUp(index)
 
-	a.Length++
-	a.data[index] = item
+  a.Length++
+  a.data[index] = item
 
-	return nil
+  return nil
 }
 
 func (a *DynamicArray[T]) shiftDataUp(index int) {
-	for i := a.Length; i > index; i-- {
-		a.data[i] = a.data[i-1]
-	}
+  for i := a.Length; i > index; i-- {
+    a.data[i] = a.data[i-1]
+  }
 }
 
 func (a *DynamicArray[T]) expandData() {
-	newCapacity := a.capacity * 2
-	newData := make([]T, newCapacity)
+  newCapacity := a.capacity * 2
+  newData := make([]T, newCapacity)
 
-	for i, item := range a.data {
-		newData[i] = item
-	}
+  for i, item := range a.data {
+    newData[i] = item
+  }
 
-	a.capacity = newCapacity
-	a.data = newData
+  a.capacity = newCapacity
+  a.data = newData
 }
 
 func (a *DynamicArray[T]) Get(index int) (T, error) {
-	if !a.isIndexWithinBounds(index) {
-		return a.emptyValue(), ErrIndexOutOfBounds
-	}
+  if !a.isIndexWithinBounds(index) {
+    return a.emptyValue(), ErrIndexOutOfBounds
+  }
 
-	return a.data[index], nil
+  return a.data[index], nil
 }
 
 func (a *DynamicArray[T]) Set(index int, value T) error {
-	if !a.isIndexWithinBounds(index) {
-		return ErrIndexOutOfBounds
-	}
+  if !a.isIndexWithinBounds(index) {
+    return ErrIndexOutOfBounds
+  }
 
-	a.data[index] = value
-	return nil
+  a.data[index] = value
+  return nil
 }
 
 func (a *DynamicArray[T]) Delete(index int) error {
-	if !a.isIndexWithinBounds(index) {
-		return ErrIndexOutOfBounds
-	}
+  if !a.isIndexWithinBounds(index) {
+    return ErrIndexOutOfBounds
+  }
 
-	a.shiftDataDown(index)
-	a.Length--
-	a.data[a.Length] = a.emptyValue()
+  a.shiftDataDown(index)
+  a.Length--
+  a.data[a.Length] = a.emptyValue()
 
-	return nil
+  return nil
 }
 
 func (a *DynamicArray[T]) shiftDataDown(index int) {
-	for i := index + 1; i < a.Length; i++ {
-		a.data[i-1] = a.data[i]
-	}
+  for i := index + 1; i < a.Length; i++ {
+    a.data[i-1] = a.data[i]
+  }
 }
 
 func (a *DynamicArray[T]) isIndexWithinBounds(index int) bool {
-	return index >= 0 && index < a.Length
+  return index >= 0 && index < a.Length
 }
 
 func (a *DynamicArray[T]) emptyValue() T {
-	var value T
-	return value
+  var value T
+  return value
 }
 
 func (a *DynamicArray[T]) Contains(item T) bool {
-	for i := 0; i < a.Length; i++ {
-		if a.data[i] == item {
-			return true
-		}
-	}
+  for i := 0; i < a.Length; i++ {
+    if a.data[i] == item {
+      return true
+    }
+  }
 
-	return false
+  return false
 }
 
 ```
