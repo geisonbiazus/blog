@@ -109,9 +109,16 @@ func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
 
 func (c *Context) Cache() shared.Cache {
 	if c.cache == nil {
-		c.cache = cache.NewMemoryCache()
+		c.cache = c.resolveCache()
 	}
 	return c.cache
+}
+
+func (c *Context) resolveCache() shared.Cache {
+	if c.isDevelopment() {
+		return cache.NewNullCache()
+	}
+	return cache.NewMemoryCache()
 }
 
 func (c *Context) DB() *sql.DB {
@@ -172,13 +179,16 @@ func (c *Context) StateRepo() auth.StateRepo {
 
 func (c *Context) UserRepo() auth.UserRepo {
 	if c.userRepo == nil {
-		if c.isTest() {
-			c.userRepo = userrepo.NewMemoryUserRepo()
-		} else {
-			c.userRepo = userrepo.NewPostgresUserRepo(c.DB())
-		}
+		c.userRepo = c.resolveUserRepo()
 	}
 	return c.userRepo
+}
+
+func (c *Context) resolveUserRepo() auth.UserRepo {
+	if c.isTest() {
+		return userrepo.NewMemoryUserRepo()
+	}
+	return userrepo.NewPostgresUserRepo(c.DB())
 }
 
 func (c *Context) TokenEncoder() auth.TokenEncoder {
@@ -193,4 +203,8 @@ func (c *Context) Logger() *log.Logger {
 
 func (c *Context) isTest() bool {
 	return c.Env == "test"
+}
+
+func (c *Context) isDevelopment() bool {
+	return c.Env == "development"
 }
