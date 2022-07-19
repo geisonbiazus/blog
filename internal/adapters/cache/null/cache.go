@@ -13,7 +13,9 @@ func NewCache() *Cache {
 }
 
 func (c *Cache) Do(
-	key string, resolve shared.ResolveFn, expiresIn time.Duration,
+	key string,
+	resolve shared.ResolveFn,
+	expiresIn time.Duration,
 ) (interface{}, error) {
 	return resolve()
 }
