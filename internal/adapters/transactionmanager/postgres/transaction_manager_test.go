@@ -67,6 +67,12 @@ func TestTransactionManager(t *testing.T) {
 		})
 
 		t.Run("It rollbacks the transaction if the callack panics", func(t *testing.T) {
+			defer func() {
+				if r := recover(); r != nil {
+					assert.Equal(t, "error", r)
+				}
+			}()
+
 			db := dbrepo.ConnectoToTestDB()
 			defer db.Close()
 
@@ -83,6 +89,89 @@ func TestTransactionManager(t *testing.T) {
 			assert.Equal(t, 0, countValues(db))
 
 			dropTestTable(db)
+		})
+
+		t.Run("With nested transactions", func(t *testing.T) {
+			t.Run("It doesn't start a new transaction", func(t *testing.T) {
+				db := dbrepo.ConnectoToTestDB()
+				defer db.Close()
+
+				createTestTable(db)
+
+				var outerTx *sql.Tx
+				var innerTx *sql.Tx
+
+				manager := postgres.NewTransactionManager(db)
+				manager.Transaction(context.Background(), func(ctx context.Context) error {
+					outerTx = dbrepo.TxFromContext(ctx)
+
+					manager.Transaction(ctx, func(ctx context.Context) error {
+						innerTx = dbrepo.TxFromContext(ctx)
+						return nil
+					})
+					return nil
+				})
+
+				assert.NotNil(t, outerTx)
+				assert.NotNil(t, innerTx)
+				assert.Equal(t, outerTx, innerTx)
+
+				dropTestTable(db)
+			})
+
+			t.Run("It commits changes from all nested transactions", func(t *testing.T) {
+				db := dbrepo.ConnectoToTestDB()
+				defer db.Close()
+
+				createTestTable(db)
+
+				manager := postgres.NewTransactionManager(db)
+				manager.Transaction(context.Background(), func(ctx context.Context) error {
+					tx1 := dbrepo.TxFromContext(ctx)
+					insertValue(tx1)
+
+					return manager.Transaction(ctx, func(ctx context.Context) error {
+						tx2 := dbrepo.TxFromContext(ctx)
+						insertValue(tx2)
+
+						return manager.Transaction(ctx, func(ctx context.Context) error {
+							tx3 := dbrepo.TxFromContext(ctx)
+							insertValue(tx3)
+							return nil
+						})
+					})
+				})
+
+				assert.Equal(t, 3, countValues(db))
+				dropTestTable(db)
+			})
+
+			t.Run("It rollbacks everything if an inner transaction returns error", func(t *testing.T) {
+				db := dbrepo.ConnectoToTestDB()
+				defer db.Close()
+
+				createTestTable(db)
+
+				manager := postgres.NewTransactionManager(db)
+				manager.Transaction(context.Background(), func(ctx context.Context) error {
+					tx1 := dbrepo.TxFromContext(ctx)
+					insertValue(tx1)
+
+					return manager.Transaction(ctx, func(ctx context.Context) error {
+						tx2 := dbrepo.TxFromContext(ctx)
+						insertValue(tx2)
+
+						return manager.Transaction(ctx, func(ctx context.Context) error {
+							tx3 := dbrepo.TxFromContext(ctx)
+							insertValue(tx3)
+							return errors.New("error")
+						})
+					})
+				})
+
+				assert.Equal(t, 0, countValues(db))
+				dropTestTable(db)
+			})
 		})
 	})
 }
