@@ -48,7 +48,7 @@ func TestTransactionManager(t *testing.T) {
 			dropTestTable(db)
 		})
 
-		t.Run("It rollbacks the transaction if the callback returns an error", func(t *testing.T) {
+		t.Run("It rolls back the transaction if the callback returns an error", func(t *testing.T) {
 			db := dbrepo.ConnectoToTestDB()
 			defer db.Close()
 
@@ -66,7 +66,7 @@ func TestTransactionManager(t *testing.T) {
 			dropTestTable(db)
 		})
 
-		t.Run("It rollbacks the transaction if the callack panics", func(t *testing.T) {
+		t.Run("It rolls back the transaction if the callack panics", func(t *testing.T) {
 			defer func() {
 				if r := recover(); r != nil {
 					assert.Equal(t, "error", r)
@@ -89,6 +89,29 @@ func TestTransactionManager(t *testing.T) {
 			assert.Equal(t, 0, countValues(db))
 
 			dropTestTable(db)
+		})
+
+		t.Run("When test mode is enabled", func(t *testing.T) {
+			t.Run("It always rolls back the transaction", func(t *testing.T) {
+				db := dbrepo.ConnectoToTestDB()
+				defer db.Close()
+
+				createTestTable(db)
+
+				manager := postgres.NewTransactionManager(db)
+
+				manager.EnableTestMode()
+
+				manager.Transaction(context.Background(), func(ctx context.Context) error {
+					tx := dbrepo.TxFromContext(ctx)
+					insertValue(tx)
+					return nil
+				})
+
+				assert.Equal(t, 0, countValues(db))
+
+				dropTestTable(db)
+			})
 		})
 
 		t.Run("With nested transactions", func(t *testing.T) {
@@ -146,7 +169,7 @@ func TestTransactionManager(t *testing.T) {
 				dropTestTable(db)
 			})
 
-			t.Run("It rollbacks everything if an inner transaction returns error", func(t *testing.T) {
+			t.Run("It rolls back everything if an inner transaction returns error", func(t *testing.T) {
 				db := dbrepo.ConnectoToTestDB()
 				defer db.Close()
 

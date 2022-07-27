@@ -9,11 +9,16 @@ import (
 )
 
 type TransactionManager struct {
-	db *sql.DB
+	db       *sql.DB
+	testMode bool
 }
 
 func NewTransactionManager(db *sql.DB) *TransactionManager {
 	return &TransactionManager{db: db}
+}
+
+func (t *TransactionManager) EnableTestMode() {
+	t.testMode = true
 }
 
 func (t *TransactionManager) Transaction(ctx context.Context, callback func(ctx context.Context) error) error {
@@ -33,6 +38,10 @@ func (t *TransactionManager) Transaction(ctx context.Context, callback func(ctx 
 	err = callback(ctx)
 	if err != nil {
 		return t.rollbackTransaction(tx, err)
+	}
+
+	if t.testMode {
+		return t.rollbackTransaction(tx, nil)
 	}
 
 	return t.commitTransaction(tx)
