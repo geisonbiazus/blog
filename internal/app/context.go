@@ -40,12 +40,14 @@ type Context struct {
 
 	AuthTokenSecret string
 
-	PostgresURL string
+	PostgresURL     string
+	PostgresTestURL string
 
-	db        *sql.DB
-	cache     shared.Cache
-	stateRepo auth.StateRepo
-	userRepo  auth.UserRepo
+	db                 *sql.DB
+	transactionManager shared.TransactionManager
+	cache              shared.Cache
+	stateRepo          auth.StateRepo
+	userRepo           auth.UserRepo
 }
 
 func NewContext() *Context {
@@ -64,7 +66,8 @@ func NewContext() *Context {
 
 		AuthTokenSecret: env.GetString("AUTH_TOKEN_SECRET", ""),
 
-		PostgresURL: env.GetString("POSTGRES_URL", "postgres://postgres:postgres@localhost:5432/blog?sslmode=disable"),
+		PostgresURL:     env.GetString("POSTGRES_URL", "postgres://postgres:postgres@localhost:5432/blog?sslmode=disable"),
+		PostgresTestURL: env.GetString("POSTGRES_TEST_URL", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable"),
 	}
 }
 
@@ -123,7 +126,7 @@ func (c *Context) resolveCache() shared.Cache {
 
 func (c *Context) DB() *sql.DB {
 	if c.db == nil {
-		db, err := sql.Open("pgx", c.PostgresURL)
+		db, err := sql.Open("pgx", c.resolvePostgresURL())
 		if err != nil {
 			panic(err)
 		}
@@ -132,15 +135,30 @@ func (c *Context) DB() *sql.DB {
 	return c.db
 }
 
+func (c *Context) resolvePostgresURL() string {
+	if c.isTest() {
+		return c.PostgresTestURL
+	}
+	return c.PostgresURL
+}
+
 func (c *Context) Migration() *migration.Migration {
 	return migration.New(c.DB(), c.MigrationsPath)
 }
 
 func (c *Context) TransactionManager() shared.TransactionManager {
-	if c.isTest() {
-		return transactionmanager.NewFakeTransactionManager()
+	if c.transactionManager == nil {
+		c.transactionManager = c.resolveTransactionManager()
 	}
-	return transactionmanager.NewPostgresTransactionManager(c.DB())
+	return c.transactionManager
+}
+
+func (c *Context) resolveTransactionManager() shared.TransactionManager {
+	tm := transactionmanager.NewPostgresTransactionManager(c.DB())
+	if c.isTest() {
+		tm.EnableTestMode()
+	}
+	return tm
 }
 
 func (c *Context) PostRepo() blog.PostRepo {
@@ -179,16 +197,9 @@ func (c *Context) StateRepo() auth.StateRepo {
 
 func (c *Context) UserRepo() auth.UserRepo {
 	if c.userRepo == nil {
-		c.userRepo = c.resolveUserRepo()
+		c.userRepo = userrepo.NewPostgresUserRepo(c.DB())
 	}
 	return c.userRepo
-}
-
-func (c *Context) resolveUserRepo() auth.UserRepo {
-	if c.isTest() {
-		return userrepo.NewMemoryUserRepo()
-	}
-	return userrepo.NewPostgresUserRepo(c.DB())
 }
 
 func (c *Context) TokenEncoder() auth.TokenEncoder {

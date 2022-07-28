@@ -29,7 +29,7 @@ func Test(cb func(ctx context.Context, db *sql.DB)) {
 }
 
 func ConnectoToTestDB() *sql.DB {
-	url := env.GetString("DB_TEST_URL", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable")
+	url := env.GetString("POSTGRES_TEST_URL", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable")
 	db, err := sql.Open("pgx", url)
 	if err != nil {
 		panic(err)

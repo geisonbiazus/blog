@@ -33,7 +33,7 @@ jobs:
           --health-retries 5
 
     env:
-      DB_TEST_URL: postgres://postgres:postgres@postgres:5432/blog_test?sslmode=disable
+      POSTGRES_TEST_URL: postgres://postgres:postgres@postgres:5432/blog_test?sslmode=disable
 
     steps:
       - uses: actions/checkout@v2
@@ -45,7 +45,7 @@ jobs:
         run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
       - name: Run migrations
-        run: make db_migrate db_url=$DB_TEST_URL
+        run: make db_migrate db_url=$POSTGRES_TEST_URL
 
       - name: Run tests
         run: make test
