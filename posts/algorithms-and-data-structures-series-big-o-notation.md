@@ -33,7 +33,7 @@ Big O is part of a family of mathematical notations invented by Paul Bachmann an
 
 Big O is expressed in a simple and common notation that makes it easier for developers to discuss the algorithm complexities and find the optimal solutions for both the implementation and the choice of the best fitting data structure for a specific problem. The following figure visually shows how each of the most common complexities compares to each other:
 
-![](/static/image/big-o-chart.png)
+![Big O chart](/static/image/big-o-chart.png)
 
 <center style="margin-top: -30px; margin-bottom: 30px;"><small>Source: <a href="https://www.bigocheatsheet.com" target="_blank">https://www.bigocheatsheet.com</a></small></center>
 
