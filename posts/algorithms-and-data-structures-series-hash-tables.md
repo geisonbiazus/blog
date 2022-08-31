@@ -67,20 +67,20 @@ First, we start with our `HashMap` type and constructor function:
 
 ```go
 type BucketItem[T any] struct {
-	key   string
-	value T
+  key   string
+  value T
 }
 
 type Bucket[T any] []*BucketItem[T]
 
 type HashMap[T any] struct {
-	buckets []Bucket[T]
+  buckets []Bucket[T]
 }
 
 func NewHashMap[T any]() *HashMap[T] {
-	return &HashMap[T]{
-		buckets: make([]Bucket[T], 1000),
-	}
+  return &HashMap[T]{
+    buckets: make([]Bucket[T], 1000),
+  }
 }
 ```
 
@@ -94,13 +94,13 @@ The hash function is used by the "insert", "lookup", and "delete" operations. It
 
 ```go
 func (h *HashMap[T]) hashKey(value string) int {
-	hash := 0
+  hash := 0
 
-	for i, chr := range value {
-		hash = (hash + int(chr)*i) % len(h.buckets)
-	}
+  for i, chr := range value {
+    hash = (hash + int(chr)*i) % len(h.buckets)
+  }
 
-	return hash
+  return hash
 }
 ```
 
@@ -114,35 +114,35 @@ Now let's implement the first operation of our hash map. To insert items, we use
 
 ```go
 func (h *HashMap[T]) Set(key string, value T) {
-	bucketIndex := h.hashKey(key)
-	h.ensureBucketExists(bucketIndex)
+  bucketIndex := h.hashKey(key)
+  h.ensureBucketExists(bucketIndex)
 
-	item := h.findBucketItem(bucketIndex, key)
-	if item != nil {
-		item.value = value
-	} else {
-		h.appendNewBucketItem(bucketIndex, key, value)
-	}
+  item := h.findBucketItem(bucketIndex, key)
+  if item != nil {
+    item.value = value
+  } else {
+    h.appendNewBucketItem(bucketIndex, key, value)
+  }
 }
 
 func (h *HashMap[T]) ensureBucketExists(bucketIindex int) {
-	if h.buckets[bucketIindex] == nil {
-		h.buckets[bucketIindex] = make(Bucket[T], 0, 1)
-	}
+  if h.buckets[bucketIindex] == nil {
+    h.buckets[bucketIindex] = make(Bucket[T], 0, 1)
+  }
 }
 
 func (h *HashMap[T]) findBucketItem(bucketIndex int, key string) *BucketItem[T] {
-	for _, item := range h.buckets[bucketIndex] {
-		if item.key == key {
-			return item
-		}
-	}
-	return nil
+  for _, item := range h.buckets[bucketIndex] {
+    if item.key == key {
+      return item
+    }
+  }
+  return nil
 }
 
 func (h *HashMap[T]) appendNewBucketItem(bucketIndex int, key string, value T) {
-	item := &BucketItem[T]{key, value}
-	h.buckets[bucketIndex] = append(h.buckets[bucketIndex], item)
+  item := &BucketItem[T]{key, value}
+  h.buckets[bucketIndex] = append(h.buckets[bucketIndex], item)
 }
 ```
 
@@ -160,35 +160,35 @@ Hash maps are all about looking up by key. We can perform this operation with th
 
 ```go
 func (h *HashMap[T]) Get(key string) T {
-	bucketIndex := h.hashKey(key)
+  bucketIndex := h.hashKey(key)
 
-	if h.bucketExists(bucketIndex) {
-		item := h.findBucketItem(bucketIndex, key)
+  if h.bucketExists(bucketIndex) {
+    item := h.findBucketItem(bucketIndex, key)
 
-		if item != nil {
-			return item.value
-		}
-	}
+    if item != nil {
+      return item.value
+    }
+  }
 
-	return h.emptyValue()
+  return h.emptyValue()
 }
 
 func (h *HashMap[T]) bucketExists(index int) bool {
-	return h.buckets[index] != nil
+  return h.buckets[index] != nil
 }
 
 func (h *HashMap[T]) findBucketItem(bucketIndex int, key string) *BucketItem[T] {
-	for _, item := range h.buckets[bucketIndex] {
-		if item.key == key {
-			return item
-		}
-	}
-	return nil
+  for _, item := range h.buckets[bucketIndex] {
+    if item.key == key {
+      return item
+    }
+  }
+  return nil
 }
 
 func (h *HashMap[T]) emptyValue() T {
-	var value T
-	return value
+  var value T
+  return value
 }
 ```
 
@@ -202,25 +202,25 @@ Removing an item from the hash map follows a similar pattern:
 
 ```go
 func (h *HashMap[T]) Delete(key string) {
-	bucketIndex := h.hashKey(key)
+  bucketIndex := h.hashKey(key)
 
-	if h.bucketExists(bucketIndex) {
-		for i, item := range h.buckets[bucketIndex] {
-			if item.key == key {
-				h.removeItem(bucketIndex, i)
-				return
-			}
-		}
-	}
+  if h.bucketExists(bucketIndex) {
+    for i, item := range h.buckets[bucketIndex] {
+      if item.key == key {
+        h.removeItem(bucketIndex, i)
+        return
+      }
+    }
+  }
 }
 
 func (h *HashMap[T]) bucketExists(index int) bool {
-	return h.buckets[index] != nil
+  return h.buckets[index] != nil
 }
 
 func (h *HashMap[T]) removeItem(bucketIndex, itemIndex int) {
-	bucket := h.buckets[bucketIndex]
-	h.buckets[bucketIndex] = append(bucket[:itemIndex], bucket[itemIndex+1:]...)
+  bucket := h.buckets[bucketIndex]
+  h.buckets[bucketIndex] = append(bucket[:itemIndex], bucket[itemIndex+1:]...)
 }
 ```
 
@@ -234,17 +234,17 @@ To traverse a hash map we need to get all the keys that were inserted in the map
 
 ```go
 func (h *HashMap[T]) Keys() []string {
-	keys := []string{}
+  keys := []string{}
 
-	for _, bucket := range h.buckets {
-		if bucket != nil {
-			for _, item := range bucket {
-				keys = append(keys, item.key)
-			}
-		}
-	}
+  for _, bucket := range h.buckets {
+    if bucket != nil {
+      for _, item := range bucket {
+        keys = append(keys, item.key)
+      }
+    }
+  }
 
-	return keys
+  return keys
 }
 ```
 
@@ -285,7 +285,7 @@ Here is the time complexity table for the operations we just saw:
 
 ## Choosing hash maps over other data structures
 
-The Hash map fast operations make it a very useful data structure. It is frequently used for optimization of many algorithms with the usage of the memoization technique where we take advantage of the fast lookups to cache values for use during the algorithm process. A Hash map is very optimized for its three main operations: insert, lookup, and delete. As long as these are the required operations for the algorithm, the hash map is a very good choice.
+The Hash map fast operations make it a very useful data structure. It is frequently used for optimizing many algorithms with the usage of the memoization technique where we take advantage of the fast lookups to cache values for use during the algorithm process. A Hash map is very optimized for its three main operations: insert, lookup, and delete. As long as these are the required operations for the algorithm, the hash map is a very good choice.
 
 Here is what we should consider when choosing or avoiding hash maps in our algorithms:
 
@@ -304,121 +304,121 @@ Here is what we should consider when choosing or avoiding hash maps in our algor
 
 ```go
 type BucketItem[T any] struct {
-	key   string
-	value T
+  key   string
+  value T
 }
 
 type Bucket[T any] []*BucketItem[T]
 
 type HashMap[T any] struct {
-	buckets []Bucket[T]
+  buckets []Bucket[T]
 }
 
 func NewHashMap[T any]() *HashMap[T] {
-	return &HashMap[T]{
-		buckets: make([]Bucket[T], 1000),
-	}
+  return &HashMap[T]{
+    buckets: make([]Bucket[T], 1000),
+  }
 }
 
 func (h *HashMap[T]) Set(key string, value T) {
-	bucketIndex := h.hashKey(key)
-	h.ensureBucketExists(bucketIndex)
+  bucketIndex := h.hashKey(key)
+  h.ensureBucketExists(bucketIndex)
 
-	item := h.findBucketItem(bucketIndex, key)
-	if item != nil {
-		item.value = value
-	} else {
-		h.appendNewBucketItem(bucketIndex, key, value)
-	}
+  item := h.findBucketItem(bucketIndex, key)
+  if item != nil {
+    item.value = value
+  } else {
+    h.appendNewBucketItem(bucketIndex, key, value)
+  }
 }
 
 func (h *HashMap[T]) hashKey(value string) int {
-	hash := 0
+  hash := 0
 
-	for i, chr := range value {
-		hash = (hash + int(chr)*i) % len(h.buckets)
-	}
+  for i, chr := range value {
+    hash = (hash + int(chr)*i) % len(h.buckets)
+  }
 
-	return hash
+  return hash
 }
 
 func (h *HashMap[T]) ensureBucketExists(bucketIindex int) {
-	if h.buckets[bucketIindex] == nil {
-		h.buckets[bucketIindex] = make(Bucket[T], 0, 1)
-	}
+  if h.buckets[bucketIindex] == nil {
+    h.buckets[bucketIindex] = make(Bucket[T], 0, 1)
+  }
 }
 
 func (h *HashMap[T]) findBucketItem(bucketIndex int, key string) *BucketItem[T] {
-	for _, item := range h.buckets[bucketIndex] {
-		if item.key == key {
-			return item
-		}
-	}
-	return nil
+  for _, item := range h.buckets[bucketIndex] {
+    if item.key == key {
+      return item
+    }
+  }
+  return nil
 }
 
 func (h *HashMap[T]) appendNewBucketItem(bucketIndex int, key string, value T) {
-	item := &BucketItem[T]{key, value}
-	h.buckets[bucketIndex] = append(h.buckets[bucketIndex], item)
+  item := &BucketItem[T]{key, value}
+  h.buckets[bucketIndex] = append(h.buckets[bucketIndex], item)
 }
 
 func (h *HashMap[T]) Get(key string) T {
-	bucketIndex := h.hashKey(key)
+  bucketIndex := h.hashKey(key)
 
-	if h.bucketExists(bucketIndex) {
-		item := h.findBucketItem(bucketIndex, key)
+  if h.bucketExists(bucketIndex) {
+    item := h.findBucketItem(bucketIndex, key)
 
-		if item != nil {
-			return item.value
-		}
-	}
+    if item != nil {
+      return item.value
+    }
+  }
 
-	return h.emptyValue()
+  return h.emptyValue()
 }
 
 func (h *HashMap[T]) bucketExists(index int) bool {
-	return h.buckets[index] != nil
+  return h.buckets[index] != nil
 }
 
 func (h *HashMap[T]) emptyValue() T {
-	var value T
-	return value
+  var value T
+  return value
 }
 
 func (h *HashMap[T]) Delete(key string) {
-	bucketIndex := h.hashKey(key)
+  bucketIndex := h.hashKey(key)
 
-	if h.bucketExists(bucketIndex) {
-		for i, item := range h.buckets[bucketIndex] {
-			if item.key == key {
-				h.removeItem(bucketIndex, i)
-				return
-			}
-		}
-	}
+  if h.bucketExists(bucketIndex) {
+    for i, item := range h.buckets[bucketIndex] {
+      if item.key == key {
+        h.removeItem(bucketIndex, i)
+        return
+      }
+    }
+  }
 }
 
 func (h *HashMap[T]) removeItem(bucketIndex, itemIndex int) {
-	bucket := h.buckets[bucketIndex]
-	h.buckets[bucketIndex] = append(bucket[:itemIndex], bucket[itemIndex+1:]...)
+  bucket := h.buckets[bucketIndex]
+  h.buckets[bucketIndex] = append(bucket[:itemIndex], bucket[itemIndex+1:]...)
 }
 
 func (h *HashMap[T]) Keys() []string {
-	keys := []string{}
+  keys := []string{}
 
-	for _, bucket := range h.buckets {
-		if bucket != nil {
-			for _, item := range bucket {
-				keys = append(keys, item.key)
-			}
-		}
-	}
+  for _, bucket := range h.buckets {
+    if bucket != nil {
+      for _, item := range bucket {
+        keys = append(keys, item.key)
+      }
+    }
+  }
 
-	return keys
+  return keys
 }
 ```
 
 ## Sources
 
 - [Master the Coding Interview: Data Structures + Algorithms](https://www.udemy.com/course/master-the-coding-interview-data-structures-algorithms/)
-- [Hsh table - Wikipedia](https://en.wikipedia.org/wiki/Hash_table)
+- [Hash table - Wikipedia](https://en.wikipedia.org/wiki/Hash_table)
