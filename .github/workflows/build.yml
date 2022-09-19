@@ -50,16 +50,18 @@ jobs:
       - name: Run tests
         run: make test
 
-  deploy:
-    name: Deploy to Heroku
+  deploy_to_railway:
+    name: Deploy to Railway
     needs: test
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "blog-geisonbiazus"
-          heroku_email: "geisonbiazus@gmail.com"
-          usedocker: true
+
+      - name: Install Railway
+        run: curl -fsSL https://railway.app/install.sh | sh
+
+      - name: Deploy
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
