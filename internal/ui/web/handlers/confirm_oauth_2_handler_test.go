@@ -1,4 +1,4 @@
-package web_test
+package handlers_test
 
 import (
 	"context"
@@ -7,7 +7,8 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/core/auth"
-	"github.com/geisonbiazus/blog/internal/ui/web"
+	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
+	"github.com/geisonbiazus/blog/internal/ui/web/test"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
@@ -16,14 +17,14 @@ func TestConfirmOAuth2Handler(t *testing.T) {
 	baseURL := "http://blog.example.com"
 
 	type fixture struct {
-		handler *web.ConfirmOAuth2Handler
+		handler *handlers.ConfirmOAuth2Handler
 		usecase *ConfirmOAuth2UseCaseSpy
 	}
 
 	setup := func() fixture {
 		usecase := &ConfirmOAuth2UseCaseSpy{}
-		templateRenderer := newTestTemplateRenderer()
-		handler := web.NewConfirmOAuth2Handler(usecase, templateRenderer, baseURL)
+		templateRenderer := test.NewTestTemplateRenderer()
+		handler := handlers.NewConfirmOAuth2Handler(usecase, templateRenderer, baseURL)
 
 		return fixture{
 			handler: handler,
@@ -36,7 +37,7 @@ func TestConfirmOAuth2Handler(t *testing.T) {
 
 		f.usecase.ReturnError = auth.ErrInvalidState
 
-		res := doGetRequest(f.handler, "/login/github/confirm?state=state&code=code")
+		res := test.DoGetRequest(f.handler, "/login/github/confirm?state=state&code=code")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, context.Background(), f.usecase.ReceivedContext)
@@ -51,7 +52,7 @@ func TestConfirmOAuth2Handler(t *testing.T) {
 
 		f.usecase.ReturnError = errors.New("some error")
 
-		res := doGetRequest(f.handler, "/login/github/confirm?state=state&code=code")
+		res := test.DoGetRequest(f.handler, "/login/github/confirm?state=state&code=code")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, context.Background(), f.usecase.ReceivedContext)
@@ -66,7 +67,7 @@ func TestConfirmOAuth2Handler(t *testing.T) {
 
 		f.usecase.ReturnToken = "token"
 
-		res := doGetRequest(f.handler, "/login/github/confirm?state=state&code=code")
+		res := test.DoGetRequest(f.handler, "/login/github/confirm?state=state&code=code")
 
 		assert.Equal(t, context.Background(), f.usecase.ReceivedContext)
 		assert.Equal(t, "state", f.usecase.ReceivedState)

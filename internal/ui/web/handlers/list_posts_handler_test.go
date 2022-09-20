@@ -1,4 +1,4 @@
-package web_test
+package handlers_test
 
 import (
 	"errors"
@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/core/blog"
-	"github.com/geisonbiazus/blog/internal/ui/web"
+	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
+	"github.com/geisonbiazus/blog/internal/ui/web/lib"
+	"github.com/geisonbiazus/blog/internal/ui/web/test"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
@@ -20,8 +22,8 @@ type listPostsHandlerFixture struct {
 func TestListPostsHandler(t *testing.T) {
 	setup := func() *listPostsHandlerFixture {
 		usecase := &listPostUseCaseSpy{}
-		templateRenderer := newTestTemplateRenderer()
-		handler := web.NewListPostsHandler(usecase, templateRenderer)
+		templateRenderer := test.NewTestTemplateRenderer()
+		handler := handlers.NewListPostsHandler(usecase, templateRenderer)
 
 		return &listPostsHandlerFixture{
 			usecase: usecase,
@@ -34,7 +36,7 @@ func TestListPostsHandler(t *testing.T) {
 
 		f.usecase.ReturnPosts = []blog.RenderedPost{renderedPost1, renderedPost2}
 
-		res := doGetRequest(f.handler, "/index")
+		res := test.DoGetRequest(f.handler, "/index")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -47,7 +49,7 @@ func TestListPostsHandler(t *testing.T) {
 
 		f.usecase.ReturnError = errors.New("some error")
 
-		res := doGetRequest(f.handler, "/posts")
+		res := test.DoGetRequest(f.handler, "/posts")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
@@ -59,7 +61,7 @@ func assertContainsListedPost(t *testing.T, body string, post blog.RenderedPost)
 	t.Helper()
 	assert.Contains(t, body, post.Post.Title)
 	assert.Contains(t, body, post.Post.Author)
-	assert.Contains(t, body, post.Post.Time.Format(web.DateFormat))
+	assert.Contains(t, body, post.Post.Time.Format(lib.DateFormat))
 	assert.Contains(t, body, fmt.Sprintf("/posts/%s", post.Post.Path))
 }
 

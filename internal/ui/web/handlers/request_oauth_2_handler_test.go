@@ -1,4 +1,4 @@
-package web_test
+package handlers_test
 
 import (
 	"errors"
@@ -6,35 +6,36 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/ui/web"
+	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
+	"github.com/geisonbiazus/blog/internal/ui/web/test"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
 
 func TestRequestOAuth2Handler(t *testing.T) {
 	t.Run("It requests a new OAuth2 and requiretcs to the returned URL", func(t *testing.T) {
-		templateRenderer := newTestTemplateRenderer()
+		templateRenderer := test.NewTestTemplateRenderer()
 		usecase := &requestOAuth2UseCaseStub{}
-		handler := web.NewRequestOAuth2Handler(usecase, templateRenderer)
+		handler := handlers.NewRequestOAuth2Handler(usecase, templateRenderer)
 
 		url := "http://example.com/login"
 
 		usecase.ReturnAuthURL = url
 
-		res := doGetRequest(handler, "/login/github")
+		res := test.DoGetRequest(handler, "/login/github")
 
 		assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 		assert.Equal(t, url, res.Header.Get("Location"))
 	})
 
 	t.Run("It responds with 500 if an error is returned from the use case", func(t *testing.T) {
-		templateRenderer := newTestTemplateRenderer()
+		templateRenderer := test.NewTestTemplateRenderer()
 		usecase := &requestOAuth2UseCaseStub{}
-		handler := web.NewRequestOAuth2Handler(usecase, templateRenderer)
+		handler := handlers.NewRequestOAuth2Handler(usecase, templateRenderer)
 
 		usecase.ReturnError = errors.New("error")
 
-		res := doGetRequest(handler, "/login/github")
+		res := test.DoGetRequest(handler, "/login/github")
 
 		body := testhelper.ReadResponseBody(res)
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)

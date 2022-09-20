@@ -20,6 +20,7 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/core/shared"
 	"github.com/geisonbiazus/blog/internal/ui/web"
+	webports "github.com/geisonbiazus/blog/internal/ui/web/ports"
 	"github.com/geisonbiazus/blog/pkg/env"
 	"github.com/geisonbiazus/blog/pkg/migration"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -83,8 +84,8 @@ func (c *Context) Router() http.Handler {
 
 // Use cases
 
-func (c *Context) UseCases() *web.UseCases {
-	return &web.UseCases{
+func (c *Context) UseCases() *webports.UseCases {
+	return &webports.UseCases{
 		ViewPost:      c.ViewPostUseCase(),
 		ListPosts:     c.ListPostsUseCase(),
 		RequestOAuth2: c.RequestOAuth2UseCase(),

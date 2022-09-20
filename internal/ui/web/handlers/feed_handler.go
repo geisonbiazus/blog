@@ -1,4 +1,4 @@
-package web
+package handlers
 
 import (
 	"fmt"
@@ -6,16 +6,18 @@ import (
 	"time"
 
 	"github.com/geisonbiazus/blog/internal/core/blog"
+	"github.com/geisonbiazus/blog/internal/ui/web/lib"
+	"github.com/geisonbiazus/blog/internal/ui/web/ports"
 	"github.com/gorilla/feeds"
 )
 
 type FeedHandler struct {
-	usecase  ListPostUseCase
-	template *TemplateRenderer
+	usecase  ports.ListPostUseCase
+	template *lib.TemplateRenderer
 	baseURL  string
 }
 
-func NewFeedHandler(usecase ListPostUseCase, templateRenderer *TemplateRenderer, baseURL string) *FeedHandler {
+func NewFeedHandler(usecase ports.ListPostUseCase, templateRenderer *lib.TemplateRenderer, baseURL string) *FeedHandler {
 	return &FeedHandler{
 		usecase:  usecase,
 		template: templateRenderer,

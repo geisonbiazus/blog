@@ -1,4 +1,4 @@
-package web_test
+package handlers_test
 
 import (
 	"errors"
@@ -7,7 +7,8 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/core/blog"
-	"github.com/geisonbiazus/blog/internal/ui/web"
+	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
+	"github.com/geisonbiazus/blog/internal/ui/web/test"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
@@ -20,9 +21,9 @@ type feedHandlerFixture struct {
 func TestFeedPostsHandler(t *testing.T) {
 	setup := func() *feedHandlerFixture {
 		usecase := &listPostUseCaseSpy{}
-		templateRenderer := newTestTemplateRenderer()
+		templateRenderer := test.NewTestTemplateRenderer()
 		baseURL := "http://example.com"
-		handler := web.NewFeedHandler(usecase, templateRenderer, baseURL)
+		handler := handlers.NewFeedHandler(usecase, templateRenderer, baseURL)
 
 		return &feedHandlerFixture{
 			usecase: usecase,
@@ -35,7 +36,7 @@ func TestFeedPostsHandler(t *testing.T) {
 
 		f.usecase.ReturnPosts = []blog.RenderedPost{renderedPost2, renderedPost1}
 
-		res := doGetRequest(f.handler, "/feed.atom")
+		res := test.DoGetRequest(f.handler, "/feed.atom")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -48,7 +49,7 @@ func TestFeedPostsHandler(t *testing.T) {
 
 		f.usecase.ReturnPosts = []blog.RenderedPost{}
 
-		res := doGetRequest(f.handler, "/feed.atom")
+		res := test.DoGetRequest(f.handler, "/feed.atom")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -61,7 +62,7 @@ func TestFeedPostsHandler(t *testing.T) {
 
 		f.usecase.ReturnError = errors.New("any error")
 
-		res := doGetRequest(f.handler, "/feed.atom")
+		res := test.DoGetRequest(f.handler, "/feed.atom")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)

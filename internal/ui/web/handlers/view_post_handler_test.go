@@ -1,4 +1,4 @@
-package web_test
+package handlers_test
 
 import (
 	"errors"
@@ -8,7 +8,9 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/core/blog"
-	"github.com/geisonbiazus/blog/internal/ui/web"
+	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
+	"github.com/geisonbiazus/blog/internal/ui/web/lib"
+	"github.com/geisonbiazus/blog/internal/ui/web/test"
 	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
 )
@@ -21,8 +23,8 @@ type viewPostHandlerFixture struct {
 func TestViewPostHandler(t *testing.T) {
 	setup := func() *viewPostHandlerFixture {
 		usecase := &viewPostUseCaseSpy{}
-		templateRenderer := newTestTemplateRenderer()
-		handler := web.NewViewPostHandler(usecase, templateRenderer)
+		templateRenderer := test.NewTestTemplateRenderer()
+		handler := handlers.NewViewPostHandler(usecase, templateRenderer)
 
 		return &viewPostHandlerFixture{
 			usecase: usecase,
@@ -36,7 +38,7 @@ func TestViewPostHandler(t *testing.T) {
 		renderedPost := buildRenderedPost()
 		f.usecase.ReturnPost = renderedPost
 
-		res := doGetRequest(f.handler, "/posts/post-path")
+		res := test.DoGetRequest(f.handler, "/posts/post-path")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -49,7 +51,7 @@ func TestViewPostHandler(t *testing.T) {
 
 		f.usecase.ReturnError = blog.ErrPostNotFound
 
-		res := doGetRequest(f.handler, "/posts/post-path")
+		res := test.DoGetRequest(f.handler, "/posts/post-path")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusNotFound, res.StatusCode)
@@ -62,7 +64,7 @@ func TestViewPostHandler(t *testing.T) {
 
 		f.usecase.ReturnError = errors.New("any error")
 
-		res := doGetRequest(f.handler, "/posts/post-path")
+		res := test.DoGetRequest(f.handler, "/posts/post-path")
 		body := testhelper.ReadResponseBody(res)
 
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
@@ -91,7 +93,7 @@ func assertContainsRenderedPost(t *testing.T, body string, renderedPost blog.Ren
 	assert.Contains(t, body, renderedPost.Post.Description)
 	assert.Contains(t, body, fmt.Sprintf("http://example.com%s", renderedPost.Post.ImagePath))
 	assert.Contains(t, body, fmt.Sprintf("http://example.com/posts/%s", renderedPost.Post.Path))
-	assert.Contains(t, body, renderedPost.Post.Time.Format(web.DateFormat))
+	assert.Contains(t, body, renderedPost.Post.Time.Format(lib.DateFormat))
 	assert.Contains(t, body, renderedPost.HTML)
 }
 

@@ -1,21 +1,23 @@
-package web
+package handlers
 
 import (
 	"errors"
 	"net/http"
 
 	"github.com/geisonbiazus/blog/internal/core/auth"
+	"github.com/geisonbiazus/blog/internal/ui/web/lib"
+	"github.com/geisonbiazus/blog/internal/ui/web/ports"
 )
 
 type ConfirmOAuth2Handler struct {
-	usecase  ConfirmOAuth2UseCase
-	template *TemplateRenderer
+	usecase  ports.ConfirmOAuth2UseCase
+	template *lib.TemplateRenderer
 	baseURL  string
 }
 
 func NewConfirmOAuth2Handler(
-	usecase ConfirmOAuth2UseCase,
-	templateRenderer *TemplateRenderer,
+	usecase ports.ConfirmOAuth2UseCase,
+	templateRenderer *lib.TemplateRenderer,
 	baseURL string,
 ) *ConfirmOAuth2Handler {
 	return &ConfirmOAuth2Handler{
