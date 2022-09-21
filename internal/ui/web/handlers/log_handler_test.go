@@ -1,4 +1,4 @@
-package web_test
+package handlers_test
 
 import (
 	"bytes"
@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/ui/web"
+	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
+	"github.com/geisonbiazus/blog/internal/ui/web/test"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
@@ -15,13 +16,13 @@ func TestLogHandler(t *testing.T) {
 		buf := &bytes.Buffer{}
 		logger := log.New(buf, "", 0)
 
-		logHandler := web.NewLogHandler(logger, http.NotFoundHandler())
+		logHandler := handlers.NewLogHandler(logger, http.NotFoundHandler())
 
-		doGetRequest(logHandler, "/log-path")
+		test.DoGetRequest(logHandler, "/log-path")
 
-		logHandler = web.NewLogHandler(logger, acceptedHandler())
+		logHandler = handlers.NewLogHandler(logger, acceptedHandler())
 
-		doGetRequest(logHandler, "/another-path")
+		test.DoGetRequest(logHandler, "/another-path")
 
 		assert.Equal(t, ""+
 			`{"type":"request","method":"GET","path":"/log-path","status":404}`+"\n"+

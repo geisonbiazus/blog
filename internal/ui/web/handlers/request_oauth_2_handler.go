@@ -1,13 +1,18 @@
-package web
+package handlers
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/geisonbiazus/blog/internal/ui/web/lib"
+	"github.com/geisonbiazus/blog/internal/ui/web/ports"
+)
 
 type RequestOAuth2Handler struct {
-	usecase  RequestOAuth2UseCase
-	template *TemplateRenderer
+	usecase  ports.RequestOAuth2UseCase
+	template *lib.TemplateRenderer
 }
 
-func NewRequestOAuth2Handler(usecase RequestOAuth2UseCase, template *TemplateRenderer) *RequestOAuth2Handler {
+func NewRequestOAuth2Handler(usecase ports.RequestOAuth2UseCase, template *lib.TemplateRenderer) *RequestOAuth2Handler {
 	return &RequestOAuth2Handler{usecase: usecase, template: template}
 }
 

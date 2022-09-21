@@ -1,4 +1,4 @@
-package web
+package handlers
 
 import (
 	"fmt"
@@ -7,14 +7,16 @@ import (
 	"path"
 
 	"github.com/geisonbiazus/blog/internal/core/blog"
+	"github.com/geisonbiazus/blog/internal/ui/web/lib"
+	"github.com/geisonbiazus/blog/internal/ui/web/ports"
 )
 
 type ViewPostHandler struct {
-	usecase  ViewPostUseCase
-	template *TemplateRenderer
+	usecase  ports.ViewPostUseCase
+	template *lib.TemplateRenderer
 }
 
-func NewViewPostHandler(usecase ViewPostUseCase, templateRenderer *TemplateRenderer) *ViewPostHandler {
+func NewViewPostHandler(usecase ports.ViewPostUseCase, templateRenderer *lib.TemplateRenderer) *ViewPostHandler {
 	return &ViewPostHandler{
 		usecase:  usecase,
 		template: templateRenderer,
@@ -45,7 +47,7 @@ func (h *ViewPostHandler) toViewModel(p blog.RenderedPost) postViewModel {
 		Description: p.Post.Description,
 		ImagePath:   p.Post.ImagePath,
 		Path:        fmt.Sprintf("/posts/%s", p.Post.Path),
-		Date:        p.Post.Time.Format(DateFormat),
+		Date:        p.Post.Time.Format(lib.DateFormat),
 		Content:     template.HTML(p.HTML),
 	}
 }

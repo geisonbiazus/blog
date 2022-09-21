@@ -1,13 +1,17 @@
-package web
+package handlers
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/geisonbiazus/blog/internal/ui/web/lib"
+)
 
 type TemplateHandler struct {
-	template     *TemplateRenderer
+	template     *lib.TemplateRenderer
 	templateName string
 }
 
-func NewTemplateHandler(renderer *TemplateRenderer, templateName string) *TemplateHandler {
+func NewTemplateHandler(renderer *lib.TemplateRenderer, templateName string) *TemplateHandler {
 	return &TemplateHandler{template: renderer, templateName: templateName}
 }
 

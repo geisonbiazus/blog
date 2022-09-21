@@ -1,18 +1,20 @@
-package web
+package handlers
 
 import (
 	"fmt"
 	"net/http"
 
 	"github.com/geisonbiazus/blog/internal/core/blog"
+	"github.com/geisonbiazus/blog/internal/ui/web/lib"
+	"github.com/geisonbiazus/blog/internal/ui/web/ports"
 )
 
 type ListPostsHandler struct {
-	usecase  ListPostUseCase
-	template *TemplateRenderer
+	usecase  ports.ListPostUseCase
+	template *lib.TemplateRenderer
 }
 
-func NewListPostsHandler(usecase ListPostUseCase, templateRenderer *TemplateRenderer) *ListPostsHandler {
+func NewListPostsHandler(usecase ports.ListPostUseCase, templateRenderer *lib.TemplateRenderer) *ListPostsHandler {
 	return &ListPostsHandler{
 		usecase:  usecase,
 		template: templateRenderer,
@@ -46,7 +48,7 @@ func (h *ListPostsHandler) toViewModel(post blog.RenderedPost) postsViewModel {
 	return postsViewModel{
 		Title:  post.Post.Title,
 		Author: post.Post.Author,
-		Date:   post.Post.Time.Format(DateFormat),
+		Date:   post.Post.Time.Format(lib.DateFormat),
 		Path:   fmt.Sprintf("/posts/%s", post.Post.Path),
 	}
 }
