@@ -3,7 +3,6 @@ package discussion
 type Comment struct {
 	ID        string
 	SubjectID string
-	Body      string
+	Markdown  string
+	HTML      string
 }
-
-type RenderedComment struct{}

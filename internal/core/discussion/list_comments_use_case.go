@@ -1,11 +1,13 @@
 package discussion
 
-type ListCommentsUseCase struct{}
-
-func NewListCommentsUseCase() *ListCommentsUseCase {
-	return &ListCommentsUseCase{}
+type ListCommentsUseCase struct {
+	commentRepo CommentRepo
 }
 
-func (u *ListCommentsUseCase) Run(subjectId string) []RenderedComment {
-	return []RenderedComment{}
+func NewListCommentsUseCase(commentRepo CommentRepo) *ListCommentsUseCase {
+	return &ListCommentsUseCase{commentRepo}
+}
+
+func (u *ListCommentsUseCase) Run(subjectID string) ([]Comment, error) {
+	return u.commentRepo.GetCommentsBySubjectID(subjectID)
 }

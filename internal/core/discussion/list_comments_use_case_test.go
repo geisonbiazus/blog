@@ -4,20 +4,21 @@ import (
 	"context"
 	"testing"
 
+	"github.com/geisonbiazus/blog/internal/adapters/commentrepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
 type listCommentsUseCaseFixture struct {
 	usecase *discussion.ListCommentsUseCase
-	repo    *CommentRepo
+	repo    *memory.CommentRepo
 	ctx     context.Context
 }
 
 func TestListCommentsUseCase(t *testing.T) {
 	setup := func() *listCommentsUseCaseFixture {
-		usecase := discussion.NewListCommentsUseCase()
-		repo := NewCommentRepo()
+		repo := memory.NewCommentRepo()
+		usecase := discussion.NewListCommentsUseCase(repo)
 
 		return &listCommentsUseCaseFixture{
 			usecase: usecase,
@@ -30,28 +31,35 @@ func TestListCommentsUseCase(t *testing.T) {
 		f := setup()
 		subjectID := "SUBJECT_ID"
 
-		assert.DeepEqual(t, []discussion.RenderedComment{}, f.usecase.Run(subjectID))
+		result, err := f.usecase.Run(subjectID)
+
+		assert.DeepEqual(t, []discussion.Comment{}, result)
+		assert.Nil(t, err)
 	})
 
-	t.Run("It fetches and returns the comments from the repository", func(t *testing.T) {
+	t.Run("It fetches and returns the comments of the given subject", func(t *testing.T) {
 		f := setup()
 
-		comment := discussion.Comment{
-			ID:        "ID",
+		comment1 := discussion.Comment{
+			ID:        "ID_1",
 			SubjectID: "SUBJECT_ID",
-			Body:      "Body",
+			Markdown:  "Comment 1 Markdown",
+			HTML:      "Comment 1 HTML",
 		}
 
-		f.repo.Save(f.ctx, comment)
+		comment2 := discussion.Comment{
+			ID:        "ID_2",
+			SubjectID: "SUBJECT_ID",
+			Markdown:  "Comment 2 Markdown",
+			HTML:      "Comment 2 HTML",
+		}
+
+		f.repo.Save(f.ctx, comment1)
+		f.repo.Save(f.ctx, comment2)
+
+		result, err := f.usecase.Run(comment1.SubjectID)
+
+		assert.DeepEqual(t, []discussion.Comment{comment1, comment2}, result)
+		assert.Nil(t, err)
 	})
-}
-
-type CommentRepo struct{}
-
-func NewCommentRepo() *CommentRepo {
-	return &CommentRepo{}
-}
-
-func (r *CommentRepo) Save(ctx context.Context, comment discussion.Comment) error {
-	return nil
 }
