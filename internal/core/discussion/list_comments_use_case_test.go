@@ -31,23 +31,23 @@ func TestListCommentsUseCase(t *testing.T) {
 		f := setup()
 		subjectID := "SUBJECT_ID"
 
-		result, err := f.usecase.Run(subjectID)
+		result, err := f.usecase.Run(f.ctx, subjectID)
 
-		assert.DeepEqual(t, []discussion.Comment{}, result)
+		assert.DeepEqual(t, []*discussion.Comment{}, result)
 		assert.Nil(t, err)
 	})
 
 	t.Run("It fetches and returns the comments of the given subject", func(t *testing.T) {
 		f := setup()
 
-		comment1 := discussion.Comment{
+		comment1 := &discussion.Comment{
 			ID:        "ID_1",
 			SubjectID: "SUBJECT_ID",
 			Markdown:  "Comment 1 Markdown",
 			HTML:      "Comment 1 HTML",
 		}
 
-		comment2 := discussion.Comment{
+		comment2 := &discussion.Comment{
 			ID:        "ID_2",
 			SubjectID: "SUBJECT_ID",
 			Markdown:  "Comment 2 Markdown",
@@ -57,9 +57,9 @@ func TestListCommentsUseCase(t *testing.T) {
 		f.repo.Save(f.ctx, comment1)
 		f.repo.Save(f.ctx, comment2)
 
-		result, err := f.usecase.Run(comment1.SubjectID)
+		result, err := f.usecase.Run(f.ctx, comment1.SubjectID)
 
-		assert.DeepEqual(t, []discussion.Comment{comment1, comment2}, result)
+		assert.DeepEqual(t, []*discussion.Comment{comment1, comment2}, result)
 		assert.Nil(t, err)
 	})
 }
