@@ -2,6 +2,7 @@ package discussion
 
 import (
 	"context"
+	"time"
 )
 
 type CommentParams struct {
@@ -9,6 +10,7 @@ type CommentParams struct {
 	SubjectID string
 	Markdown  string
 	HTML      string
+	CreatedAt time.Time
 }
 
 type Comment struct {
@@ -16,6 +18,9 @@ type Comment struct {
 	SubjectID string
 	Markdown  string
 	HTML      string
+	CreatedAt time.Time
+
+	replies []*Comment
 
 	loader CommentLoader
 }
@@ -26,10 +31,20 @@ func NewComment(params CommentParams, commentLoader CommentLoader) *Comment {
 		SubjectID: params.SubjectID,
 		Markdown:  params.Markdown,
 		HTML:      params.HTML,
+		CreatedAt: params.CreatedAt,
 		loader:    commentLoader,
 	}
 }
 
 func (c *Comment) Replies(ctx context.Context) ([]*Comment, error) {
-	return c.loader.GetCommentsBySubjectID(ctx, c.ID)
+	if c.replies == nil {
+		replies, err := c.loader.GetCommentsBySubjectID(ctx, c.ID)
+		if err != nil {
+			return []*Comment{}, err
+		}
+
+		c.replies = replies
+	}
+
+	return c.replies, nil
 }

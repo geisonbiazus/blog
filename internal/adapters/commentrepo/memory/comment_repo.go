@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"sort"
 
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 )
@@ -30,5 +31,13 @@ func (r *CommentRepo) GetCommentsBySubjectID(ctx context.Context, subjectID stri
 		}
 	}
 
+	sort.Sort(byCreatedAt(result))
+
 	return result, nil
 }
+
+type byCreatedAt []*discussion.Comment
+
+func (c byCreatedAt) Len() int           { return len(c) }
+func (a byCreatedAt) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byCreatedAt) Less(i, j int) bool { return a[i].CreatedAt.Before(a[j].CreatedAt) }
