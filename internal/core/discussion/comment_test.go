@@ -48,6 +48,28 @@ func TestComment(t *testing.T) {
 		}
 	}
 
+	t.Run("NewComment", func(t *testing.T) {
+		t.Run("it initializes a comment with all params", func(t *testing.T) {
+			f := setup()
+
+			params := discussion.CommentParams{
+				ID:        "ID",
+				SubjectID: "SUBJECT_ID",
+				Markdown:  "Markdown",
+				HTML:      "HTML",
+				CreatedAt: time.Now(),
+			}
+
+			comment := discussion.NewComment(params, f.repo)
+
+			assert.Equal(t, params.ID, comment.ID)
+			assert.Equal(t, params.SubjectID, comment.SubjectID)
+			assert.Equal(t, params.Markdown, comment.Markdown)
+			assert.Equal(t, params.HTML, comment.HTML)
+			assert.Equal(t, params.CreatedAt, comment.CreatedAt)
+		})
+	})
+
 	t.Run("Replies", func(t *testing.T) {
 		t.Run("It returns comment replies when they exist", func(t *testing.T) {
 			f := setup()
@@ -70,6 +92,19 @@ func TestComment(t *testing.T) {
 			replies, err := f.comment.Replies(f.ctx)
 
 			assert.DeepEqual(t, []*discussion.Comment{f.reply1, f.reply2}, replies)
+			assert.Nil(t, err)
+		})
+	})
+
+	t.Run("SetReplies", func(t *testing.T) {
+		t.Run("It sets the replies so they are not loaded when requested", func(t *testing.T) {
+			f := setup()
+
+			f.comment.SetReplies([]*discussion.Comment{f.reply2})
+
+			replies, err := f.comment.Replies(f.ctx)
+
+			assert.DeepEqual(t, []*discussion.Comment{f.reply2}, replies)
 			assert.Nil(t, err)
 		})
 	})

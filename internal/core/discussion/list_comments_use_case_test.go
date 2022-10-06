@@ -41,19 +41,13 @@ func TestListCommentsUseCase(t *testing.T) {
 	t.Run("It fetches and returns the comments of the given subject in chronological order", func(t *testing.T) {
 		f := setup()
 
-		comment1 := discussion.NewComment(discussion.CommentParams{
+		comment1 := newComment(discussion.CommentParams{
 			ID:        "ID_1",
-			SubjectID: "SUBJECT_ID",
-			Markdown:  "Comment 1 Markdown",
-			HTML:      "Comment 1 HTML",
 			CreatedAt: time.Date(2022, time.October, 4, 9, 0, 0, 0, time.UTC),
 		}, f.repo)
 
-		comment2 := discussion.NewComment(discussion.CommentParams{
+		comment2 := newComment(discussion.CommentParams{
 			ID:        "ID_2",
-			SubjectID: "SUBJECT_ID",
-			Markdown:  "Comment 2 Markdown",
-			HTML:      "Comment 2 HTML",
 			CreatedAt: time.Date(2022, time.October, 4, 8, 0, 0, 0, time.UTC),
 		}, f.repo)
 

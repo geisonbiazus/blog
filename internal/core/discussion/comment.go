@@ -48,3 +48,7 @@ func (c *Comment) Replies(ctx context.Context) ([]*Comment, error) {
 
 	return c.replies, nil
 }
+
+func (c *Comment) SetReplies(replies []*Comment) {
+	c.replies = replies
+}
