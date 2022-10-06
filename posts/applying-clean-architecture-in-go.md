@@ -64,7 +64,7 @@ time: 2021-04-21 22:37
 
 ## Implementation
 
-The project has been implemented using Test Driven Development but the tests as well as some parts of the code are omitted from this post for simplicity. You can find the full source code on the [blog repository](https://github.com/geisonbiazus/blog) on GitHub.
+The project has been implemented using Test Driven Development but the tests as well as some parts of the code are omitted from this post for simplicity. You can find the full source code on the [blog repository](https://github.com/geisonbiazus/blog/tree/post-clean-architecture) on GitHub.
 
 In this post, I show you the implementation of the **View Post** use case through all the layers. Other use cases follow a similar structure and the code can be seen in the GitHub repository.
 
@@ -218,7 +218,7 @@ func (r *PostRepo) GetPostByPath(path string) (blog.Post, error) {
 
 The `filesystem.PostRepo` implements the `blog.PostRepo` interface. The `GetPostByPath` receives a path, which is the post identifier in the system, reads the file based on the base path given in the repository constructor, and then parses the file content using the `ParseFileContent` function generating a `blog.Post` entity.
 
-The `ParseFileContent` function implementation is omitted from this post for simplicity. You can check its [implementation](https://github.com/geisonbiazus/blog/blob/main/internal/adapters/postrepo/filesystem/parser.go) as well as its [tests](https://github.com/geisonbiazus/blog/blob/main/internal/adapters/postrepo/filesystem/parser_test.go) on GitHub.
+The `ParseFileContent` function implementation is omitted from this post for simplicity. You can check its [implementation](https://github.com/geisonbiazus/blog/blob/post-clean-architecture/internal/adapters/postrepo/filesystem/parser.go) as well as its [tests](https://github.com/geisonbiazus/blog/blob/post-clean-architecture/internal/adapters/postrepo/filesystem/parser_test.go) on GitHub.
 
 The second adapter used by the `ViewPostUseCase` is the `Renderer` and you can see the implementation next:
 
@@ -365,7 +365,7 @@ The `web.ViewPostHandler` struct implements the Go internal `http.Handler` inter
 
 In case of success, a `postViewModel` is generated. This view model contains all the information of the post properly formatted and ready to be displayed in the UI. The view model then is passed to the template renderer which will simply generate the final HTML and display it to the user.
 
-The [template renderer](https://github.com/geisonbiazus/blog/blob/main/internal/ui/web/template_renderer.go), the [router](https://github.com/geisonbiazus/blog/blob/main/internal/ui/web/router.go), and the [server](https://github.com/geisonbiazus/blog/blob/main/internal/ui/web/server.go) are also part of the `web` package but their implementation is omitted from this post. You can check their code on GitHub.
+The [template renderer](https://github.com/geisonbiazus/blog/blob/post-clean-architecture/internal/ui/web/template_renderer.go), the [router](https://github.com/geisonbiazus/blog/blob/post-clean-architecture/internal/ui/web/router.go), and the [server](https://github.com/geisonbiazus/blog/blob/post-clean-architecture/internal/ui/web/server.go) are also part of the `web` package but their implementation is omitted from this post. You can check their code on GitHub.
 
 ### App
 

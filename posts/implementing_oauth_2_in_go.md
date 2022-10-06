@@ -516,7 +516,7 @@ This method uses the `TokenEncoder` dependency to encode the ID of the user in a
 
 As we can see, the `ConfirmOAuth2UseCase` type has multiple responsibilities. Each time it splits the flow into other methods could potentially be extracted into another type and facilitate code reuse. For example, if we need to authenticate a user using a method other than OAuth 2.0, the `getAuthenticationToken` method could become a standalone type. If we need to process the OAuth 2.0 confirmation but not proceed to the user creation and authentication, the `getProviderAuthenticatedUser` method could become another standalone type. For the moment, the current implementation is sufficient as these functionalities are only used in this module and we don't know yet what could potentially be reused in the future.
 
-You can see the [full implementation](https://github.com/geisonbiazus/blog/blob/main/internal/core/auth/confirm_oauth_2_use_case.go) of `ConfirmOAuth2UseCase` on GitHub.
+You can see the [full implementation](https://github.com/geisonbiazus/blog/blob/post-oauth/internal/core/auth/confirm_oauth_2_use_case.go) of `ConfirmOAuth2UseCase` on GitHub.
 
 #### Ports
 
@@ -895,7 +895,7 @@ func expiresAt(expiresIn time.Duration) int64 {
 
 ```
 
-The `jwt.TokenEncoder` uses the `github.com/dgrijalva/jwt-go` library to generate and sign the JWT. As in the content of this post we just encode the token, we are omitting the `Decode` method. You can see the full implementation on the [blog repository](https://github.com/geisonbiazus/blog/blob/main/internal/adapters/tokenencoder/jwt/jwt.go?ts=2) on GitHub. You can also learn more about JWT on the [JWT website](https://jwt.io)
+The `jwt.TokenEncoder` uses the `github.com/dgrijalva/jwt-go` library to generate and sign the JWT. As in the content of this post we just encode the token, we are omitting the `Decode` method. You can see the full implementation on the [blog repository](https://github.com/geisonbiazus/blog/blob/post-oauth/internal/adapters/tokenencoder/jwt/jwt.go?ts=2) on GitHub. You can also learn more about JWT on the [JWT website](https://jwt.io)
 
 ##### HTTP Handler
 
@@ -998,7 +998,7 @@ That ends the "Confirm OAuth 2.0" use case and the implementation of the OAuth 2
 
 OAuth 2.0, being a standard that is followed by many providers, facilitates applications to authenticate and connect to many third-party systems in a secure way. There are many libraries that abstract this authentication process but this is just one portion of the full process, which also consists of managing the users and generating session tokens. The main challenge is to orchestrate this process in a testable and maintainable way, and for that, the Clean Architecture is a good fit.
 
-You can see the full implementation in the [Blog Repository](https://github.com/geisonbiazus/blog) on GitHub.
+You can see the full implementation in the [Blog Repository](https://github.com/geisonbiazus/blog/tree/post-oauth) on GitHub.
 
 ## References
 
