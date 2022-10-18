@@ -51,8 +51,8 @@ func TestListCommentsUseCase(t *testing.T) {
 			CreatedAt: time.Date(2022, time.October, 4, 8, 0, 0, 0, time.UTC),
 		}, f.repo)
 
-		f.repo.Save(f.ctx, comment1)
-		f.repo.Save(f.ctx, comment2)
+		f.repo.SaveComment(f.ctx, comment1)
+		f.repo.SaveComment(f.ctx, comment2)
 
 		result, err := f.usecase.Run(f.ctx, comment1.SubjectID)
 

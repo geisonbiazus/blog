@@ -12,6 +12,7 @@ func newComment(
 	return discussion.NewComment(discussion.CommentParams{
 		ID:        stringOrDefault(params.ID, "ID"),
 		SubjectID: stringOrDefault(params.SubjectID, "SUBJECT_ID"),
+		AuthorID:  stringOrDefault(params.AuthorID, "AUTHOR_ID"),
 		Markdown:  stringOrDefault(params.Markdown, "Markdown"),
 		HTML:      stringOrDefault(params.HTML, "HTML"),
 		CreatedAt: timeOrDefault(params.CreatedAt, time.Now()),

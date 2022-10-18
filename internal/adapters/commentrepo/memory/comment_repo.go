@@ -9,17 +9,28 @@ import (
 
 type CommentRepo struct {
 	comments map[string]*discussion.Comment
+	authors  map[string]discussion.Author
 }
 
 func NewCommentRepo() *CommentRepo {
 	return &CommentRepo{
 		comments: make(map[string]*discussion.Comment),
+		authors:  make(map[string]discussion.Author),
 	}
 }
 
-func (r *CommentRepo) Save(ctx context.Context, comment *discussion.Comment) error {
+func (r *CommentRepo) SaveComment(ctx context.Context, comment *discussion.Comment) error {
 	r.comments[comment.ID] = comment
 	return nil
+}
+
+func (r *CommentRepo) SaveAuthor(ctx context.Context, author discussion.Author) error {
+	r.authors[author.ID] = author
+	return nil
+}
+
+func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (discussion.Author, error) {
+	return r.authors[id], nil
 }
 
 func (r *CommentRepo) GetCommentsBySubjectID(ctx context.Context, subjectID string) ([]*discussion.Comment, error) {

@@ -12,6 +12,7 @@ import (
 
 type listCommentFixture struct {
 	comment *discussion.Comment
+	author  discussion.Author
 	reply1  *discussion.Comment
 	reply2  *discussion.Comment
 	repo    *memory.CommentRepo
@@ -22,10 +23,21 @@ func TestComment(t *testing.T) {
 	setup := func() *listCommentFixture {
 		ctx := context.Background()
 		repo := memory.NewCommentRepo()
+
+		author := discussion.Author{
+			ID:        "AUTHOR_ID",
+			Name:      "Name",
+			AvatarURL: "https://example.com/avatar.png",
+		}
+
+		repo.SaveAuthor(ctx, author)
+
 		comment := newComment(discussion.CommentParams{}, repo)
+
 		reply1 := newComment(discussion.CommentParams{
 			ID:        "reply1",
 			SubjectID: comment.ID,
+			AuthorID:  author.ID,
 			CreatedAt: time.Now().Add(-1 * time.Hour),
 		}, repo)
 
@@ -35,12 +47,13 @@ func TestComment(t *testing.T) {
 			CreatedAt: time.Now(),
 		}, repo)
 
-		repo.Save(ctx, comment)
-		repo.Save(ctx, reply1)
-		repo.Save(ctx, reply2)
+		repo.SaveComment(ctx, comment)
+		repo.SaveComment(ctx, reply1)
+		repo.SaveComment(ctx, reply2)
 
 		return &listCommentFixture{
 			comment: comment,
+			author:  author,
 			reply1:  reply1,
 			reply2:  reply2,
 			repo:    repo,
@@ -87,7 +100,7 @@ func TestComment(t *testing.T) {
 
 			reply3 := newComment(discussion.CommentParams{ID: "repply3", SubjectID: f.comment.ID}, f.repo)
 
-			f.repo.Save(f.ctx, reply3)
+			f.repo.SaveComment(f.ctx, reply3)
 
 			replies, err := f.comment.Replies(f.ctx)
 
@@ -105,6 +118,57 @@ func TestComment(t *testing.T) {
 			replies, err := f.comment.Replies(f.ctx)
 
 			assert.DeepEqual(t, []*discussion.Comment{f.reply2}, replies)
+			assert.Nil(t, err)
+		})
+	})
+
+	t.Run("Author", func(t *testing.T) {
+		t.Run("It loads and returns the associated author", func(t *testing.T) {
+			f := setup()
+
+			author, err := f.comment.Author(f.ctx)
+
+			assert.Equal(t, f.author, author)
+			assert.Nil(t, err)
+		})
+
+		t.Run("It caches loaded author", func(t *testing.T) {
+			f := setup()
+
+			f.comment.Author(f.ctx)
+
+			author2 := discussion.Author{
+				ID:   "AUTHOR_2",
+				Name: "Author 2",
+			}
+
+			f.repo.SaveAuthor(f.ctx, author2)
+
+			f.comment.AuthorID = author2.ID
+
+			author, err := f.comment.Author(f.ctx)
+
+			assert.Equal(t, f.author, author)
+			assert.Nil(t, err)
+		})
+	})
+
+	t.Run("SetAuthor", func(t *testing.T) {
+		t.Run("It sets the author for eager loading", func(t *testing.T) {
+			f := setup()
+
+			f.comment.Author(f.ctx)
+
+			author2 := discussion.Author{
+				ID:   "AUTHOR_2",
+				Name: "Author 2",
+			}
+
+			f.comment.SetAuthor(author2)
+
+			author, err := f.comment.Author(f.ctx)
+
+			assert.Equal(t, author2, author)
 			assert.Nil(t, err)
 		})
 	})
