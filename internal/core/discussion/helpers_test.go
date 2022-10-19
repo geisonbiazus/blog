@@ -6,17 +6,15 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 )
 
-func newComment(
-	params discussion.CommentParams, commentLoader discussion.CommentLoader,
-) *discussion.Comment {
-	return discussion.NewComment(discussion.CommentParams{
+func newComment(params discussion.Comment) *discussion.Comment {
+	return &discussion.Comment{
 		ID:        stringOrDefault(params.ID, "ID"),
 		SubjectID: stringOrDefault(params.SubjectID, "SUBJECT_ID"),
 		AuthorID:  stringOrDefault(params.AuthorID, "AUTHOR_ID"),
 		Markdown:  stringOrDefault(params.Markdown, "Markdown"),
 		HTML:      stringOrDefault(params.HTML, "HTML"),
 		CreatedAt: timeOrDefault(params.CreatedAt, time.Now()),
-	}, commentLoader)
+	}
 }
 
 func stringOrDefault(value, defaultValue string) string {
