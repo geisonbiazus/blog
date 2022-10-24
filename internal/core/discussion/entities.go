@@ -15,6 +15,11 @@ type Comment struct {
 	Replies   []*Comment
 }
 
+func (c *Comment) Clone() *Comment {
+	clone := *c
+	return &clone
+}
+
 type Author struct {
 	ID        string
 	Name      string

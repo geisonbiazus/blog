@@ -33,12 +33,16 @@ func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (discussion.
 	return r.authors[id], nil
 }
 
-func (r *CommentRepo) GetCommentsBySubjectID(ctx context.Context, subjectID string) ([]*discussion.Comment, error) {
+func (r *CommentRepo) GetCommentsAndRepliesRecursively(ctx context.Context, subjectID string) ([]*discussion.Comment, error) {
 	result := []*discussion.Comment{}
 
 	for _, comment := range r.comments {
 		if comment.SubjectID == subjectID {
-			result = append(result, comment)
+			clone := comment.Clone()
+			replies, _ := r.GetCommentsAndRepliesRecursively(ctx, comment.ID)
+			clone.Replies = replies
+
+			result = append(result, clone)
 		}
 	}
 

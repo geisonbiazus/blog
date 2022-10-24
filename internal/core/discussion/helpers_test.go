@@ -14,6 +14,7 @@ func newComment(params discussion.Comment) *discussion.Comment {
 		Markdown:  stringOrDefault(params.Markdown, "Markdown"),
 		HTML:      stringOrDefault(params.HTML, "HTML"),
 		CreatedAt: timeOrDefault(params.CreatedAt, time.Now()),
+		Replies:   sliceOrDefault(params.Replies, []*discussion.Comment{}),
 	}
 }
 
@@ -28,5 +29,13 @@ func timeOrDefault(value, defaultValue time.Time) time.Time {
 	if (value != time.Time{}) {
 		return value
 	}
+	return defaultValue
+}
+
+func sliceOrDefault[T any](value []T, defaultValue []T) []T {
+	if value != nil {
+		return value
+	}
+
 	return defaultValue
 }

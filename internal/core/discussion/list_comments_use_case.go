@@ -11,5 +11,5 @@ func NewListCommentsUseCase(commentRepo CommentRepo) *ListCommentsUseCase {
 }
 
 func (u *ListCommentsUseCase) Run(ctx context.Context, subjectID string) ([]*Comment, error) {
-	return u.commentRepo.GetCommentsBySubjectID(ctx, subjectID)
+	return u.commentRepo.GetCommentsAndRepliesRecursively(ctx, subjectID)
 }

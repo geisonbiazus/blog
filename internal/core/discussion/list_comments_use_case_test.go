@@ -59,4 +59,53 @@ func TestListCommentsUseCase(t *testing.T) {
 		assert.DeepEqual(t, []*discussion.Comment{comment2, comment1}, result)
 		assert.Nil(t, err)
 	})
+
+	t.Run("It fetches replies recursively", func(t *testing.T) {
+		f := setup()
+
+		comment := newComment(discussion.Comment{
+			ID: "COMMENT",
+		})
+
+		reply1 := newComment(discussion.Comment{
+			ID:        "REPLY_1",
+			SubjectID: comment.ID,
+		})
+
+		reply2 := newComment(discussion.Comment{
+			ID:        "REPLY_2",
+			SubjectID: reply1.ID,
+		})
+
+		f.repo.SaveComment(f.ctx, comment)
+		f.repo.SaveComment(f.ctx, reply1)
+		f.repo.SaveComment(f.ctx, reply2)
+
+		result, err := f.usecase.Run(f.ctx, comment.SubjectID)
+
+		commentWithReplies := []*discussion.Comment{
+			newComment(discussion.Comment{
+				ID:        comment.ID,
+				CreatedAt: comment.CreatedAt,
+				Replies: []*discussion.Comment{
+					newComment(discussion.Comment{
+						ID:        reply1.ID,
+						SubjectID: reply1.SubjectID,
+						CreatedAt: reply1.CreatedAt,
+						Replies: []*discussion.Comment{
+							newComment(discussion.Comment{
+								ID:        reply2.ID,
+								SubjectID: reply2.SubjectID,
+								CreatedAt: reply2.CreatedAt,
+							}),
+						},
+					}),
+				},
+			}),
+		}
+
+		assert.DeepEqual(t, commentWithReplies, result)
+		assert.DeepEqual(t, commentWithReplies[0].Replies[0].Replies[0], result[0].Replies[0].Replies[0])
+		assert.Nil(t, err)
+	})
 }
