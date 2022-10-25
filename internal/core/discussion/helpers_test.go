@@ -8,27 +8,23 @@ import (
 
 func newComment(params discussion.Comment) *discussion.Comment {
 	return &discussion.Comment{
-		ID:        stringOrDefault(params.ID, "ID"),
-		SubjectID: stringOrDefault(params.SubjectID, "SUBJECT_ID"),
-		AuthorID:  stringOrDefault(params.AuthorID, "AUTHOR_ID"),
-		Markdown:  stringOrDefault(params.Markdown, "Markdown"),
-		HTML:      stringOrDefault(params.HTML, "HTML"),
-		CreatedAt: timeOrDefault(params.CreatedAt, time.Now()),
+		ID:        valueOrDefault(params.ID, "ID"),
+		SubjectID: valueOrDefault(params.SubjectID, "SUBJECT_ID"),
+		AuthorID:  valueOrDefault(params.AuthorID, "AUTHOR_ID"),
+		Author:    valueOrDefault(params.Author, nil),
+		Markdown:  valueOrDefault(params.Markdown, "Markdown"),
+		HTML:      valueOrDefault(params.HTML, "HTML"),
+		CreatedAt: valueOrDefault(params.CreatedAt, time.Now()),
 		Replies:   sliceOrDefault(params.Replies, []*discussion.Comment{}),
 	}
 }
 
-func stringOrDefault(value, defaultValue string) string {
-	if value != "" {
+func valueOrDefault[T comparable](value T, defaultValue T) T {
+	var empty T
+	if value != empty {
 		return value
 	}
-	return defaultValue
-}
 
-func timeOrDefault(value, defaultValue time.Time) time.Time {
-	if (value != time.Time{}) {
-		return value
-	}
 	return defaultValue
 }
 
