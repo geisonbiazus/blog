@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/geisonbiazus/blog/internal/core/blog"
+	"github.com/geisonbiazus/blog/internal/core/discussion"
 )
 
 type UseCases struct {
@@ -27,4 +28,8 @@ type RequestOAuth2UseCase interface {
 
 type ConfirmOAuth2UseCase interface {
 	Run(ctx context.Context, state, code string) (string, error)
+}
+
+type ListCommentsUseCase interface {
+	Run(ctx context.Context, subjectID string) ([]*discussion.Comment, error)
 }
