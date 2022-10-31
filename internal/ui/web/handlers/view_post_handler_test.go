@@ -66,6 +66,34 @@ func TestViewPostHandler(t *testing.T) {
 		assertContainsComments(t, body, comments)
 	})
 
+	t.Run("Given a post with no comments it doesn't render comments", func(t *testing.T) {
+		f := setup()
+
+		renderedPost := buildRenderedPost()
+		f.viewPostUseCase.ReturnPost = renderedPost
+		f.listCommentsUseCase.ReturnComments = []*discussion.Comment{}
+
+		res := test.DoGetRequest(f.handler, "/posts/post-path")
+		body := testhelper.ReadResponseBody(res)
+
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.NotContains(t, body, "Comments")
+	})
+
+	t.Run("Given an error is returned when loading coments it responds with server error", func(t *testing.T) {
+		f := setup()
+
+		renderedPost := buildRenderedPost()
+		f.viewPostUseCase.ReturnPost = renderedPost
+		f.listCommentsUseCase.ReturnError = errors.New("any error")
+
+		res := test.DoGetRequest(f.handler, "/posts/post-path")
+		body := testhelper.ReadResponseBody(res)
+
+		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+		assert.True(t, strings.Contains(body, "Internal server error"))
+	})
+
 	t.Run("Given a wrong post path it responds with not found", func(t *testing.T) {
 		f := setup()
 
@@ -147,6 +175,7 @@ func assertContainsRenderedPost(t *testing.T, body string, renderedPost blog.Ren
 }
 
 func assertContainsComments(t *testing.T, body string, comments []*discussion.Comment) {
+	assert.Contains(t, body, "Comments")
 	for _, comment := range comments {
 		assert.Contains(t, body, comment.Author.Name)
 		assert.Contains(t, body, comment.Author.AvatarURL)

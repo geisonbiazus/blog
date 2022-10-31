@@ -1,52 +1,64 @@
 {{define "title"}}
-<title>{{ .Title }} | Geison Biazus</title>
+  <title>{{ .Title }} | Geison Biazus</title>
 {{end}}
 
 {{define "head"}}
-<meta property="og:url" content="{{urlFor .Path}}" />
-<meta property="og:type" content="website" />
-<meta property="og:title" content="{{.Title}}" />
-<meta property="og:description" content="{{.Description}}" />
-<meta property="og:image" content="{{urlFor .ImagePath}}" />
+  <meta property="og:url" content="{{urlFor .Path}}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="{{.Title}}" />
+  <meta property="og:description" content="{{.Description}}" />
+  <meta property="og:image" content="{{urlFor .ImagePath}}" />
 {{end}}
 
 {{define "content"}}
-<h1 class="mb-0">{{ .Title }}</h1>
-<span class="fs-6 text-muted">{{ .Date }} - </span>
-<span class="fs-6 text-muted fst-italic">{{ .Author }}</span><br>
-
-<div class="mt-3" id="post-content">
-  {{.Content}}
-</div>
-
-<div class="fs-6">
-  Share:
-
-  <a target="_blank" class="text-decoration-none fs-5 link-secondary mx-1"
-    href="http://www.facebook.com/sharer/sharer.php?u={{urlFor .Path}}&title={{ .Title}}">
-    <i class="bi-facebook" role="img" aria-label="Facebook" title="Facebook"></i>
-  </a>
-
-  <a target="_blank" class="text-decoration-none fs-5 link-secondary mx-1"
-    href="http://www.linkedin.com/shareArticle?mini=true&url={{urlFor .Path}}&title={{ .Title}}">
-    <i class="bi-linkedin" role="img" aria-label="LinkedIn" title="LinkedIn"></i>
-  </a>
-
-  <a target="_blank" class="text-decoration-none fs-5 link-secondary mx-1"
-    href="http://twitter.com/intent/tweet?original_referer={{urlFor .Path}}&text={{ .Title}}&url={{urlFor .Path}}">
-    <i class="bi-twitter" role="img" aria-label="Twitter" title="Twitter"></i>
-  </a>
-</div>
-
-<hr>
-
-<div>
-  <h2>Comments</h2>
-
-  {{ range .Comments }}
-    {{ template "comment" . }}
-  {{ end }}
+  {{ template "post" . }}
+  {{ template "share" . }}
+  {{ template "comments" .Comments }}
 {{end}}
+
+{{ define "post" }}
+  <h1 class="mb-0">{{ .Title }}</h1>
+  <span class="fs-6 text-muted">{{ .Date }} - </span>
+  <span class="fs-6 text-muted fst-italic">{{ .Author }}</span><br>
+
+  <div class="mt-3" id="post-content">
+    {{.Content}}
+  </div>
+{{ end }}
+
+{{ define "share" }}
+  <div class="fs-6">
+    Share:
+
+    <a target="_blank" class="text-decoration-none fs-5 link-secondary mx-1"
+      href="http://www.facebook.com/sharer/sharer.php?u={{urlFor .Path}}&title={{ .Title}}">
+      <i class="bi-facebook" role="img" aria-label="Facebook" title="Facebook"></i>
+    </a>
+
+    <a target="_blank" class="text-decoration-none fs-5 link-secondary mx-1"
+      href="http://www.linkedin.com/shareArticle?mini=true&url={{urlFor .Path}}&title={{ .Title}}">
+      <i class="bi-linkedin" role="img" aria-label="LinkedIn" title="LinkedIn"></i>
+    </a>
+
+    <a target="_blank" class="text-decoration-none fs-5 link-secondary mx-1"
+      href="http://twitter.com/intent/tweet?original_referer={{urlFor .Path}}&text={{ .Title}}&url={{urlFor .Path}}">
+      <i class="bi-twitter" role="img" aria-label="Twitter" title="Twitter"></i>
+    </a>
+  </div>
+{{ end }}
+
+{{ define "comments" }}
+  <hr>
+  {{ if . }}
+    <div>
+      <h2>Comments</h2>
+
+      {{ range . }}
+        {{ template "comment" . }}
+      {{ end }}
+    </div>
+  {{ end }}
+{{ end }}
 
 {{ define "comment" }}
   <div class="comment mt-3">

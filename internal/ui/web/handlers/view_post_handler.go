@@ -32,20 +32,39 @@ func NewViewPostHandler(
 
 func (h *ViewPostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := path.Base(r.URL.Path)
-	renderedPost, err := h.viewPostUseCase.Run(path)
-	comments, _ := h.listCommentsUseCase.Run(r.Context(), path)
 
-	switch err {
-	case nil:
-		w.WriteHeader(http.StatusOK)
-		h.template.Render(w, "view_post.html", h.toViewModel(renderedPost, comments))
-	case blog.ErrPostNotFound:
-		w.WriteHeader(http.StatusNotFound)
-		h.template.Render(w, "404.html", nil)
-	default:
-		w.WriteHeader(http.StatusInternalServerError)
-		h.template.Render(w, "500.html", nil)
+	renderedPost, err := h.viewPostUseCase.Run(path)
+	if err != nil {
+		h.handleViewPostError(w, err)
+		return
 	}
+
+	comments, err := h.listCommentsUseCase.Run(r.Context(), path)
+	if err != nil {
+		h.respondWithInternalServerError(w)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	h.template.Render(w, "view_post.html", h.toViewModel(renderedPost, comments))
+}
+
+func (h *ViewPostHandler) handleViewPostError(w http.ResponseWriter, err error) {
+	if err == blog.ErrPostNotFound {
+		h.respondWithNotFound(w)
+	} else {
+		h.respondWithInternalServerError(w)
+	}
+}
+
+func (h *ViewPostHandler) respondWithNotFound(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNotFound)
+	h.template.Render(w, "404.html", nil)
+}
+
+func (h *ViewPostHandler) respondWithInternalServerError(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusInternalServerError)
+	h.template.Render(w, "500.html", nil)
 }
 
 func (h *ViewPostHandler) toViewModel(p blog.RenderedPost, comments []*discussion.Comment) postViewModel {
