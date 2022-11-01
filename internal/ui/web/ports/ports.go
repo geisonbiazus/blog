@@ -12,6 +12,7 @@ type UseCases struct {
 	ListPosts     ListPostUseCase
 	RequestOAuth2 RequestOAuth2UseCase
 	ConfirmOAuth2 ConfirmOAuth2UseCase
+	ListComments  ListCommentsUseCase
 }
 
 type ViewPostUseCase interface {
