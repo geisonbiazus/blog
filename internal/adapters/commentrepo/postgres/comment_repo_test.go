@@ -11,8 +11,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/idgenerator/uuid"
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 	. "github.com/geisonbiazus/blog/internal/core/discussion/test"
-	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCommentRepo(t *testing.T) {
@@ -49,13 +49,10 @@ func TestCommentRepo(t *testing.T) {
 				comments, err := repo.GetCommentsAndRepliesRecursively(ctx, subjectID)
 
 				assert.Nil(t, err)
-				assert.DeepEqual(t, []*discussion.Comment{
+				assert.Equal(t, []*discussion.Comment{
 					comment1,
 					comment2,
 				}, comments)
-
-				fmt.Println(comment1)
-				fmt.Println(comment2)
 
 				for _, c := range comments {
 					fmt.Println(c)
