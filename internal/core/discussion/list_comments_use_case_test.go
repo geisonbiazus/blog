@@ -7,6 +7,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/commentrepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/discussion"
+	. "github.com/geisonbiazus/blog/internal/core/discussion/test"
 	"github.com/geisonbiazus/blog/pkg/assert"
 )
 
@@ -51,14 +52,14 @@ func TestListCommentsUseCase(t *testing.T) {
 	t.Run("It fetches and returns the comments of the given subject in chronological order", func(t *testing.T) {
 		f := setup()
 
-		comment1 := newComment(discussion.Comment{
+		comment1 := NewComment(discussion.Comment{
 			ID:        "ID_1",
 			AuthorID:  f.author.ID,
 			Author:    f.author,
 			CreatedAt: time.Date(2022, time.October, 4, 9, 0, 0, 0, time.UTC),
 		})
 
-		comment2 := newComment(discussion.Comment{
+		comment2 := NewComment(discussion.Comment{
 			ID:        "ID_2",
 			AuthorID:  f.author.ID,
 			Author:    f.author,
@@ -77,18 +78,18 @@ func TestListCommentsUseCase(t *testing.T) {
 	t.Run("It fetches replies recursively", func(t *testing.T) {
 		f := setup()
 
-		comment := newComment(discussion.Comment{
+		comment := NewComment(discussion.Comment{
 			ID:       "COMMENT",
 			AuthorID: f.author.ID,
 		})
 
-		reply1 := newComment(discussion.Comment{
+		reply1 := NewComment(discussion.Comment{
 			ID:        "REPLY_1",
 			SubjectID: comment.ID,
 			AuthorID:  f.author.ID,
 		})
 
-		reply2 := newComment(discussion.Comment{
+		reply2 := NewComment(discussion.Comment{
 			ID:        "REPLY_2",
 			SubjectID: reply1.ID,
 			AuthorID:  f.author.ID,
@@ -103,20 +104,20 @@ func TestListCommentsUseCase(t *testing.T) {
 		// TODO: Return author
 
 		commentWithReplies := []*discussion.Comment{
-			newComment(discussion.Comment{
+			NewComment(discussion.Comment{
 				ID:        comment.ID,
 				CreatedAt: comment.CreatedAt,
 				AuthorID:  comment.AuthorID,
 				Author:    f.author,
 				Replies: []*discussion.Comment{
-					newComment(discussion.Comment{
+					NewComment(discussion.Comment{
 						ID:        reply1.ID,
 						SubjectID: reply1.SubjectID,
 						CreatedAt: reply1.CreatedAt,
 						AuthorID:  reply1.AuthorID,
 						Author:    f.author,
 						Replies: []*discussion.Comment{
-							newComment(discussion.Comment{
+							NewComment(discussion.Comment{
 								ID:        reply2.ID,
 								SubjectID: reply2.SubjectID,
 								CreatedAt: reply2.CreatedAt,
