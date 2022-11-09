@@ -62,12 +62,26 @@ func (r *CommentRepo) GetCommentsAndRepliesRecursively(ctx context.Context, subj
 	result := []*discussion.Comment{}
 
 	rows, err := conn.QueryContext(ctx, `
-		SELECT 
-			c.id, c.subject_id, c.author_id, c.markdown, c.html, c.created_at,
-			a.id, a.name, a.avatar_url
-		FROM discussion_comments c
-		JOIN discussion_authors a on c.author_id = a.id
-		WHERE c.subject_id = $1`,
+		WITH RECURSIVE comments_and_replies as (
+			SELECT 
+				c.id, c.subject_id, c.author_id, c.markdown, c.html, c.created_at,
+				a.id AS author_id, a.name, a.avatar_url
+			FROM discussion_comments c
+			JOIN discussion_authors a ON c.author_id = a.id
+			WHERE c.subject_id = $1
+			
+			UNION
+
+			SELECT 
+				c.id, c.subject_id, c.author_id, c.markdown, c.html, c.created_at,
+				a.id AS author_id, a.name, a.avatar_url
+			FROM discussion_comments c
+			JOIN discussion_authors a ON c.author_id = a.id
+			JOIN comments_and_replies cr ON c.subject_id = cr.id::TEXT
+		) 
+		SELECT * 
+		FROM comments_and_replies
+		ORDER BY created_at`,
 		subjectID,
 	)
 
@@ -75,10 +89,11 @@ func (r *CommentRepo) GetCommentsAndRepliesRecursively(ctx context.Context, subj
 		return result, fmt.Errorf("error on GetCommentsAndRepliesRecursively when resolving query: %w", err)
 	}
 
+	commentMap := map[string][]*discussion.Comment{}
+
 	for rows.Next() {
 		comment := &discussion.Comment{
-			Author:  &discussion.Author{},
-			Replies: []*discussion.Comment{},
+			Author: &discussion.Author{},
 		}
 
 		err = rows.Scan(
@@ -97,8 +112,30 @@ func (r *CommentRepo) GetCommentsAndRepliesRecursively(ctx context.Context, subj
 			return result, fmt.Errorf("error on GetCommentsAndRepliesRecursively when scanning row: %w", err)
 		}
 
-		result = append(result, comment)
+		if commentMap[comment.SubjectID] == nil {
+			commentMap[comment.SubjectID] = []*discussion.Comment{}
+		}
+
+		commentMap[comment.SubjectID] = append(commentMap[comment.SubjectID], comment)
+
+		if comment.SubjectID == subjectID {
+			result = append(result, comment)
+		}
 	}
 
+	r.appendRepliesRecursively(commentMap, result)
+
 	return result, err
+}
+
+func (r *CommentRepo) appendRepliesRecursively(commentMap map[string][]*discussion.Comment, comments []*discussion.Comment) {
+	for _, comment := range comments {
+		comment.Replies = commentMap[comment.ID]
+
+		if comment.Replies == nil {
+			comment.Replies = []*discussion.Comment{}
+		}
+
+		r.appendRepliesRecursively(commentMap, comment.Replies)
+	}
 }
