@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/geisonbiazus/blog/internal/adapters/cache"
+	"github.com/geisonbiazus/blog/internal/adapters/commentrepo"
 	"github.com/geisonbiazus/blog/internal/adapters/idgenerator"
 	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider"
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo"
@@ -18,6 +19,7 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/userrepo"
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/internal/core/blog"
+	"github.com/geisonbiazus/blog/internal/core/discussion"
 	"github.com/geisonbiazus/blog/internal/core/shared"
 	"github.com/geisonbiazus/blog/internal/ui/web"
 	webports "github.com/geisonbiazus/blog/internal/ui/web/ports"
@@ -49,6 +51,7 @@ type Context struct {
 	cache              shared.Cache
 	stateRepo          auth.StateRepo
 	userRepo           auth.UserRepo
+	commentRepo        discussion.CommentRepo
 }
 
 func NewContext() *Context {
@@ -90,6 +93,7 @@ func (c *Context) UseCases() *webports.UseCases {
 		ListPosts:     c.ListPostsUseCase(),
 		RequestOAuth2: c.RequestOAuth2UseCase(),
 		ConfirmOAuth2: c.ConfirmOAuth2UseCase(),
+		ListComments:  c.ListCommentsUseCase(),
 	}
 }
 
@@ -107,6 +111,10 @@ func (c *Context) RequestOAuth2UseCase() *auth.RequestOAuth2UseCase {
 
 func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
 	return auth.NewConfirmOAuth2UseCase(c.OAuth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenEncoder(), c.TransactionManager())
+}
+
+func (c *Context) ListCommentsUseCase() *discussion.ListCommentsUseCase {
+	return discussion.NewListCommentsUseCase(c.CommentRepo())
 }
 
 // Adapters
@@ -201,6 +209,13 @@ func (c *Context) UserRepo() auth.UserRepo {
 		c.userRepo = userrepo.NewPostgresUserRepo(c.DB())
 	}
 	return c.userRepo
+}
+
+func (c *Context) CommentRepo() discussion.CommentRepo {
+	if c.commentRepo == nil {
+		c.commentRepo = commentrepo.NewPostgresCommentRepo(c.DB())
+	}
+	return c.commentRepo
 }
 
 func (c *Context) TokenEncoder() auth.TokenEncoder {

@@ -57,6 +57,13 @@ func Contains(t *testing.T, content, expected string) {
 	}
 }
 
+func NotContains(t *testing.T, content, expected string) {
+	t.Helper()
+	if strings.Contains(content, expected) {
+		t.Errorf("\nExpected not to contain \"%s\" but it does. \nContent:\n%s", expected, content)
+	}
+}
+
 func Matches(t *testing.T, pattern, value string) {
 	t.Helper()
 	matched, _ := regexp.MatchString(pattern, value)

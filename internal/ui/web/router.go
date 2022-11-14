@@ -15,7 +15,7 @@ func NewRouter(templatePath, staticFilesPath string, usecases *ports.UseCases, b
 
 	mux.Handle("/static/", http.StripPrefix("/static", http.FileServer(http.Dir(staticFilesPath))))
 	mux.Handle("/", handlers.NewListPostsHandler(usecases.ListPosts, templateRenderer))
-	mux.Handle("/posts/", handlers.NewViewPostHandler(usecases.ViewPost, templateRenderer))
+	mux.Handle("/posts/", handlers.NewViewPostHandler(usecases.ViewPost, usecases.ListComments, templateRenderer))
 	mux.Handle("/feed.atom", handlers.NewFeedHandler(usecases.ListPosts, templateRenderer, baseURL))
 	mux.Handle("/about", handlers.NewTemplateHandler(templateRenderer, "about.html"))
 	mux.Handle("/login/github", handlers.NewRequestOAuth2Handler(usecases.RequestOAuth2, templateRenderer))
