@@ -213,7 +213,7 @@ func (c *Context) UserRepo() auth.UserRepo {
 
 func (c *Context) CommentRepo() discussion.CommentRepo {
 	if c.commentRepo == nil {
-		c.commentRepo = commentrepo.NewMemoryCommentRepo()
+		c.commentRepo = commentrepo.NewPostgresCommentRepo(c.DB())
 	}
 	return c.commentRepo
 }
