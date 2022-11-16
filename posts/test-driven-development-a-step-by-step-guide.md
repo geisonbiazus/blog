@@ -57,7 +57,7 @@ As we are talking about the use case here, we are going to ignore the low-level 
 
 If you are interested in how this blog is architectured, I wrote a post about it and you can see it here: [Applying Clean Architecture in Go](https://blog.geisonbiazus.com/posts/applying-clean-architecture-in-go).
 
-This example is done using the Go programming language but the flow is the same for any language. The Go standard library is used to write the tests but it doesn't have assertion functions. As I like the expressivity of assertions, I created some [helper functions](https://github.com/geisonbiazus/blog/blob/main/pkg/assert/assert.go) that I'll make use of in the tests.
+This example is done using the Go programming language but the flow is the same for any language. The Go standard library is used to write the tests but it doesn't have assertion functions. As I like the expressivity of assertions, I created some [helper functions](https://github.com/geisonbiazus/blog/blob/post-tdd/pkg/assert/assert.go) that I'll make use of in the tests.
 
 ### Starting from nothing (Red Phase)
 
@@ -1036,4 +1036,4 @@ In this post, we saw how we can implement and design our application in small st
 
 TDD also helps us to identify the application boundaries and hide the low-level details behind interfaces and focus on the high-level policies of the application. Of course that the low-level details also have their tests but they are separated in a way that they can be developed and tested in isolation, and more important, extended or replaced if needed.
 
-This post only shows the use case implementation. If you are interested in how the whole blog is architectured, you can see the post [Applying Clean Architecture in Go](https://blog.geisonbiazus.com/posts/applying-clean-architecture-in-go) and check out the [blog source code](https://github.com/geisonbiazus/blog) where all the layers are implemented and tested.
+This post only shows the use case implementation. If you are interested in how the whole blog is architectured, you can see the post [Applying Clean Architecture in Go](https://blog.geisonbiazus.com/posts/applying-clean-architecture-in-go) and check out the [blog source code](https://github.com/geisonbiazus/blog/tree/post-tdd) where all the layers are implemented and tested.
