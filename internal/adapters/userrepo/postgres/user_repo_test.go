@@ -8,8 +8,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/idgenerator/uuid"
 	"github.com/geisonbiazus/blog/internal/adapters/userrepo/postgres"
 	"github.com/geisonbiazus/blog/internal/core/auth"
-	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
+	"github.com/stretchr/testify/assert"
 )
 
 type testUserRepoFixture struct {

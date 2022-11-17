@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager/postgres"
-	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTransactionManager(t *testing.T) {

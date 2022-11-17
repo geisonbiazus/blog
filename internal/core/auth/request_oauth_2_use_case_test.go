@@ -5,7 +5,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/auth"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 type requestOAuth2UseCaseFixture struct {

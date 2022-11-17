@@ -10,7 +10,7 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager/fake"
 	userrepo "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/auth"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 type confirmOAuth2UseCaseFixture struct {

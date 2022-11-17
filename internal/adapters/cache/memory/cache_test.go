@@ -7,7 +7,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/cache/memory"
 	"github.com/geisonbiazus/blog/internal/core/shared"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCache(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 	. "github.com/geisonbiazus/blog/internal/core/discussion/test"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestComment(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/adapters/idgenerator/uuid"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 const UUIDRegex = `^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$`
@@ -12,6 +12,6 @@ const UUIDRegex = `^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-
 func TestUUIDGenerator(t *testing.T) {
 	t.Run("It generates a v4 uuid", func(t *testing.T) {
 		idgen := uuid.NewGenerator()
-		assert.Matches(t, UUIDRegex, idgen.Generate())
+		assert.Regexp(t, UUIDRegex, idgen.Generate())
 	})
 }

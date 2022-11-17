@@ -8,8 +8,8 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
 	"github.com/geisonbiazus/blog/internal/ui/web/test"
-	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRequestOAuth2Handler(t *testing.T) {

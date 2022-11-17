@@ -9,8 +9,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
 	"github.com/geisonbiazus/blog/internal/ui/web/test"
-	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
+	"github.com/stretchr/testify/assert"
 )
 
 type feedHandlerFixture struct {

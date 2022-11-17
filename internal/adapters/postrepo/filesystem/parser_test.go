@@ -6,7 +6,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/core/blog"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseFileContent(t *testing.T) {
@@ -97,14 +97,14 @@ func TestParseFileContent(t *testing.T) {
 func assertParsedContent(t *testing.T, content string, expectedPost blog.Post) {
 	t.Helper()
 	post, err := filesystem.ParseFileContent(content)
-	assert.DeepEqual(t, expectedPost, post)
+	assert.Equal(t, expectedPost, post)
 	assert.Nil(t, err)
 }
 
 func assertParseError(t *testing.T, content string, expectedError error) {
 	t.Helper()
 	post, err := filesystem.ParseFileContent(content)
-	assert.DeepEqual(t, blog.Post{}, post)
+	assert.Equal(t, blog.Post{}, post)
 	assert.Equal(t, expectedError, err)
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/commentrepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 	. "github.com/geisonbiazus/blog/internal/core/discussion/test"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 type listCommentsUseCaseFixture struct {
@@ -45,7 +45,7 @@ func TestListCommentsUseCase(t *testing.T) {
 
 		result, err := f.usecase.Run(f.ctx, subjectID)
 
-		assert.DeepEqual(t, []*discussion.Comment{}, result)
+		assert.Equal(t, []*discussion.Comment{}, result)
 		assert.Nil(t, err)
 	})
 
@@ -71,7 +71,7 @@ func TestListCommentsUseCase(t *testing.T) {
 
 		result, err := f.usecase.Run(f.ctx, comment1.SubjectID)
 
-		assert.DeepEqual(t, []*discussion.Comment{comment2, comment1}, result)
+		assert.Equal(t, []*discussion.Comment{comment2, comment1}, result)
 		assert.Nil(t, err)
 	})
 
@@ -130,8 +130,8 @@ func TestListCommentsUseCase(t *testing.T) {
 			}),
 		}
 
-		assert.DeepEqual(t, commentWithReplies, result)
-		assert.DeepEqual(t, commentWithReplies[0].Replies[0].Replies[0], result[0].Replies[0].Replies[0])
+		assert.Equal(t, commentWithReplies, result)
+		assert.Equal(t, commentWithReplies[0].Replies[0].Replies[0], result[0].Replies[0].Replies[0])
 		assert.Nil(t, err)
 	})
 }
