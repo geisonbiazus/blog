@@ -6,7 +6,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/cache"
 	"github.com/geisonbiazus/blog/internal/core/blog"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 type listPostsUseCaseFixture struct {
@@ -33,7 +33,7 @@ func TestTestListPostsUseCase(t *testing.T) {
 
 		posts, err := f.usecase.Run()
 
-		assert.DeepEqual(t, []blog.RenderedPost{}, posts)
+		assert.Equal(t, []blog.RenderedPost{}, posts)
 		assert.Nil(t, err)
 	})
 
@@ -50,7 +50,7 @@ func TestTestListPostsUseCase(t *testing.T) {
 
 		result, err := f.usecase.Run()
 
-		assert.DeepEqual(t, renderedPosts, result)
+		assert.Equal(t, renderedPosts, result)
 		assert.Nil(t, err)
 	})
 
@@ -61,7 +61,7 @@ func TestTestListPostsUseCase(t *testing.T) {
 
 		result, err := f.usecase.Run()
 
-		assert.DeepEqual(t, []blog.RenderedPost{}, result)
+		assert.Equal(t, []blog.RenderedPost{}, result)
 		assert.Equal(t, f.repo.ReturnError, err)
 	})
 
@@ -73,7 +73,7 @@ func TestTestListPostsUseCase(t *testing.T) {
 
 		result, err := f.usecase.Run()
 
-		assert.DeepEqual(t, []blog.RenderedPost{}, result)
+		assert.Equal(t, []blog.RenderedPost{}, result)
 		assert.Equal(t, f.renderer.ReturnError, err)
 	})
 }

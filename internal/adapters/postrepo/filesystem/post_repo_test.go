@@ -5,7 +5,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo/filesystem"
 	"github.com/geisonbiazus/blog/internal/core/blog"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 const postPath = "fixtures/posts"
@@ -21,7 +21,7 @@ func TestPostRepo(t *testing.T) {
 
 			post, err := repo.GetPostByPath("wrong_path")
 
-			assert.DeepEqual(t, blog.Post{}, post)
+			assert.Equal(t, blog.Post{}, post)
 			assert.Equal(t, blog.ErrPostNotFound, err)
 		})
 
@@ -31,7 +31,7 @@ func TestPostRepo(t *testing.T) {
 			post, err := repo.GetPostByPath("test-post-1")
 
 			assert.Nil(t, err)
-			assert.DeepEqual(t, testPost1, post)
+			assert.Equal(t, testPost1, post)
 		})
 	})
 
@@ -40,7 +40,7 @@ func TestPostRepo(t *testing.T) {
 			repo := filesystem.NewPostRepo(emptyFolder)
 			posts, err := repo.GetAllPosts()
 
-			assert.DeepEqual(t, []blog.Post{}, posts)
+			assert.Equal(t, []blog.Post{}, posts)
 			assert.Nil(t, err)
 		})
 
@@ -48,7 +48,7 @@ func TestPostRepo(t *testing.T) {
 			repo := filesystem.NewPostRepo(invalidPath)
 			posts, err := repo.GetAllPosts()
 
-			assert.DeepEqual(t, []blog.Post{}, posts)
+			assert.Equal(t, []blog.Post{}, posts)
 			assert.NotNil(t, err)
 		})
 
@@ -58,7 +58,7 @@ func TestPostRepo(t *testing.T) {
 
 			actualPosts, err := repo.GetAllPosts()
 
-			assert.DeepEqual(t, expectedPosts, actualPosts)
+			assert.Equal(t, expectedPosts, actualPosts)
 			assert.Nil(t, err)
 		})
 
@@ -68,7 +68,7 @@ func TestPostRepo(t *testing.T) {
 
 			actualPosts, err := repo.GetAllPosts()
 
-			assert.DeepEqual(t, expectedPosts, actualPosts)
+			assert.Equal(t, expectedPosts, actualPosts)
 			assert.Nil(t, err)
 		})
 
@@ -78,7 +78,7 @@ func TestPostRepo(t *testing.T) {
 
 			actualPosts, err := repo.GetAllPosts()
 
-			assert.DeepEqual(t, expectedPosts, actualPosts)
+			assert.Equal(t, expectedPosts, actualPosts)
 			assert.Nil(t, err)
 		})
 	})

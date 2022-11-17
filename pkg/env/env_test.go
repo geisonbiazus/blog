@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/env"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetString(t *testing.T) {

@@ -9,7 +9,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider/github"
 	"github.com/geisonbiazus/blog/internal/core/auth"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient(t *testing.T) {
@@ -51,7 +51,7 @@ func TestClient(t *testing.T) {
 			user, err := client.GetAuthenticatedUser()
 
 			assert.Equal(t, auth.ProviderUser{}, user)
-			assert.DeepEqual(t, errors.New("error requesting user. Status: 404. Response: Not found"), err)
+			assert.Equal(t, errors.New("error requesting user. Status: 404. Response: Not found"), err)
 		})
 	})
 }

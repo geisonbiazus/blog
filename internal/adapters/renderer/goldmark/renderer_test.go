@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/adapters/renderer/goldmark"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGoldmarkRenderer(t *testing.T) {

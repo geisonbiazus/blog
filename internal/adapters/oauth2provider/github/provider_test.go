@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider/github"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestProvider(t *testing.T) {

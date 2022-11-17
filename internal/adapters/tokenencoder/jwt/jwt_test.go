@@ -6,7 +6,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/tokenencoder/jwt"
 	"github.com/geisonbiazus/blog/internal/core/auth"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTokenEncoder(t *testing.T) {

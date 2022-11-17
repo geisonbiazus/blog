@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 var locationPattern = `^http://localhost:3000/login/github/confirm\?state=(.{36})&code=(.{36})$`
@@ -22,7 +22,7 @@ func TestRequestOAuth2Integration(t *testing.T) {
 		res, _ := client.Get(server.URL + "/login/github")
 
 		assert.Equal(t, http.StatusSeeOther, res.StatusCode)
-		assert.Matches(t, locationPattern, res.Header.Get("Location"))
+		assert.Regexp(t, locationPattern, res.Header.Get("Location"))
 
 		matches := locationRegex.FindStringSubmatch(res.Header.Get("Location"))
 		state := matches[1]
@@ -31,6 +31,6 @@ func TestRequestOAuth2Integration(t *testing.T) {
 		res, _ = client.Get(fmt.Sprintf("%s/login/github/confirm?state=%s&code=%s", server.URL, state, code))
 
 		assert.Equal(t, http.StatusSeeOther, res.StatusCode)
-		assert.Matches(t, "_blog_session=.+; Path=/", res.Cookies()[0].String())
+		assert.Regexp(t, "_blog_session=.+; Path=/", res.Cookies()[0].String())
 	})
 }

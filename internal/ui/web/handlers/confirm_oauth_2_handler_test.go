@@ -9,8 +9,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/auth"
 	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
 	"github.com/geisonbiazus/blog/internal/ui/web/test"
-	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConfirmOAuth2Handler(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/adapters/cache/memory"
 	"github.com/geisonbiazus/blog/internal/core/blog"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 type viewPostUseCaseFixture struct {
@@ -38,7 +38,7 @@ func TestViewPostUseCase(t *testing.T) {
 		renderedPost, err := f.usecase.Run("path")
 
 		assert.Equal(t, "path", f.repo.ReceivedPath)
-		assert.DeepEqual(t, blog.RenderedPost{}, renderedPost)
+		assert.Equal(t, blog.RenderedPost{}, renderedPost)
 		assert.Equal(t, blog.ErrPostNotFound, err)
 	})
 

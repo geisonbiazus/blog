@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/geisonbiazus/blog/pkg/assert"
 	"github.com/geisonbiazus/blog/pkg/testhelper"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestViewPostIntegration(t *testing.T) {

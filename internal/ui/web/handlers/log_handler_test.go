@@ -8,7 +8,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/ui/web/handlers"
 	"github.com/geisonbiazus/blog/internal/ui/web/test"
-	"github.com/geisonbiazus/blog/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLogHandler(t *testing.T) {
