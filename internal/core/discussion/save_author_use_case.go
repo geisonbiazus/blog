@@ -20,9 +20,15 @@ func NewSaveAuthorUseCase(commentRepo CommentRepo) *SaveAuthorUseCase {
 }
 
 func (u *SaveAuthorUseCase) Run(ctx context.Context, input SaveAuthorInput) (*Author, error) {
-	author := u.authorFrom(input)
+	author, err := u.findOrInitializeAuthor(ctx, input.ID)
+	if err != nil {
+		return &Author{}, err
+	}
 
-	err := u.commentRepo.SaveAuthor(ctx, author)
+	author.Name = input.Name
+	author.AvatarURL = input.AvatarURL
+
+	err = u.commentRepo.SaveAuthor(ctx, author)
 	if err != nil {
 		return &Author{}, fmt.Errorf("error on SaveAuthorUseCase.Run when saving author: %w", err)
 	}
@@ -30,10 +36,15 @@ func (u *SaveAuthorUseCase) Run(ctx context.Context, input SaveAuthorInput) (*Au
 	return author, nil
 }
 
-func (u *SaveAuthorUseCase) authorFrom(input SaveAuthorInput) *Author {
-	return &Author{
-		ID:        input.ID,
-		Name:      input.Name,
-		AvatarURL: input.AvatarURL,
+func (u *SaveAuthorUseCase) findOrInitializeAuthor(ctx context.Context, id string) (*Author, error) {
+	author, err := u.commentRepo.GetAuthorByID(ctx, id)
+	if err != nil {
+		return &Author{}, fmt.Errorf("error on SaveAuthorUseCase.Run when finding author: %w", err)
 	}
+
+	if author == nil {
+		author = &Author{ID: id}
+	}
+
+	return author, nil
 }
