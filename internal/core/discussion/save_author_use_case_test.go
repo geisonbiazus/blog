@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/adapters/commentrepo/memory"
+	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager"
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 	"github.com/stretchr/testify/suite"
 )
@@ -19,7 +20,8 @@ type SaveAuthorUseCaseSuite struct {
 func (s *SaveAuthorUseCaseSuite) SetupTest() {
 	s.ctx = context.Background()
 	s.repo = memory.NewCommentRepo()
-	s.usecase = discussion.NewSaveAuthorUseCase(s.repo)
+	txManager := transactionmanager.NewFakeTransactionManager()
+	s.usecase = discussion.NewSaveAuthorUseCase(s.repo, txManager)
 }
 
 func (s *SaveAuthorUseCaseSuite) TestRun() {

@@ -3,6 +3,8 @@ package discussion
 import (
 	"context"
 	"fmt"
+
+	"github.com/geisonbiazus/blog/internal/core/shared"
 )
 
 type SaveAuthorInput struct {
@@ -13,13 +15,25 @@ type SaveAuthorInput struct {
 
 type SaveAuthorUseCase struct {
 	commentRepo CommentRepo
+	txManager   shared.TransactionManager
 }
 
-func NewSaveAuthorUseCase(commentRepo CommentRepo) *SaveAuthorUseCase {
-	return &SaveAuthorUseCase{commentRepo: commentRepo}
+func NewSaveAuthorUseCase(commentRepo CommentRepo, txManager shared.TransactionManager) *SaveAuthorUseCase {
+	return &SaveAuthorUseCase{
+		commentRepo: commentRepo,
+		txManager:   txManager,
+	}
 }
 
-func (u *SaveAuthorUseCase) Run(ctx context.Context, input SaveAuthorInput) (*Author, error) {
+func (u *SaveAuthorUseCase) Run(ctx context.Context, input SaveAuthorInput) (author *Author, err error) {
+	u.txManager.Transaction(ctx, func(ctx context.Context) error {
+		author, err = u.run(ctx, input)
+		return err
+	})
+	return
+}
+
+func (u *SaveAuthorUseCase) run(ctx context.Context, input SaveAuthorInput) (*Author, error) {
 	author, err := u.findOrInitializeAuthor(ctx, input.ID)
 	if err != nil {
 		return &Author{}, err
