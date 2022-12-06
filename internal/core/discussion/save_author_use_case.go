@@ -39,8 +39,7 @@ func (u *SaveAuthorUseCase) run(ctx context.Context, input SaveAuthorInput) (*Au
 		return &Author{}, err
 	}
 
-	author.Name = input.Name
-	author.AvatarURL = input.AvatarURL
+	u.setAuthorAttributes(author, input)
 
 	err = u.commentRepo.SaveAuthor(ctx, author)
 	if err != nil {
@@ -61,4 +60,9 @@ func (u *SaveAuthorUseCase) findOrInitializeAuthor(ctx context.Context, id strin
 	}
 
 	return author, nil
+}
+
+func (u *SaveAuthorUseCase) setAuthorAttributes(author *Author, input SaveAuthorInput) {
+	author.Name = input.Name
+	author.AvatarURL = input.AvatarURL
 }
