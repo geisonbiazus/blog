@@ -27,7 +27,7 @@ type CommentRepoSuite struct {
 	comment1WithReplies *discussion.Comment
 }
 
-func (s *CommentRepoSuite) SetupTest() {
+func (s *CommentRepoSuite) SetupSubTest() {
 	s.uuidGen = uuid.NewGenerator()
 
 	s.author = NewAuthor(discussion.Author{ID: s.uuidGen.Generate()})
@@ -71,6 +71,20 @@ func (s *CommentRepoSuite) SetupTest() {
 	s.comment1WithReplies = NewComment(*s.comment1)
 	s.comment1WithReplies.Replies = []*discussion.Comment{reply1WithReplies}
 }
+
+// func (s *CommentRepoSuite) TestSaveAuthor() {
+// 	s.Run("With a new author", func() {
+// 		s.Run("It inserts the author", func() {
+// 			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
+// 				repo := postgres.NewCommentRepo(db)
+
+// 				repo.SaveAuthor(ctx, s.author)
+
+// 				author, err := repo
+// 			})
+// 		})
+// 	})
+// }
 
 func (s *CommentRepoSuite) TestGetCommentsAndRepliesRecursively() {
 	s.Run("It fetches the comments by subjectID", func() {
