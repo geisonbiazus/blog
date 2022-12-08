@@ -21,7 +21,14 @@ func (c *Comment) Clone() *Comment {
 }
 
 type Author struct {
+	Persisted bool
+
 	ID        string
 	Name      string
 	AvatarURL string
+}
+
+func (c *Author) Clone() *Author {
+	clone := *c
+	return &clone
 }

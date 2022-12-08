@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/geisonbiazus/blog/internal/core/discussion"
@@ -18,11 +19,22 @@ func NewCommentRepo(db *sql.DB) *CommentRepo {
 }
 
 func (r *CommentRepo) SaveAuthor(ctx context.Context, author *discussion.Author) error {
-	rows, err := r.Exec(ctx, `
-		INSERT INTO discussion_authors 
-			(id, name, avatar_url) 
-		VALUES 
-			($1, $2, $3)`,
+	statement := ""
+
+	if author.Persisted {
+		statement = `
+			UPDATE discussion_authors
+				SET name = $2, avatar_url = $3
+			WHERE id = $1`
+	} else {
+		statement = `
+			INSERT INTO discussion_authors 
+				(id, name, avatar_url) 
+			VALUES 
+			($1, $2, $3)`
+	}
+
+	rows, err := r.Exec(ctx, statement,
 		author.ID, author.Name, author.AvatarURL,
 	)
 
@@ -34,7 +46,35 @@ func (r *CommentRepo) SaveAuthor(ctx context.Context, author *discussion.Author)
 		return fmt.Errorf("error on SaveAuthor, no affected rows")
 	}
 
+	author.Persisted = true
+
 	return nil
+}
+
+func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion.Author, error) {
+	conn := r.Conn(ctx)
+
+	row := conn.QueryRowContext(ctx, `
+		SELECT 
+			id, name, avatar_url 
+		FROM discussion_authors 
+		WHERE id = $1`,
+		id,
+	)
+
+	author := &discussion.Author{Persisted: true}
+
+	err := row.Scan(&author.ID, &author.Name, &author.AvatarURL)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("error on GetAuthorByID when executing query: %w", err)
+	}
+
+	return author, nil
 }
 
 func (r *CommentRepo) SaveComment(ctx context.Context, comment *discussion.Comment) error {

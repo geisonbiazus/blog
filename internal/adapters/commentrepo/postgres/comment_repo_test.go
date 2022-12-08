@@ -72,19 +72,78 @@ func (s *CommentRepoSuite) SetupSubTest() {
 	s.comment1WithReplies.Replies = []*discussion.Comment{reply1WithReplies}
 }
 
-// func (s *CommentRepoSuite) TestSaveAuthor() {
-// 	s.Run("With a new author", func() {
-// 		s.Run("It inserts the author", func() {
-// 			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
-// 				repo := postgres.NewCommentRepo(db)
+func (s *CommentRepoSuite) TestGetAuthorByID() {
+	s.Run("When author doesn't exist", func() {
+		s.Run("It returns nil", func() {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
+				repo := postgres.NewCommentRepo(db)
+				author, err := repo.GetAuthorByID(ctx, s.uuidGen.Generate())
 
-// 				repo.SaveAuthor(ctx, s.author)
+				s.Nil(err)
+				s.Nil(author)
+			})
+		})
 
-// 				author, err := repo
-// 			})
-// 		})
-// 	})
-// }
+		s.Run("When author exists", func() {
+			s.Run("It returns the author", func() {
+				dbrepo.Test(func(ctx context.Context, db *sql.DB) {
+					repo := postgres.NewCommentRepo(db)
+
+					err := repo.SaveAuthor(ctx, s.author)
+					s.Nil(err)
+
+					author, err := repo.GetAuthorByID(ctx, s.author.ID)
+
+					s.Nil(err)
+					s.Equal(s.author, author)
+					s.True(author.Persisted)
+				})
+			})
+		})
+	})
+}
+
+func (s *CommentRepoSuite) TestSaveAuthor() {
+	s.Run("With a new author", func() {
+		s.Run("It inserts the author", func() {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
+				repo := postgres.NewCommentRepo(db)
+
+				err := repo.SaveAuthor(ctx, s.author)
+				s.Nil(err)
+				s.True(s.author.Persisted)
+
+				author, err := repo.GetAuthorByID(ctx, s.author.ID)
+
+				s.Nil(err)
+				s.Equal(s.author, author)
+			})
+		})
+	})
+
+	s.Run("With an existing author", func() {
+		s.Run("It updates the author", func() {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
+				repo := postgres.NewCommentRepo(db)
+
+				repo.SaveAuthor(ctx, s.author)
+
+				author, _ := repo.GetAuthorByID(ctx, s.author.ID)
+
+				author.Name = "Updated Name"
+				author.AvatarURL = "https://example.com/updated-avatar"
+
+				err := repo.SaveAuthor(ctx, author)
+				s.Nil(err)
+
+				updatedAuthor, err := repo.GetAuthorByID(ctx, s.author.ID)
+
+				s.Nil(err)
+				s.Equal(author, updatedAuthor)
+			})
+		})
+	})
+}
 
 func (s *CommentRepoSuite) TestGetCommentsAndRepliesRecursively() {
 	s.Run("It fetches the comments by subjectID", func() {
