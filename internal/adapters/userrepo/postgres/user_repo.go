@@ -19,42 +19,35 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 }
 
 func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
-	rows, err := r.Exec(ctx, `
-		INSERT INTO users 
-			(id, name, email, provider_user_id, avatar_url) 
-		VALUES 
-			($1, $2, $3, $4, $5)`,
-		user.ID, user.Name, user.Email, user.ProviderUserID, user.AvatarURL,
-	)
+	err := r.Insert(ctx, "users", map[string]interface{}{
+		"id":               user.ID,
+		"name":             user.Name,
+		"email":            user.Email,
+		"provider_user_id": user.ProviderUserID,
+		"avatar_url":       user.AvatarURL,
+	})
 
 	if err != nil {
-		return fmt.Errorf("error on CreateUser when executing query: %w", err)
-	}
-
-	if rows != 1 {
-		return fmt.Errorf("error on CreateUser, no affected rows")
+		return fmt.Errorf("error on CreateUser: %w", err)
 	}
 
 	return nil
 }
 
 func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
-	rows, err := r.Exec(ctx, `
-		UPDATE users set 
-			name = $1, 
-			email = $2, 
-			provider_user_id = $3, 
-			avatar_url = $4
-		WHERE id = $5`,
-		user.Name, user.Email, user.ProviderUserID, user.AvatarURL, user.ID,
-	)
+	err := r.Update(ctx, "users", user.ID, map[string]interface{}{
+		"name":             user.Name,
+		"email":            user.Email,
+		"provider_user_id": user.ProviderUserID,
+		"avatar_url":       user.AvatarURL,
+	})
 
 	if err != nil {
-		return fmt.Errorf("error on UpdateUser when executing query: %w", err)
-	}
+		if errors.Is(err, dbrepo.ErrNoRowsUpdated) {
+			return auth.ErrUserNotFound
+		}
 
-	if rows != 1 {
-		return auth.ErrUserNotFound
+		return fmt.Errorf("error on UpdateAuthor: %w", err)
 	}
 
 	return nil
