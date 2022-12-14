@@ -19,34 +19,38 @@ func NewCommentRepo(db *sql.DB) *CommentRepo {
 }
 
 func (r *CommentRepo) SaveAuthor(ctx context.Context, author *discussion.Author) error {
-	statement := ""
-
 	if author.Persisted {
-		statement = `
-			UPDATE discussion_authors
-				SET name = $2, avatar_url = $3
-			WHERE id = $1`
+		return r.updateAuthor(ctx, author)
 	} else {
-		statement = `
-			INSERT INTO discussion_authors 
-				(id, name, avatar_url) 
-			VALUES 
-			($1, $2, $3)`
+		return r.insertAuthor(ctx, author)
 	}
+}
 
-	rows, err := r.Exec(ctx, statement,
-		author.ID, author.Name, author.AvatarURL,
-	)
+func (r *CommentRepo) insertAuthor(ctx context.Context, author *discussion.Author) error {
+	err := r.Insert(ctx, "discussion_authors", map[string]interface{}{
+		"id":         author.ID,
+		"name":       author.Name,
+		"avatar_url": author.AvatarURL,
+	})
 
 	if err != nil {
-		return fmt.Errorf("error on SaveAuthor when executing query: %w", err)
-	}
-
-	if rows != 1 {
-		return fmt.Errorf("error on SaveAuthor, no affected rows")
+		return fmt.Errorf("error on insertAuthor: %w", err)
 	}
 
 	author.Persisted = true
+
+	return nil
+}
+
+func (r *CommentRepo) updateAuthor(ctx context.Context, author *discussion.Author) error {
+	err := r.Update(ctx, "discussion_authors", author.ID, map[string]interface{}{
+		"name":       author.Name,
+		"avatar_url": author.AvatarURL,
+	})
+
+	if err != nil {
+		return fmt.Errorf("error on updateAuthor: %w", err)
+	}
 
 	return nil
 }
@@ -78,20 +82,17 @@ func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion
 }
 
 func (r *CommentRepo) SaveComment(ctx context.Context, comment *discussion.Comment) error {
-	rows, err := r.Exec(ctx, `
-		INSERT INTO discussion_comments 
-			(id, subject_id, author_id, markdown, html, created_at) 
-		VALUES 
-		($1, $2, $3, $4, $5, $6)`,
-		comment.ID, comment.SubjectID, comment.AuthorID, comment.Markdown, comment.HTML, comment.CreatedAt,
-	)
+	err := r.Insert(ctx, "discussion_comments", map[string]interface{}{
+		"id":         comment.ID,
+		"subject_id": comment.SubjectID,
+		"author_id":  comment.AuthorID,
+		"markdown":   comment.Markdown,
+		"html":       comment.HTML,
+		"created_at": comment.CreatedAt,
+	})
 
 	if err != nil {
-		return fmt.Errorf("error on SaveComment when executing query: %w", err)
-	}
-
-	if rows != 1 {
-		return fmt.Errorf("error on SaveComment, no affected rows")
+		return fmt.Errorf("error on SaveComment: %w", err)
 	}
 
 	return nil
