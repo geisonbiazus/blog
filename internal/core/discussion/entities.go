@@ -28,7 +28,7 @@ type Author struct {
 	AvatarURL string
 }
 
-func (c *Author) Clone() *Author {
-	clone := *c
+func (a *Author) Clone() *Author {
+	clone := *a
 	return &clone
 }

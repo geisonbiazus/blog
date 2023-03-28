@@ -12,6 +12,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/idgenerator"
 	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider"
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo"
+	"github.com/geisonbiazus/blog/internal/adapters/pubsub"
+	"github.com/geisonbiazus/blog/internal/adapters/pubsub/memory"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer"
 	"github.com/geisonbiazus/blog/internal/adapters/staterepo"
 	"github.com/geisonbiazus/blog/internal/adapters/tokenencoder"
@@ -48,6 +50,7 @@ type Context struct {
 
 	db                 *sql.DB
 	transactionManager shared.TransactionManager
+	pubsub             *memory.PubSub
 	cache              shared.Cache
 	stateRepo          auth.StateRepo
 	userRepo           auth.UserRepo
@@ -110,7 +113,7 @@ func (c *Context) RequestOAuth2UseCase() *auth.RequestOAuth2UseCase {
 }
 
 func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
-	return auth.NewConfirmOAuth2UseCase(c.OAuth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenEncoder(), c.TransactionManager())
+	return auth.NewConfirmOAuth2UseCase(c.OAuth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenEncoder(), c.TransactionManager(), c.PubSub())
 }
 
 func (c *Context) ListCommentsUseCase() *discussion.ListCommentsUseCase {
@@ -168,6 +171,13 @@ func (c *Context) resolveTransactionManager() shared.TransactionManager {
 		tm.EnableTestMode()
 	}
 	return tm
+}
+
+func (c *Context) PubSub() *memory.PubSub {
+	if c.pubsub == nil {
+		c.pubsub = pubsub.NewMemoryPubSub()
+	}
+	return c.pubsub
 }
 
 func (c *Context) PostRepo() blog.PostRepo {

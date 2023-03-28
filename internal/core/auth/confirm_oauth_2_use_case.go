@@ -16,6 +16,7 @@ type ConfirmOAuth2UseCase struct {
 	idGen        IDGenerator
 	tokenEncoder TokenEncoder
 	txManager    shared.TransactionManager
+	publisher    shared.Publisher
 }
 
 func NewConfirmOAuth2UseCase(
@@ -25,6 +26,7 @@ func NewConfirmOAuth2UseCase(
 	idGen IDGenerator,
 	tokenEncoder TokenEncoder,
 	txManager shared.TransactionManager,
+	publisher shared.Publisher,
 ) *ConfirmOAuth2UseCase {
 	return &ConfirmOAuth2UseCase{
 		provider:     provider,
@@ -33,6 +35,7 @@ func NewConfirmOAuth2UseCase(
 		idGen:        idGen,
 		tokenEncoder: tokenEncoder,
 		txManager:    txManager,
+		publisher:    publisher,
 	}
 }
 
@@ -126,6 +129,11 @@ func (u *ConfirmOAuth2UseCase) createNewUser(ctx context.Context, providerUser P
 		return User{}, fmt.Errorf("error creatinng user on ConfirmOAuth2UseCase: %w", err)
 	}
 
+	err = u.publisher.Publish(NewUserCreatedEvent(user))
+	if err != nil {
+		return User{}, fmt.Errorf("error publishing event on ConfirmOAuth2UseCase: %w", err)
+	}
+
 	return user, nil
 }
 
@@ -137,6 +145,11 @@ func (u *ConfirmOAuth2UseCase) updateExistingUser(ctx context.Context, user User
 	err := u.userRepo.UpdateUser(ctx, user)
 	if err != nil {
 		return User{}, fmt.Errorf("error updating user on ConfirmOAuth2UseCase: %w", err)
+	}
+
+	err = u.publisher.Publish(NewUserUpdatedEvent(user))
+	if err != nil {
+		return User{}, fmt.Errorf("error publishing event on ConfirmOAuth2UseCase: %w", err)
 	}
 
 	return user, nil
