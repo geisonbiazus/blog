@@ -23,6 +23,7 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 	"github.com/geisonbiazus/blog/internal/core/shared"
+	"github.com/geisonbiazus/blog/internal/ui/subscriptions"
 	"github.com/geisonbiazus/blog/internal/ui/web"
 	webports "github.com/geisonbiazus/blog/internal/ui/web/ports"
 	"github.com/geisonbiazus/blog/pkg/env"
@@ -88,6 +89,10 @@ func (c *Context) Router() http.Handler {
 	return web.NewRouter(c.TemplatePath, c.StaticPath, c.UseCases(), c.BaseURL)
 }
 
+func (c *Context) Subscriptions() *subscriptions.Subscriptions {
+	return subscriptions.New(c.PubSub(), c.SubscriptionUseCases())
+}
+
 // Use cases
 
 func (c *Context) UseCases() *webports.UseCases {
@@ -97,6 +102,12 @@ func (c *Context) UseCases() *webports.UseCases {
 		RequestOAuth2: c.RequestOAuth2UseCase(),
 		ConfirmOAuth2: c.ConfirmOAuth2UseCase(),
 		ListComments:  c.ListCommentsUseCase(),
+	}
+}
+
+func (c *Context) SubscriptionUseCases() *subscriptions.UseCases {
+	return &subscriptions.UseCases{
+		SaveAuthor: c.SaveAuthorUseCase(),
 	}
 }
 
@@ -118,6 +129,10 @@ func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
 
 func (c *Context) ListCommentsUseCase() *discussion.ListCommentsUseCase {
 	return discussion.NewListCommentsUseCase(c.CommentRepo())
+}
+
+func (c *Context) SaveAuthorUseCase() *discussion.SaveAuthorUseCase {
+	return discussion.NewSaveAuthorUseCase(c.CommentRepo(), c.TransactionManager())
 }
 
 // Adapters

@@ -37,3 +37,7 @@ func (p *PubSub) ensureSubscribersFor(eventType string) {
 		p.subscribers[eventType] = []chan shared.Event{}
 	}
 }
+
+func (p *PubSub) NotifyError(event shared.Event, err error) {}
+
+func (p *PubSub) NotifySuccess(event shared.Event) {}
