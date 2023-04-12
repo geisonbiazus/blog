@@ -8,26 +8,26 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/shared"
 )
 
-type SaveAuthorSubscriber struct {
+type UpdateAuthorSubscriber struct {
 	*BaseSubscriber
 	usecase SaveAuthorUseCase
 }
 
-func NewSaveAuthorSubscriber(usecase SaveAuthorUseCase, subscriber Subscriber) *SaveAuthorSubscriber {
-	return &SaveAuthorSubscriber{
+func NewUpdateAuthorSubscriber(usecase SaveAuthorUseCase, subscriber Subscriber) *UpdateAuthorSubscriber {
+	return &UpdateAuthorSubscriber{
 		BaseSubscriber: NewBaseSubscriber(subscriber, auth.UserUpdatedEvent),
 		usecase:        usecase,
 	}
 }
 
-func (s *SaveAuthorSubscriber) Start() {
+func (s *UpdateAuthorSubscriber) Start() {
 	s.BaseSubscriber.Start(func(event shared.Event) error {
 		_, err := s.usecase.Run(context.Background(), s.inputFrom(event))
 		return err
 	})
 }
 
-func (s *SaveAuthorSubscriber) inputFrom(event shared.Event) discussion.SaveAuthorInput {
+func (s *UpdateAuthorSubscriber) inputFrom(event shared.Event) discussion.SaveAuthorInput {
 	return discussion.SaveAuthorInput{
 		ID:        event.Payload["ID"].(string),
 		Name:      event.Payload["Name"].(string),
