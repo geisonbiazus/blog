@@ -30,6 +30,7 @@ func (s *SaveAuthorUseCaseSpy) Run(ctx context.Context, input discussion.SaveAut
 
 type SubscriberSpy struct {
 	channel                    chan shared.Event
+	SubscribeReceivedEventType string
 	NotifySuccessReceivedEvent shared.Event
 	NotifyErrorReceivedEvent   shared.Event
 	NotifyErrorReceivedError   error
@@ -43,10 +44,13 @@ func NewSubscriberSpy() *SubscriberSpy {
 }
 
 func (f *SubscriberSpy) Publish(event shared.Event) {
-	f.channel <- event
+	if event.Type == f.SubscribeReceivedEventType {
+		f.channel <- event
+	}
 }
 
 func (f *SubscriberSpy) Subscribe(eventType string) chan shared.Event {
+	f.SubscribeReceivedEventType = eventType
 	f.channel = make(chan shared.Event)
 	return f.channel
 }

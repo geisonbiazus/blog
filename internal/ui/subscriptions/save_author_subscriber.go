@@ -15,7 +15,7 @@ type SaveAuthorSubscriber struct {
 
 func NewSaveAuthorSubscriber(usecase SaveAuthorUseCase, subscriber Subscriber) *SaveAuthorSubscriber {
 	return &SaveAuthorSubscriber{
-		BaseSubscriber: NewBaseSubscriber(subscriber, auth.UserUpdatedEvent),
+		BaseSubscriber: NewBaseSubscriber(subscriber, auth.UserCreatedEvent),
 		usecase:        usecase,
 	}
 }
