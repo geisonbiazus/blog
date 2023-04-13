@@ -6,10 +6,12 @@ import (
 	"testing"
 	"time"
 
+	fakepublisher "github.com/geisonbiazus/blog/internal/adapters/publisher/fake"
 	staterepo "github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
 	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager/fake"
 	userrepo "github.com/geisonbiazus/blog/internal/adapters/userrepo/memory"
 	"github.com/geisonbiazus/blog/internal/core/auth"
+	"github.com/geisonbiazus/blog/internal/core/shared"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,6 +22,7 @@ type confirmOAuth2UseCaseFixture struct {
 	userRepo     *userrepo.UserRepo
 	idGen        *IDGeneratorStub
 	tokenEncoder *TokenEncoderSpy
+	publisher    *fakepublisher.Publisher
 	ctx          context.Context
 }
 
@@ -41,7 +44,8 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		idGen := NewIDGeneratorStub()
 		tokenEncoder := NewTokenEncoderSpy()
 		txManager := fake.NewTransactionManager()
-		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder, txManager)
+		publisher := fakepublisher.NewPublisher()
+		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder, txManager, publisher)
 		return &confirmOAuth2UseCaseFixture{
 			usecase:      usecase,
 			provider:     provider,
@@ -49,6 +53,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 			userRepo:     userRepo,
 			idGen:        idGen,
 			tokenEncoder: tokenEncoder,
+			publisher:    publisher,
 			ctx:          context.Background(),
 		}
 	}
@@ -107,6 +112,17 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		createdUser, _ := f.userRepo.FindUserByEmail(f.ctx, providerUser.Email)
 
 		assert.Equal(t, user, createdUser)
+
+		assert.Equal(t, shared.Event{
+			Type:       auth.UserCreatedEvent,
+			OccurredOn: f.publisher.LastEvent().OccurredOn,
+			Payload: map[string]interface{}{
+				"ID":        user.ID,
+				"Email":     user.Email,
+				"Name":      user.Name,
+				"AvatarURL": user.AvatarURL,
+			},
+		}, f.publisher.LastEvent())
 	})
 
 	t.Run("It updates user data when authentication is successful and the user already exists", func(t *testing.T) {
@@ -139,6 +155,17 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		createdUser, _ := f.userRepo.FindUserByEmail(f.ctx, providerUser.Email)
 
 		assert.Equal(t, expctedUser, createdUser)
+
+		assert.Equal(t, shared.Event{
+			Type:       auth.UserUpdatedEvent,
+			OccurredOn: f.publisher.LastEvent().OccurredOn,
+			Payload: map[string]interface{}{
+				"ID":        expctedUser.ID,
+				"Email":     expctedUser.Email,
+				"Name":      expctedUser.Name,
+				"AvatarURL": expctedUser.AvatarURL,
+			},
+		}, f.publisher.LastEvent())
 	})
 
 	t.Run("It authenticates the user and returns the authentication token", func(t *testing.T) {

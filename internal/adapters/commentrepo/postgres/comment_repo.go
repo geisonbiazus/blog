@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/geisonbiazus/blog/internal/core/discussion"
@@ -18,40 +19,80 @@ func NewCommentRepo(db *sql.DB) *CommentRepo {
 }
 
 func (r *CommentRepo) SaveAuthor(ctx context.Context, author *discussion.Author) error {
-	rows, err := r.Exec(ctx, `
-		INSERT INTO discussion_authors 
-			(id, name, avatar_url) 
-		VALUES 
-			($1, $2, $3)`,
-		author.ID, author.Name, author.AvatarURL,
-	)
+	if author.Persisted {
+		return r.updateAuthor(ctx, author)
+	} else {
+		return r.insertAuthor(ctx, author)
+	}
+}
+
+func (r *CommentRepo) insertAuthor(ctx context.Context, author *discussion.Author) error {
+	err := r.Insert(ctx, "discussion_authors", map[string]interface{}{
+		"id":         author.ID,
+		"name":       author.Name,
+		"avatar_url": author.AvatarURL,
+	})
 
 	if err != nil {
-		return fmt.Errorf("error on SaveAuthor when executing query: %w", err)
+		return fmt.Errorf("error on insertAuthor: %w", err)
 	}
 
-	if rows != 1 {
-		return fmt.Errorf("error on SaveAuthor, no affected rows")
+	author.Persisted = true
+
+	return nil
+}
+
+func (r *CommentRepo) updateAuthor(ctx context.Context, author *discussion.Author) error {
+	err := r.Update(ctx, "discussion_authors", author.ID, map[string]interface{}{
+		"name":       author.Name,
+		"avatar_url": author.AvatarURL,
+	})
+
+	if err != nil {
+		return fmt.Errorf("error on updateAuthor: %w", err)
 	}
 
 	return nil
 }
 
-func (r *CommentRepo) SaveComment(ctx context.Context, comment *discussion.Comment) error {
-	rows, err := r.Exec(ctx, `
-		INSERT INTO discussion_comments 
-			(id, subject_id, author_id, markdown, html, created_at) 
-		VALUES 
-		($1, $2, $3, $4, $5, $6)`,
-		comment.ID, comment.SubjectID, comment.AuthorID, comment.Markdown, comment.HTML, comment.CreatedAt,
+func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion.Author, error) {
+	conn := r.Conn(ctx)
+
+	row := conn.QueryRowContext(ctx, `
+		SELECT 
+			id, name, avatar_url 
+		FROM discussion_authors 
+		WHERE id = $1`,
+		id,
 	)
 
-	if err != nil {
-		return fmt.Errorf("error on SaveComment when executing query: %w", err)
+	author := &discussion.Author{Persisted: true}
+
+	err := row.Scan(&author.ID, &author.Name, &author.AvatarURL)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
 	}
 
-	if rows != 1 {
-		return fmt.Errorf("error on SaveComment, no affected rows")
+	if err != nil {
+		return nil, fmt.Errorf("error on GetAuthorByID when executing query: %w", err)
+	}
+
+	return author, nil
+}
+
+func (r *CommentRepo) SaveComment(ctx context.Context, comment *discussion.Comment) error {
+	err := r.Insert(ctx, "discussion_comments", map[string]interface{}{
+		"id":         comment.ID,
+		"subject_id": comment.SubjectID,
+		"author_id":  comment.AuthorID,
+		"markdown":   comment.Markdown,
+		"html":       comment.HTML,
+		"created_at": comment.CreatedAt,
+	})
+
+	if err != nil {
+		return fmt.Errorf("error on SaveComment: %w", err)
 	}
 
 	return nil

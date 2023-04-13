@@ -97,7 +97,7 @@ func (q *getCommentsAndRepliesRecursivelyQuery) scanRowsAndBuildCommentMap() err
 
 func (q *getCommentsAndRepliesRecursivelyQuery) scanRow(row *sql.Rows) (*discussion.Comment, error) {
 	comment := &discussion.Comment{
-		Author: &discussion.Author{},
+		Author: &discussion.Author{Persisted: true},
 	}
 
 	err := q.rows.Scan(

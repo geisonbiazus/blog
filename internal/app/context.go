@@ -12,6 +12,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/adapters/idgenerator"
 	"github.com/geisonbiazus/blog/internal/adapters/oauth2provider"
 	"github.com/geisonbiazus/blog/internal/adapters/postrepo"
+	"github.com/geisonbiazus/blog/internal/adapters/pubsub"
+	"github.com/geisonbiazus/blog/internal/adapters/pubsub/memory"
 	"github.com/geisonbiazus/blog/internal/adapters/renderer"
 	"github.com/geisonbiazus/blog/internal/adapters/staterepo"
 	"github.com/geisonbiazus/blog/internal/adapters/tokenencoder"
@@ -21,6 +23,7 @@ import (
 	"github.com/geisonbiazus/blog/internal/core/blog"
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 	"github.com/geisonbiazus/blog/internal/core/shared"
+	"github.com/geisonbiazus/blog/internal/ui/subscriptions"
 	"github.com/geisonbiazus/blog/internal/ui/web"
 	webports "github.com/geisonbiazus/blog/internal/ui/web/ports"
 	"github.com/geisonbiazus/blog/pkg/env"
@@ -48,6 +51,7 @@ type Context struct {
 
 	db                 *sql.DB
 	transactionManager shared.TransactionManager
+	pubsub             *memory.PubSub
 	cache              shared.Cache
 	stateRepo          auth.StateRepo
 	userRepo           auth.UserRepo
@@ -85,6 +89,10 @@ func (c *Context) Router() http.Handler {
 	return web.NewRouter(c.TemplatePath, c.StaticPath, c.UseCases(), c.BaseURL)
 }
 
+func (c *Context) Subscriptions() *subscriptions.Subscriptions {
+	return subscriptions.New(c.PubSub(), c.SubscriptionUseCases())
+}
+
 // Use cases
 
 func (c *Context) UseCases() *webports.UseCases {
@@ -94,6 +102,12 @@ func (c *Context) UseCases() *webports.UseCases {
 		RequestOAuth2: c.RequestOAuth2UseCase(),
 		ConfirmOAuth2: c.ConfirmOAuth2UseCase(),
 		ListComments:  c.ListCommentsUseCase(),
+	}
+}
+
+func (c *Context) SubscriptionUseCases() *subscriptions.UseCases {
+	return &subscriptions.UseCases{
+		SaveAuthor: c.SaveAuthorUseCase(),
 	}
 }
 
@@ -110,11 +124,15 @@ func (c *Context) RequestOAuth2UseCase() *auth.RequestOAuth2UseCase {
 }
 
 func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
-	return auth.NewConfirmOAuth2UseCase(c.OAuth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenEncoder(), c.TransactionManager())
+	return auth.NewConfirmOAuth2UseCase(c.OAuth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenEncoder(), c.TransactionManager(), c.PubSub())
 }
 
 func (c *Context) ListCommentsUseCase() *discussion.ListCommentsUseCase {
 	return discussion.NewListCommentsUseCase(c.CommentRepo())
+}
+
+func (c *Context) SaveAuthorUseCase() *discussion.SaveAuthorUseCase {
+	return discussion.NewSaveAuthorUseCase(c.CommentRepo(), c.TransactionManager())
 }
 
 // Adapters
@@ -168,6 +186,13 @@ func (c *Context) resolveTransactionManager() shared.TransactionManager {
 		tm.EnableTestMode()
 	}
 	return tm
+}
+
+func (c *Context) PubSub() *memory.PubSub {
+	if c.pubsub == nil {
+		c.pubsub = pubsub.NewMemoryPubSub()
+	}
+	return c.pubsub
 }
 
 func (c *Context) PostRepo() blog.PostRepo {

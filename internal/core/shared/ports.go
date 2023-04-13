@@ -16,3 +16,7 @@ type Cache interface {
 }
 
 var NeverExpire time.Duration = 0
+
+type Publisher interface {
+	Publish(event Event) error
+}

@@ -15,5 +15,6 @@ func main() {
 		log.Fatal(err)
 	}
 
+	c.Subscriptions().Start()
 	log.Fatal(c.WebServer().Start())
 }
