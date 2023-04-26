@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	fakeidgenerator "github.com/geisonbiazus/blog/internal/adapters/idgenerator/fake"
 	fakepublisher "github.com/geisonbiazus/blog/internal/adapters/publisher/fake"
 	staterepo "github.com/geisonbiazus/blog/internal/adapters/staterepo/memory"
 	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager/fake"
@@ -20,7 +21,7 @@ type confirmOAuth2UseCaseFixture struct {
 	provider     *OAuth2ProviderSpy
 	stateRepo    *staterepo.StateRepo
 	userRepo     *userrepo.UserRepo
-	idGen        *IDGeneratorStub
+	idGen        *fakeidgenerator.IDGenerator
 	tokenEncoder *TokenEncoderSpy
 	publisher    *fakepublisher.Publisher
 	ctx          context.Context
@@ -41,7 +42,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		provider := NewOAuth2ProviderSpy()
 		stateRepo := staterepo.NewStateRepo()
 		userRepo := userrepo.NewUserRepo()
-		idGen := NewIDGeneratorStub()
+		idGen := fakeidgenerator.NewIDGenerator()
 		tokenEncoder := NewTokenEncoderSpy()
 		txManager := fake.NewTransactionManager()
 		publisher := fakepublisher.NewPublisher()

@@ -10,10 +10,6 @@ type OAuth2Provider interface {
 	AuthenticatedUser(ctx context.Context, code string) (ProviderUser, error)
 }
 
-type IDGenerator interface {
-	Generate() string
-}
-
 type StateRepo interface {
 	AddState(state string) error
 	Exists(state string) (bool, error)

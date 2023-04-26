@@ -29,7 +29,7 @@ func (s *UpdateAuthorSubscriber) Start() {
 
 func (s *UpdateAuthorSubscriber) inputFrom(event shared.Event) discussion.SaveAuthorInput {
 	return discussion.SaveAuthorInput{
-		ID:        event.Payload["ID"].(string),
+		UserID:    event.Payload["ID"].(string),
 		Name:      event.Payload["Name"].(string),
 		AvatarURL: event.Payload["AvatarURL"].(string),
 	}

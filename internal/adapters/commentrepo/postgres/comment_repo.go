@@ -28,9 +28,10 @@ func (r *CommentRepo) SaveAuthor(ctx context.Context, author *discussion.Author)
 
 func (r *CommentRepo) insertAuthor(ctx context.Context, author *discussion.Author) error {
 	err := r.Insert(ctx, "discussion_authors", map[string]interface{}{
-		"id":         author.ID,
-		"name":       author.Name,
-		"avatar_url": author.AvatarURL,
+		"id":           author.ID,
+		"auth_user_id": author.UserID,
+		"name":         author.Name,
+		"avatar_url":   author.AvatarURL,
 	})
 
 	if err != nil {
@@ -44,8 +45,9 @@ func (r *CommentRepo) insertAuthor(ctx context.Context, author *discussion.Autho
 
 func (r *CommentRepo) updateAuthor(ctx context.Context, author *discussion.Author) error {
 	err := r.Update(ctx, "discussion_authors", author.ID, map[string]interface{}{
-		"name":       author.Name,
-		"avatar_url": author.AvatarURL,
+		"auth_user_id": author.UserID,
+		"name":         author.Name,
+		"avatar_url":   author.AvatarURL,
 	})
 
 	if err != nil {
@@ -60,7 +62,7 @@ func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion
 
 	row := conn.QueryRowContext(ctx, `
 		SELECT 
-			id, name, avatar_url 
+		id, auth_user_id, name, avatar_url 
 		FROM discussion_authors 
 		WHERE id = $1`,
 		id,
@@ -68,7 +70,7 @@ func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion
 
 	author := &discussion.Author{Persisted: true}
 
-	err := row.Scan(&author.ID, &author.Name, &author.AvatarURL)
+	err := row.Scan(&author.ID, &author.UserID, &author.Name, &author.AvatarURL)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
@@ -76,6 +78,32 @@ func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion
 
 	if err != nil {
 		return nil, fmt.Errorf("error on GetAuthorByID when executing query: %w", err)
+	}
+
+	return author, nil
+}
+
+func (r *CommentRepo) GetAuthorByUserID(ctx context.Context, userID string) (*discussion.Author, error) {
+	conn := r.Conn(ctx)
+
+	row := conn.QueryRowContext(ctx, `
+		SELECT 
+			id, auth_user_id, name, avatar_url 
+		FROM discussion_authors 
+		WHERE auth_user_id = $1`,
+		userID,
+	)
+
+	author := &discussion.Author{Persisted: true}
+
+	err := row.Scan(&author.ID, &author.UserID, &author.Name, &author.AvatarURL)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("error on GetAuthorByUserID when executing query: %w", err)
 	}
 
 	return author, nil

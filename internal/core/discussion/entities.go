@@ -24,6 +24,7 @@ type Author struct {
 	Persisted bool
 
 	ID        string
+	UserID    string
 	Name      string
 	AvatarURL string
 }

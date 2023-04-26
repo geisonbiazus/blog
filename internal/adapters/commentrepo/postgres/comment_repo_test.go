@@ -30,7 +30,7 @@ type CommentRepoSuite struct {
 func (s *CommentRepoSuite) SetupSubTest() {
 	s.uuidGen = uuid.NewGenerator()
 
-	s.author = NewAuthor(discussion.Author{ID: s.uuidGen.Generate()})
+	s.author = NewAuthor(discussion.Author{ID: s.uuidGen.Generate(), UserID: s.uuidGen.Generate()})
 	s.subjectID = "SUBJECT_ID"
 
 	s.comment1 = NewComment(discussion.Comment{
@@ -103,6 +103,37 @@ func (s *CommentRepoSuite) TestGetAuthorByID() {
 	})
 }
 
+func (s *CommentRepoSuite) TestGetAuthorByUserId() {
+	s.Run("When author doesn't exist", func() {
+		s.Run("It returns nil", func() {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
+				repo := postgres.NewCommentRepo(db)
+				author, err := repo.GetAuthorByUserID(ctx, s.uuidGen.Generate())
+
+				s.Nil(err)
+				s.Nil(author)
+			})
+		})
+	})
+
+	s.Run("When author exists", func() {
+		s.Run("It returns the author", func() {
+			dbrepo.Test(func(ctx context.Context, db *sql.DB) {
+				repo := postgres.NewCommentRepo(db)
+
+				err := repo.SaveAuthor(ctx, s.author)
+				s.Nil(err)
+
+				author, err := repo.GetAuthorByUserID(ctx, s.author.UserID)
+
+				s.Nil(err)
+				s.Equal(s.author, author)
+				s.True(author.Persisted)
+			})
+		})
+	})
+}
+
 func (s *CommentRepoSuite) TestSaveAuthor() {
 	s.Run("With a new author", func() {
 		s.Run("It inserts the author", func() {
@@ -132,6 +163,7 @@ func (s *CommentRepoSuite) TestSaveAuthor() {
 
 				author.Name = "Updated Name"
 				author.AvatarURL = "https://example.com/updated-avatar"
+				author.UserID = s.uuidGen.Generate()
 
 				err := repo.SaveAuthor(ctx, author)
 				s.Nil(err)

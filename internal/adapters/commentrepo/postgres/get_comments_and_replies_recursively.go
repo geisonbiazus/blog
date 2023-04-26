@@ -53,7 +53,7 @@ func (q *getCommentsAndRepliesRecursivelyQuery) executeQuery() error {
 		WITH RECURSIVE comments_and_replies as (
 			SELECT 
 				c.id, c.subject_id, c.author_id, c.markdown, c.html, c.created_at,
-				a.id AS author_id, a.name, a.avatar_url
+				a.id AS author_id, a.auth_user_id, a.name, a.avatar_url
 			FROM discussion_comments c
 			JOIN discussion_authors a ON c.author_id = a.id
 			WHERE c.subject_id = $1
@@ -62,7 +62,7 @@ func (q *getCommentsAndRepliesRecursivelyQuery) executeQuery() error {
 
 			SELECT 
 				c.id, c.subject_id, c.author_id, c.markdown, c.html, c.created_at,
-				a.id AS author_id, a.name, a.avatar_url
+				a.id AS author_id, a.auth_user_id, a.name, a.avatar_url
 			FROM discussion_comments c
 			JOIN discussion_authors a ON c.author_id = a.id
 			JOIN comments_and_replies cr ON c.subject_id = cr.id::TEXT
@@ -108,6 +108,7 @@ func (q *getCommentsAndRepliesRecursivelyQuery) scanRow(row *sql.Rows) (*discuss
 		&comment.HTML,
 		&comment.CreatedAt,
 		&comment.Author.ID,
+		&comment.Author.UserID,
 		&comment.Author.Name,
 		&comment.Author.AvatarURL,
 	)

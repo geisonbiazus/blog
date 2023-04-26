@@ -132,7 +132,7 @@ func (c *Context) ListCommentsUseCase() *discussion.ListCommentsUseCase {
 }
 
 func (c *Context) SaveAuthorUseCase() *discussion.SaveAuthorUseCase {
-	return discussion.NewSaveAuthorUseCase(c.CommentRepo(), c.TransactionManager())
+	return discussion.NewSaveAuthorUseCase(c.CommentRepo(), c.TransactionManager(), c.IDGenerator())
 }
 
 // Adapters
@@ -218,7 +218,7 @@ func (c *Context) FakeOAuth2Provider() auth.OAuth2Provider {
 	return oauth2provider.NewFakeProvider(c.BaseURL)
 }
 
-func (c *Context) IDGenerator() auth.IDGenerator {
+func (c *Context) IDGenerator() shared.IDGenerator {
 	return idgenerator.NewUUIDGenerator()
 }
 

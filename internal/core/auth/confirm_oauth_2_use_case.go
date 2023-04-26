@@ -13,7 +13,7 @@ type ConfirmOAuth2UseCase struct {
 	provider     OAuth2Provider
 	stateRepo    StateRepo
 	userRepo     UserRepo
-	idGen        IDGenerator
+	idGen        shared.IDGenerator
 	tokenEncoder TokenEncoder
 	txManager    shared.TransactionManager
 	publisher    shared.Publisher
@@ -23,7 +23,7 @@ func NewConfirmOAuth2UseCase(
 	provider OAuth2Provider,
 	stateRepo StateRepo,
 	userRepo UserRepo,
-	idGen IDGenerator,
+	idGen shared.IDGenerator,
 	tokenEncoder TokenEncoder,
 	txManager shared.TransactionManager,
 	publisher shared.Publisher,

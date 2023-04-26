@@ -22,6 +22,7 @@ func NewComment(params discussion.Comment) *discussion.Comment {
 func NewAuthor(params discussion.Author) *discussion.Author {
 	return &discussion.Author{
 		ID:        valueOrDefault(params.ID, "AUTHOR_ID"),
+		UserID:    valueOrDefault(params.UserID, "USER_ID"),
 		Name:      valueOrDefault(params.Name, "Author"),
 		AvatarURL: valueOrDefault(params.AvatarURL, "http://example.com/avatar"),
 	}

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/adapters/commentrepo/memory"
+	"github.com/geisonbiazus/blog/internal/adapters/idgenerator/fake"
 	"github.com/geisonbiazus/blog/internal/adapters/transactionmanager"
 	"github.com/geisonbiazus/blog/internal/core/discussion"
 	"github.com/stretchr/testify/suite"
@@ -15,13 +16,16 @@ type SaveAuthorUseCaseSuite struct {
 	usecase *discussion.SaveAuthorUseCase
 	repo    *memory.CommentRepo
 	ctx     context.Context
+	idGen   *fake.IDGenerator
 }
 
 func (s *SaveAuthorUseCaseSuite) SetupTest() {
 	s.ctx = context.Background()
 	s.repo = memory.NewCommentRepo()
 	txManager := transactionmanager.NewFakeTransactionManager()
-	s.usecase = discussion.NewSaveAuthorUseCase(s.repo, txManager)
+	s.idGen = fake.NewIDGenerator()
+	s.idGen.ReturnID = s.AuthorID()
+	s.usecase = discussion.NewSaveAuthorUseCase(s.repo, txManager, s.idGen)
 }
 
 func (s *SaveAuthorUseCaseSuite) TestRun() {
@@ -31,7 +35,7 @@ func (s *SaveAuthorUseCaseSuite) TestRun() {
 		s.Equal(s.author(), author)
 		s.Nil(err)
 
-		persistedAuthor, _ := s.repo.GetAuthorByID(s.ctx, s.input().ID)
+		persistedAuthor, _ := s.repo.GetAuthorByID(s.ctx, author.ID)
 
 		s.Equal(s.author(), persistedAuthor)
 	})
@@ -52,7 +56,7 @@ func (s *SaveAuthorUseCaseSuite) TestRun() {
 
 func (s *SaveAuthorUseCaseSuite) input() discussion.SaveAuthorInput {
 	return discussion.SaveAuthorInput{
-		ID:        "ID",
+		UserID:    "USER_ID",
 		Name:      "Name",
 		AvatarURL: "https://example.com/avatar",
 	}
@@ -60,7 +64,7 @@ func (s *SaveAuthorUseCaseSuite) input() discussion.SaveAuthorInput {
 
 func (s *SaveAuthorUseCaseSuite) updatedInput() discussion.SaveAuthorInput {
 	return discussion.SaveAuthorInput{
-		ID:        s.input().ID,
+		UserID:    s.input().UserID,
 		Name:      "Updated Name",
 		AvatarURL: "https://example.com/updated-avatar",
 	}
@@ -70,7 +74,8 @@ func (s *SaveAuthorUseCaseSuite) author() *discussion.Author {
 	input := s.input()
 
 	return &discussion.Author{
-		ID:        input.ID,
+		ID:        s.AuthorID(),
+		UserID:    input.UserID,
 		Name:      input.Name,
 		AvatarURL: input.AvatarURL,
 	}
@@ -80,10 +85,15 @@ func (s *SaveAuthorUseCaseSuite) updatedAuthor() *discussion.Author {
 	input := s.updatedInput()
 
 	return &discussion.Author{
-		ID:        input.ID,
+		ID:        s.AuthorID(),
+		UserID:    input.UserID,
 		Name:      input.Name,
 		AvatarURL: input.AvatarURL,
 	}
+}
+
+func (s *SaveAuthorUseCaseSuite) AuthorID() string {
+	return "AUTHOR_ID"
 }
 
 func TestSaveAuthorUseCaseSuite(t *testing.T) {
