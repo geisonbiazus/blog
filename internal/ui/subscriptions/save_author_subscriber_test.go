@@ -43,7 +43,7 @@ func (s *SaveAuthorSubscriberSuite) TestStart() {
 
 		s.True(<-s.usecase.Ran)
 		s.Equal(discussion.SaveAuthorInput{
-			ID:        "ID",
+			UserID:    "ID",
 			Name:      "Name",
 			AvatarURL: "http://example.com/avatar.png",
 		}, s.usecase.ReceivedInput)

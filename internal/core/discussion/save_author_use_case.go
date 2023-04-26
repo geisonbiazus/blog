@@ -8,7 +8,7 @@ import (
 )
 
 type SaveAuthorInput struct {
-	ID        string
+	UserID    string
 	Name      string
 	AvatarURL string
 }
@@ -16,12 +16,14 @@ type SaveAuthorInput struct {
 type SaveAuthorUseCase struct {
 	commentRepo CommentRepo
 	txManager   shared.TransactionManager
+	idGen       shared.IDGenerator
 }
 
-func NewSaveAuthorUseCase(commentRepo CommentRepo, txManager shared.TransactionManager) *SaveAuthorUseCase {
+func NewSaveAuthorUseCase(commentRepo CommentRepo, txManager shared.TransactionManager, idGen shared.IDGenerator) *SaveAuthorUseCase {
 	return &SaveAuthorUseCase{
 		commentRepo: commentRepo,
 		txManager:   txManager,
+		idGen:       idGen,
 	}
 }
 
@@ -34,7 +36,7 @@ func (u *SaveAuthorUseCase) Run(ctx context.Context, input SaveAuthorInput) (aut
 }
 
 func (u *SaveAuthorUseCase) run(ctx context.Context, input SaveAuthorInput) (*Author, error) {
-	author, err := u.findOrInitializeAuthor(ctx, input.ID)
+	author, err := u.findOrInitializeAuthor(ctx, input.UserID)
 	if err != nil {
 		return &Author{}, err
 	}
@@ -50,19 +52,20 @@ func (u *SaveAuthorUseCase) run(ctx context.Context, input SaveAuthorInput) (*Au
 }
 
 func (u *SaveAuthorUseCase) findOrInitializeAuthor(ctx context.Context, id string) (*Author, error) {
-	author, err := u.commentRepo.GetAuthorByID(ctx, id)
+	author, err := u.commentRepo.GetAuthorByUserID(ctx, id)
 	if err != nil {
 		return &Author{}, fmt.Errorf("error on SaveAuthorUseCase.Run when finding author: %w", err)
 	}
 
 	if author == nil {
-		author = &Author{ID: id}
+		author = &Author{ID: u.idGen.Generate()}
 	}
 
 	return author, nil
 }
 
 func (u *SaveAuthorUseCase) setAuthorAttributes(author *Author, input SaveAuthorInput) {
+	author.UserID = input.UserID
 	author.Name = input.Name
 	author.AvatarURL = input.AvatarURL
 }
