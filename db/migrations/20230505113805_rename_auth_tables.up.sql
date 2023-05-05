@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE users RENAME TO auth_users;
+COMMIT;
