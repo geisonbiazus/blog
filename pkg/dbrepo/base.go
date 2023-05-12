@@ -107,7 +107,7 @@ func (r *Base) Update(
 
 	statement := fmt.Sprintf(`
 		UPDATE %s 
-		SET %s 
+		SET %s, updated_at = now() 
 		WHERE id = $1`,
 		tableName,
 		strings.Join(columns, ","),

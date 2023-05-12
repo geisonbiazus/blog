@@ -19,7 +19,7 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 }
 
 func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
-	err := r.Insert(ctx, "users", map[string]interface{}{
+	err := r.Insert(ctx, "auth_users", map[string]interface{}{
 		"id":               user.ID,
 		"name":             user.Name,
 		"email":            user.Email,
@@ -35,7 +35,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
 }
 
 func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
-	err := r.Update(ctx, "users", user.ID, map[string]interface{}{
+	err := r.Update(ctx, "auth_users", user.ID, map[string]interface{}{
 		"name":             user.Name,
 		"email":            user.Email,
 		"provider_user_id": user.ProviderUserID,
@@ -67,7 +67,7 @@ func (r *UserRepo) findUserBy(ctx context.Context, field string, value interface
 	row := conn.QueryRowContext(ctx, `
 		SELECT 
 			id, name, email, provider_user_id, avatar_url 
-		FROM users 
+		FROM auth_users 
 		WHERE `+field+` = $1`,
 		value,
 	)
