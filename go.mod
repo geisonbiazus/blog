@@ -1,6 +1,6 @@
 module github.com/geisonbiazus/blog
 
-go 1.18
+go 1.23
 
 require (
 	github.com/alecthomas/chroma v0.9.1
