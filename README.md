@@ -92,3 +92,23 @@ Force migration version on test database
 ```
 make db_test_force version=20211108120029
 ```
+
+# Run with docker locally
+
+Build the image
+
+```
+docker build -t blog .
+```
+
+Change the POSTGRES_URL to point to the docker container on the .env file
+
+```
+POSTGRES_URL=postgres://postgres:postgres@blog-postgres-1:5432/blog?sslmode=disable
+```
+
+Run using docker
+
+```
+docker run --rm  --env-file .env -p 3000:3000 --network blog_default blog
+```
