@@ -59,9 +59,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Railway
-        run: curl -fsSL https://railway.app/install.sh | sh
+        run: bash <(curl -fsSL cli.new)
 
       - name: Deploy
-        run: railway up
+        run: railway up --ci --service blog
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
