@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/geisonbiazus/blog/internal/discussion"
-	"github.com/geisonbiazus/blog/internal/shared"
+	"github.com/geisonbiazus/blog/pkg/eventing"
 )
 
 type Subscriber interface {
-	Subscribe(eventType string) chan shared.Event
-	NotifyError(event shared.Event, err error)
-	NotifySuccess(event shared.Event)
+	Subscribe(eventType string) chan eventing.Event
+	NotifyError(event eventing.Event, err error)
+	NotifySuccess(event eventing.Event)
 }
 
 type UseCases struct {

@@ -1,6 +1,6 @@
 package subscriptions
 
-import "github.com/geisonbiazus/blog/internal/shared"
+import "github.com/geisonbiazus/blog/pkg/eventing"
 
 type BaseSubscriber struct {
 	subscriber Subscriber
@@ -11,7 +11,7 @@ func NewBaseSubscriber(subscriber Subscriber, eventType string) *BaseSubscriber 
 	return &BaseSubscriber{subscriber: subscriber, eventType: eventType}
 }
 
-func (s *BaseSubscriber) Start(runUseCase func(event shared.Event) error) {
+func (s *BaseSubscriber) Start(runUseCase func(event eventing.Event) error) {
 	subscription := s.subscriber.Subscribe(s.eventType)
 
 	go func() {

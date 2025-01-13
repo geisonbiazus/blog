@@ -1,17 +1,17 @@
 package blog
 
-import "github.com/geisonbiazus/blog/internal/shared"
+import "github.com/geisonbiazus/blog/pkg/caching"
 
 type ListPostsUseCase struct {
 	postRepo PostRepo
 	renderer Renderer
-	cache    shared.Cache
+	cache    caching.Cache
 }
 
 func NewListPostsUseCase(
 	postRepo PostRepo,
 	renderer Renderer,
-	cache shared.Cache,
+	cache caching.Cache,
 ) *ListPostsUseCase {
 	return &ListPostsUseCase{
 		postRepo: postRepo,
@@ -25,7 +25,7 @@ const cacheKey = "all-posts"
 func (u *ListPostsUseCase) Run() ([]RenderedPost, error) {
 	result, err := u.cache.Do(cacheKey, func() (interface{}, error) {
 		return u.run()
-	}, shared.NeverExpire)
+	}, caching.NeverExpire)
 
 	return result.([]RenderedPost), err
 }

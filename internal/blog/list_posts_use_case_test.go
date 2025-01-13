@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/geisonbiazus/blog/internal/blog"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/cache"
+	"github.com/geisonbiazus/blog/pkg/caching"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +19,7 @@ func TestTestListPostsUseCase(t *testing.T) {
 	setup := func() *listPostsUseCaseFixture {
 		repo := NewPostRepoSpy()
 		renderer := NewRendererSpy()
-		cache := cache.NewMemoryCache()
+		cache := caching.NewMemoryCache()
 		usecase := blog.NewListPostsUseCase(repo, renderer, cache)
 		return &listPostsUseCaseFixture{
 			usecase:  usecase,

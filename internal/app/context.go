@@ -17,17 +17,16 @@ import (
 	"github.com/geisonbiazus/blog/internal/blog/adapters/renderer"
 	"github.com/geisonbiazus/blog/internal/discussion"
 	"github.com/geisonbiazus/blog/internal/discussion/adapters/commentrepo"
-	"github.com/geisonbiazus/blog/internal/shared"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/cache"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/idgenerator"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/pubsub"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/pubsub/memory"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/transactionmanager"
 	"github.com/geisonbiazus/blog/internal/subscriptions"
 	"github.com/geisonbiazus/blog/internal/web"
 	webports "github.com/geisonbiazus/blog/internal/web/ports"
+	"github.com/geisonbiazus/blog/pkg/caching"
 	"github.com/geisonbiazus/blog/pkg/env"
+	"github.com/geisonbiazus/blog/pkg/eventing"
+	"github.com/geisonbiazus/blog/pkg/eventing/memory"
+	"github.com/geisonbiazus/blog/pkg/gen"
 	"github.com/geisonbiazus/blog/pkg/migration"
+	"github.com/geisonbiazus/blog/pkg/transaction"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
@@ -50,9 +49,9 @@ type Context struct {
 	PostgresTestURL string
 
 	db                 *sql.DB
-	transactionManager shared.TransactionManager
+	transactionManager transaction.Manager
 	pubsub             *memory.PubSub
-	cache              shared.Cache
+	cache              caching.Cache
 	stateRepo          auth.StateRepo
 	userRepo           auth.UserRepo
 	commentRepo        discussion.CommentRepo
@@ -137,18 +136,18 @@ func (c *Context) SaveAuthorUseCase() *discussion.SaveAuthorUseCase {
 
 // Adapters
 
-func (c *Context) Cache() shared.Cache {
+func (c *Context) Cache() caching.Cache {
 	if c.cache == nil {
 		c.cache = c.resolveCache()
 	}
 	return c.cache
 }
 
-func (c *Context) resolveCache() shared.Cache {
+func (c *Context) resolveCache() caching.Cache {
 	if c.isDevelopment() {
-		return cache.NewNullCache()
+		return caching.NewNullCache()
 	}
-	return cache.NewMemoryCache()
+	return caching.NewMemoryCache()
 }
 
 func (c *Context) DB() *sql.DB {
@@ -173,15 +172,15 @@ func (c *Context) Migration() *migration.Migration {
 	return migration.New(c.DB(), c.MigrationsPath)
 }
 
-func (c *Context) TransactionManager() shared.TransactionManager {
+func (c *Context) TransactionManager() transaction.Manager {
 	if c.transactionManager == nil {
 		c.transactionManager = c.resolveTransactionManager()
 	}
 	return c.transactionManager
 }
 
-func (c *Context) resolveTransactionManager() shared.TransactionManager {
-	tm := transactionmanager.NewPostgresTransactionManager(c.DB())
+func (c *Context) resolveTransactionManager() transaction.Manager {
+	tm := transaction.NewPostgresManager(c.DB())
 	if c.isTest() {
 		tm.EnableTestMode()
 	}
@@ -190,7 +189,7 @@ func (c *Context) resolveTransactionManager() shared.TransactionManager {
 
 func (c *Context) PubSub() *memory.PubSub {
 	if c.pubsub == nil {
-		c.pubsub = pubsub.NewMemoryPubSub()
+		c.pubsub = eventing.NewMemoryPubSub()
 	}
 	return c.pubsub
 }
@@ -218,8 +217,8 @@ func (c *Context) FakeOAuth2Provider() auth.OAuth2Provider {
 	return oauth2provider.NewFakeProvider(c.BaseURL)
 }
 
-func (c *Context) IDGenerator() shared.IDGenerator {
-	return idgenerator.NewUUIDGenerator()
+func (c *Context) IDGenerator() gen.Generator {
+	return gen.NewUUIDGenerator()
 }
 
 func (c *Context) StateRepo() auth.StateRepo {

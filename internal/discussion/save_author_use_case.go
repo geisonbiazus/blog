@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/geisonbiazus/blog/internal/shared"
+	"github.com/geisonbiazus/blog/pkg/gen"
+	"github.com/geisonbiazus/blog/pkg/transaction"
 )
 
 type SaveAuthorInput struct {
@@ -15,11 +16,11 @@ type SaveAuthorInput struct {
 
 type SaveAuthorUseCase struct {
 	commentRepo CommentRepo
-	txManager   shared.TransactionManager
-	idGen       shared.IDGenerator
+	txManager   transaction.Manager
+	idGen       gen.Generator
 }
 
-func NewSaveAuthorUseCase(commentRepo CommentRepo, txManager shared.TransactionManager, idGen shared.IDGenerator) *SaveAuthorUseCase {
+func NewSaveAuthorUseCase(commentRepo CommentRepo, txManager transaction.Manager, idGen gen.Generator) *SaveAuthorUseCase {
 	return &SaveAuthorUseCase{
 		commentRepo: commentRepo,
 		txManager:   txManager,

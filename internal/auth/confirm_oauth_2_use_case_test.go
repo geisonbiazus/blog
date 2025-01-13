@@ -9,10 +9,10 @@ import (
 	"github.com/geisonbiazus/blog/internal/auth"
 	staterepo "github.com/geisonbiazus/blog/internal/auth/adapters/staterepo/memory"
 	userrepo "github.com/geisonbiazus/blog/internal/auth/adapters/userrepo/memory"
-	"github.com/geisonbiazus/blog/internal/shared"
-	fakeidgenerator "github.com/geisonbiazus/blog/internal/shared/adapters/idgenerator/fake"
-	fakepublisher "github.com/geisonbiazus/blog/internal/shared/adapters/publisher/fake"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/transactionmanager/fake"
+	"github.com/geisonbiazus/blog/pkg/eventing"
+	fakepublisher "github.com/geisonbiazus/blog/pkg/eventing/fake"
+	fakegen "github.com/geisonbiazus/blog/pkg/gen/fake"
+	"github.com/geisonbiazus/blog/pkg/transaction"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +21,7 @@ type confirmOAuth2UseCaseFixture struct {
 	provider     *OAuth2ProviderSpy
 	stateRepo    *staterepo.StateRepo
 	userRepo     *userrepo.UserRepo
-	idGen        *fakeidgenerator.IDGenerator
+	idGen        *fakegen.Generator
 	tokenEncoder *TokenEncoderSpy
 	publisher    *fakepublisher.Publisher
 	ctx          context.Context
@@ -42,10 +42,10 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		provider := NewOAuth2ProviderSpy()
 		stateRepo := staterepo.NewStateRepo()
 		userRepo := userrepo.NewUserRepo()
-		idGen := fakeidgenerator.NewIDGenerator()
+		idGen := fakegen.NewGenerator()
 		tokenEncoder := NewTokenEncoderSpy()
-		txManager := fake.NewTransactionManager()
-		publisher := fakepublisher.NewPublisher()
+		txManager := transaction.NewFakeManager()
+		publisher := eventing.NewFakePublisher()
 		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder, txManager, publisher)
 		return &confirmOAuth2UseCaseFixture{
 			usecase:      usecase,
@@ -114,7 +114,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 
 		assert.Equal(t, user, createdUser)
 
-		assert.Equal(t, shared.Event{
+		assert.Equal(t, eventing.Event{
 			Type:       auth.UserCreatedEvent,
 			OccurredOn: f.publisher.LastEvent().OccurredOn,
 			Payload: map[string]interface{}{
@@ -157,7 +157,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 
 		assert.Equal(t, expctedUser, createdUser)
 
-		assert.Equal(t, shared.Event{
+		assert.Equal(t, eventing.Event{
 			Type:       auth.UserUpdatedEvent,
 			OccurredOn: f.publisher.LastEvent().OccurredOn,
 			Payload: map[string]interface{}{

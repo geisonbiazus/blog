@@ -7,8 +7,8 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/auth"
 	"github.com/geisonbiazus/blog/internal/discussion"
-	"github.com/geisonbiazus/blog/internal/shared"
 	"github.com/geisonbiazus/blog/internal/subscriptions"
+	"github.com/geisonbiazus/blog/pkg/eventing"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -17,14 +17,14 @@ type SaveAuthorSubscriberSuite struct {
 	saveAuthorSubscriber *subscriptions.SaveAuthorSubscriber
 	usecase              *SaveAuthorUseCaseSpy
 	subscriber           *SubscriberSpy
-	event                shared.Event
+	event                eventing.Event
 }
 
 func (s *SaveAuthorSubscriberSuite) SetupSubTest() {
 	s.usecase = NewSaveAuthorUseCaseSpy()
 	s.subscriber = NewSubscriberSpy()
 	s.saveAuthorSubscriber = subscriptions.NewSaveAuthorSubscriber(s.usecase, s.subscriber)
-	s.event = shared.Event{
+	s.event = eventing.Event{
 		Type:       auth.UserCreatedEvent,
 		OccurredOn: time.Now(),
 		Payload: map[string]interface{}{

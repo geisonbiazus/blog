@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/geisonbiazus/blog/internal/discussion"
-	"github.com/geisonbiazus/blog/internal/shared"
+	"github.com/geisonbiazus/blog/pkg/eventing"
 )
 
 type SaveAuthorUseCaseSpy struct {
@@ -29,10 +29,10 @@ func (s *SaveAuthorUseCaseSpy) Run(ctx context.Context, input discussion.SaveAut
 }
 
 type SubscriberSpy struct {
-	channel                    chan shared.Event
+	channel                    chan eventing.Event
 	SubscribeReceivedEventType string
-	NotifySuccessReceivedEvent shared.Event
-	NotifyErrorReceivedEvent   shared.Event
+	NotifySuccessReceivedEvent eventing.Event
+	NotifyErrorReceivedEvent   eventing.Event
 	NotifyErrorReceivedError   error
 	Notified                   chan bool
 }
@@ -43,25 +43,25 @@ func NewSubscriberSpy() *SubscriberSpy {
 	}
 }
 
-func (f *SubscriberSpy) Publish(event shared.Event) {
+func (f *SubscriberSpy) Publish(event eventing.Event) {
 	if event.Type == f.SubscribeReceivedEventType {
 		f.channel <- event
 	}
 }
 
-func (f *SubscriberSpy) Subscribe(eventType string) chan shared.Event {
+func (f *SubscriberSpy) Subscribe(eventType string) chan eventing.Event {
 	f.SubscribeReceivedEventType = eventType
-	f.channel = make(chan shared.Event)
+	f.channel = make(chan eventing.Event)
 	return f.channel
 }
 
-func (f *SubscriberSpy) NotifyError(event shared.Event, err error) {
+func (f *SubscriberSpy) NotifyError(event eventing.Event, err error) {
 	f.NotifyErrorReceivedEvent = event
 	f.NotifyErrorReceivedError = err
 	f.Notified <- true
 }
 
-func (f *SubscriberSpy) NotifySuccess(event shared.Event) {
+func (f *SubscriberSpy) NotifySuccess(event eventing.Event) {
 	f.NotifySuccessReceivedEvent = event
 	f.Notified <- true
 }

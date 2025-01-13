@@ -7,8 +7,8 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/auth"
 	"github.com/geisonbiazus/blog/internal/auth/adapters/userrepo/postgres"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/idgenerator/uuid"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
+	"github.com/geisonbiazus/blog/pkg/gen/uuid"
 	"github.com/stretchr/testify/assert"
 )
 

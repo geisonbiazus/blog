@@ -1,17 +1,19 @@
 package blog
 
-import "github.com/geisonbiazus/blog/internal/shared"
+import (
+	"github.com/geisonbiazus/blog/pkg/caching"
+)
 
 type ViewPostUseCase struct {
 	postRepo PostRepo
 	renderer Renderer
-	cache    shared.Cache
+	cache    caching.Cache
 }
 
 func NewViewPostUseCase(
 	postRepo PostRepo,
 	renderer Renderer,
-	cache shared.Cache,
+	cache caching.Cache,
 ) *ViewPostUseCase {
 	return &ViewPostUseCase{
 		postRepo: postRepo,
@@ -23,7 +25,7 @@ func NewViewPostUseCase(
 func (u *ViewPostUseCase) Run(path string) (RenderedPost, error) {
 	result, err := u.cache.Do(path, func() (interface{}, error) {
 		return u.run(path)
-	}, shared.NeverExpire)
+	}, caching.NeverExpire)
 
 	return result.(RenderedPost), err
 }

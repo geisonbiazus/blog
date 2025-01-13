@@ -9,8 +9,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/discussion"
 	"github.com/geisonbiazus/blog/internal/discussion/adapters/commentrepo/postgres"
 	. "github.com/geisonbiazus/blog/internal/discussion/test"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/idgenerator/uuid"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
+	"github.com/geisonbiazus/blog/pkg/gen/uuid"
 	"github.com/stretchr/testify/suite"
 )
 

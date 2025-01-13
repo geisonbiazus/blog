@@ -6,27 +6,29 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/shared"
+	"github.com/geisonbiazus/blog/pkg/eventing"
+	"github.com/geisonbiazus/blog/pkg/gen"
+	"github.com/geisonbiazus/blog/pkg/transaction"
 )
 
 type ConfirmOAuth2UseCase struct {
 	provider     OAuth2Provider
 	stateRepo    StateRepo
 	userRepo     UserRepo
-	idGen        shared.IDGenerator
+	idGen        gen.Generator
 	tokenEncoder TokenEncoder
-	txManager    shared.TransactionManager
-	publisher    shared.Publisher
+	txManager    transaction.Manager
+	publisher    eventing.Publisher
 }
 
 func NewConfirmOAuth2UseCase(
 	provider OAuth2Provider,
 	stateRepo StateRepo,
 	userRepo UserRepo,
-	idGen shared.IDGenerator,
+	idGen gen.Generator,
 	tokenEncoder TokenEncoder,
-	txManager shared.TransactionManager,
-	publisher shared.Publisher,
+	txManager transaction.Manager,
+	publisher eventing.Publisher,
 ) *ConfirmOAuth2UseCase {
 	return &ConfirmOAuth2UseCase{
 		provider:     provider,

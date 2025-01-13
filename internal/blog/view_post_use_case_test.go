@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/geisonbiazus/blog/internal/blog"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/cache/memory"
+	"github.com/geisonbiazus/blog/pkg/caching"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,7 +20,7 @@ func TestViewPostUseCase(t *testing.T) {
 	setup := func() *viewPostUseCaseFixture {
 		repo := NewPostRepoSpy()
 		renderer := NewRendererSpy()
-		cache := memory.NewCache()
+		cache := caching.NewNullCache()
 		usecase := blog.NewViewPostUseCase(repo, renderer, cache)
 
 		return &viewPostUseCaseFixture{

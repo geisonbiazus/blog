@@ -6,8 +6,9 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/discussion"
 	"github.com/geisonbiazus/blog/internal/discussion/adapters/commentrepo/memory"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/idgenerator/fake"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/transactionmanager"
+	"github.com/geisonbiazus/blog/pkg/gen"
+	"github.com/geisonbiazus/blog/pkg/gen/fake"
+	"github.com/geisonbiazus/blog/pkg/transaction"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -16,14 +17,14 @@ type SaveAuthorUseCaseSuite struct {
 	usecase *discussion.SaveAuthorUseCase
 	repo    *memory.CommentRepo
 	ctx     context.Context
-	idGen   *fake.IDGenerator
+	idGen   *fake.Generator
 }
 
 func (s *SaveAuthorUseCaseSuite) SetupTest() {
 	s.ctx = context.Background()
 	s.repo = memory.NewCommentRepo()
-	txManager := transactionmanager.NewFakeTransactionManager()
-	s.idGen = fake.NewIDGenerator()
+	txManager := transaction.NewFakeManager()
+	s.idGen = gen.NewFakeGenerator()
 	s.idGen.ReturnID = s.AuthorID()
 	s.usecase = discussion.NewSaveAuthorUseCase(s.repo, txManager, s.idGen)
 }

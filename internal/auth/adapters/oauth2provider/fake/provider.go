@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/geisonbiazus/blog/internal/auth"
-	"github.com/geisonbiazus/blog/internal/shared/adapters/idgenerator/uuid"
+	"github.com/geisonbiazus/blog/pkg/gen/uuid"
 )
 
 type Provider struct {

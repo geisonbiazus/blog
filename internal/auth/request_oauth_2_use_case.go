@@ -3,18 +3,18 @@ package auth
 import (
 	"fmt"
 
-	"github.com/geisonbiazus/blog/internal/shared"
+	"github.com/geisonbiazus/blog/pkg/gen"
 )
 
 type RequestOAuth2UseCase struct {
 	provider  OAuth2Provider
-	idGen     shared.IDGenerator
+	idGen     gen.Generator
 	stateRepo StateRepo
 }
 
 func NewRequestOAuth2UseCase(
 	provider OAuth2Provider,
-	idGen shared.IDGenerator,
+	idGen gen.Generator,
 	stateRepo StateRepo,
 ) *RequestOAuth2UseCase {
 	return &RequestOAuth2UseCase{

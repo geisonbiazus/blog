@@ -3,7 +3,7 @@ package auth
 import (
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/shared"
+	"github.com/geisonbiazus/blog/pkg/eventing"
 )
 
 const (
@@ -11,8 +11,8 @@ const (
 	UserUpdatedEvent = "UserUpdated"
 )
 
-func NewUserCreatedEvent(user User) shared.Event {
-	return shared.Event{
+func NewUserCreatedEvent(user User) eventing.Event {
+	return eventing.Event{
 		Type:       UserCreatedEvent,
 		OccurredOn: time.Now(),
 		Payload: map[string]interface{}{
@@ -24,8 +24,8 @@ func NewUserCreatedEvent(user User) shared.Event {
 	}
 }
 
-func NewUserUpdatedEvent(user User) shared.Event {
-	return shared.Event{
+func NewUserUpdatedEvent(user User) eventing.Event {
+	return eventing.Event{
 		Type:       UserUpdatedEvent,
 		OccurredOn: time.Now(),
 		Payload: map[string]interface{}{

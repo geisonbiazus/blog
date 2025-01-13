@@ -5,7 +5,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/auth"
 	"github.com/geisonbiazus/blog/internal/discussion"
-	"github.com/geisonbiazus/blog/internal/shared"
+	"github.com/geisonbiazus/blog/pkg/eventing"
 )
 
 type UpdateAuthorSubscriber struct {
@@ -21,13 +21,13 @@ func NewUpdateAuthorSubscriber(usecase SaveAuthorUseCase, subscriber Subscriber)
 }
 
 func (s *UpdateAuthorSubscriber) Start() {
-	s.BaseSubscriber.Start(func(event shared.Event) error {
+	s.BaseSubscriber.Start(func(event eventing.Event) error {
 		_, err := s.usecase.Run(context.Background(), s.inputFrom(event))
 		return err
 	})
 }
 
-func (s *UpdateAuthorSubscriber) inputFrom(event shared.Event) discussion.SaveAuthorInput {
+func (s *UpdateAuthorSubscriber) inputFrom(event eventing.Event) discussion.SaveAuthorInput {
 	return discussion.SaveAuthorInput{
 		UserID:    event.Payload["ID"].(string),
 		Name:      event.Payload["Name"].(string),
