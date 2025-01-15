@@ -10,16 +10,17 @@ import (
 )
 
 func newServer() *httptest.Server {
-	os.Setenv("ENV", "test")
-	c := app.NewContext()
-
 	basePath := filepath.Join("..", "..")
 
-	c.TemplatePath = filepath.Join(basePath, "web", "template")
-	c.StaticPath = filepath.Join(basePath, "web", "static")
-	c.PostPath = filepath.Join(basePath, "test", "posts")
-	c.GitHubClientID = "github_client_id"
-	c.GitHubClientSecret = "github_client_secret"
+	os.Setenv("ENV", "test")
+	os.Setenv("POST_PATH", filepath.Join(basePath, "test", "posts"))
+	os.Setenv("TEMPLATE_PATH", filepath.Join(basePath, "web", "template"))
+	os.Setenv("STATIC_PATH", filepath.Join(basePath, "web", "static"))
+	os.Setenv("GITHUB_CLIENT_ID", "github_client_id")
+	os.Setenv("GITHUB_CLIENT_SECRET", "github_client_secret")
+
+	c := app.NewContext()
+
 	return httptest.NewServer(c.Router())
 }
 

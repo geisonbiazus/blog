@@ -1,17 +1,18 @@
-package blog_test
+package usecases_test
 
 import (
 	"errors"
 	"testing"
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/blog"
+	"github.com/geisonbiazus/blog/internal/blog/entities"
+	"github.com/geisonbiazus/blog/internal/blog/usecases"
 	"github.com/geisonbiazus/blog/pkg/caching"
 	"github.com/stretchr/testify/assert"
 )
 
 type viewPostUseCaseFixture struct {
-	usecase  *blog.ViewPostUseCase
+	usecase  *usecases.ViewPostUseCase
 	repo     *PostRepoSpy
 	renderer *RendererSpy
 }
@@ -21,7 +22,7 @@ func TestViewPostUseCase(t *testing.T) {
 		repo := NewPostRepoSpy()
 		renderer := NewRendererSpy()
 		cache := caching.NewNullCache()
-		usecase := blog.NewViewPostUseCase(repo, renderer, cache)
+		usecase := usecases.NewViewPostUseCase(repo, renderer, cache)
 
 		return &viewPostUseCaseFixture{
 			usecase:  usecase,
@@ -33,13 +34,13 @@ func TestViewPostUseCase(t *testing.T) {
 	t.Run("It returns error when post is not found", func(t *testing.T) {
 		f := setup()
 
-		f.repo.ReturnError = blog.ErrPostNotFound
+		f.repo.ReturnError = entities.ErrPostNotFound
 
 		renderedPost, err := f.usecase.Run("path")
 
 		assert.Equal(t, "path", f.repo.ReceivedPath)
-		assert.Equal(t, blog.RenderedPost{}, renderedPost)
-		assert.Equal(t, blog.ErrPostNotFound, err)
+		assert.Equal(t, entities.RenderedPost{}, renderedPost)
+		assert.Equal(t, entities.ErrPostNotFound, err)
 	})
 
 	t.Run("It returns the rendered post when post is found", func(t *testing.T) {
@@ -53,7 +54,7 @@ func TestViewPostUseCase(t *testing.T) {
 
 		assert.Equal(t, "path", f.repo.ReceivedPath)
 		assert.Equal(t, post.Markdown, f.renderer.ReceivedContent)
-		assert.Equal(t, rennderedPost, blog.RenderedPost{
+		assert.Equal(t, rennderedPost, entities.RenderedPost{
 			Post: post,
 			HTML: "Rendered content",
 		})
@@ -68,15 +69,15 @@ func TestViewPostUseCase(t *testing.T) {
 		f.renderer.ReturnError = errors.New("render error")
 
 		rennderedPost, err := f.usecase.Run(post.Path)
-		assert.Equal(t, rennderedPost, blog.RenderedPost{})
+		assert.Equal(t, rennderedPost, entities.RenderedPost{})
 		assert.Equal(t, f.renderer.ReturnError, err)
 	})
 }
 
-func newPost() blog.Post {
+func newPost() entities.Post {
 	postTime, _ := time.Parse(time.RFC3339, "2021-04-03T00:00:00+00:00")
 
-	return blog.Post{
+	return entities.Post{
 		Title:       "Title",
 		Author:      "Author",
 		Time:        postTime,

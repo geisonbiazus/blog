@@ -5,19 +5,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/blog"
+	"github.com/geisonbiazus/blog/internal/blog/entities"
 )
 
 var ErrInvalidTime = errors.New("invalid time format, please use YYYY-MM-DD HH:MM")
 var ErrInvalidFormat = errors.New("invalid file format, please include a header / body separator \"--\"")
 
-func ParseFileContent(content string) (blog.Post, error) {
+func ParseFileContent(content string) (entities.Post, error) {
 	return newParser(content).parse()
 }
 
 type parser struct {
 	content string
-	post    blog.Post
+	post    entities.Post
 	err     error
 }
 
@@ -25,7 +25,7 @@ func newParser(content string) *parser {
 	return &parser{content: content}
 }
 
-func (p *parser) parse() (blog.Post, error) {
+func (p *parser) parse() (entities.Post, error) {
 	header, body := p.splitHeaderAndBody()
 
 	p.parseHeader(header)

@@ -13,8 +13,6 @@ import (
 	"github.com/geisonbiazus/blog/internal/auth/adapters/tokenencoder"
 	"github.com/geisonbiazus/blog/internal/auth/adapters/userrepo"
 	"github.com/geisonbiazus/blog/internal/blog"
-	"github.com/geisonbiazus/blog/internal/blog/adapters/postrepo"
-	"github.com/geisonbiazus/blog/internal/blog/adapters/renderer"
 	"github.com/geisonbiazus/blog/internal/discussion"
 	"github.com/geisonbiazus/blog/internal/discussion/adapters/commentrepo"
 	"github.com/geisonbiazus/blog/internal/subscriptions"
@@ -55,6 +53,8 @@ type Context struct {
 	stateRepo          auth.StateRepo
 	userRepo           auth.UserRepo
 	commentRepo        discussion.CommentRepo
+
+	blog *blog.Context
 }
 
 func NewContext() *Context {
@@ -64,7 +64,6 @@ func NewContext() *Context {
 		Port:           env.GetInt("PORT", 3000),
 		TemplatePath:   env.GetString("TEMPLATE_PATH", filepath.Join("web", "template")),
 		StaticPath:     env.GetString("STATIC_PATH", filepath.Join("web", "static")),
-		PostPath:       env.GetString("POST_PATH", filepath.Join("posts")),
 		MigrationsPath: env.GetString("MIGRATIONS_PATH", "file://"+filepath.Join("db", "migrations")),
 		BaseURL:        env.GetString("BASE_URL", "http://localhost:3000"),
 
@@ -76,6 +75,14 @@ func NewContext() *Context {
 		PostgresURL:     env.GetString("POSTGRES_URL", "postgres://postgres:postgres@localhost:5432/blog?sslmode=disable"),
 		PostgresTestURL: env.GetString("POSTGRES_TEST_URL", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable"),
 	}
+}
+
+// Components
+func (c *Context) Blog() *blog.Context {
+	if c.blog == nil {
+		c.blog = blog.NewContext(c.Cache)
+	}
+	return c.blog
 }
 
 // UI
@@ -96,8 +103,8 @@ func (c *Context) Subscriptions() *subscriptions.Subscriptions {
 
 func (c *Context) UseCases() *webports.UseCases {
 	return &webports.UseCases{
-		ViewPost:      c.ViewPostUseCase(),
-		ListPosts:     c.ListPostsUseCase(),
+		ViewPost:      c.Blog().ViewPostUseCase(),
+		ListPosts:     c.Blog().ListPostsUseCase(),
 		RequestOAuth2: c.RequestOAuth2UseCase(),
 		ConfirmOAuth2: c.ConfirmOAuth2UseCase(),
 		ListComments:  c.ListCommentsUseCase(),
@@ -108,14 +115,6 @@ func (c *Context) SubscriptionUseCases() *subscriptions.UseCases {
 	return &subscriptions.UseCases{
 		SaveAuthor: c.SaveAuthorUseCase(),
 	}
-}
-
-func (c *Context) ViewPostUseCase() *blog.ViewPostUseCase {
-	return blog.NewViewPostUseCase(c.PostRepo(), c.Renderer(), c.Cache())
-}
-
-func (c *Context) ListPostsUseCase() *blog.ListPostsUseCase {
-	return blog.NewListPostsUseCase(c.PostRepo(), c.Renderer(), c.Cache())
 }
 
 func (c *Context) RequestOAuth2UseCase() *auth.RequestOAuth2UseCase {
@@ -192,14 +191,6 @@ func (c *Context) PubSub() *memory.PubSub {
 		c.pubsub = eventing.NewMemoryPubSub()
 	}
 	return c.pubsub
-}
-
-func (c *Context) PostRepo() blog.PostRepo {
-	return postrepo.NewFileSystemPostRepo(c.PostPath)
-}
-
-func (c *Context) Renderer() blog.Renderer {
-	return renderer.NewGoldmarkRenderer()
 }
 
 func (c *Context) OAuth2Provider() auth.OAuth2Provider {

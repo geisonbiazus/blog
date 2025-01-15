@@ -3,8 +3,8 @@ package filesystem_test
 import (
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/blog"
 	"github.com/geisonbiazus/blog/internal/blog/adapters/postrepo/filesystem"
+	"github.com/geisonbiazus/blog/internal/blog/entities"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,8 +21,8 @@ func TestPostRepo(t *testing.T) {
 
 			post, err := repo.GetPostByPath("wrong_path")
 
-			assert.Equal(t, blog.Post{}, post)
-			assert.Equal(t, blog.ErrPostNotFound, err)
+			assert.Equal(t, entities.Post{}, post)
+			assert.Equal(t, entities.ErrPostNotFound, err)
 		})
 
 		t.Run("It returns parsed post when the file exists", func(t *testing.T) {
@@ -40,7 +40,7 @@ func TestPostRepo(t *testing.T) {
 			repo := filesystem.NewPostRepo(emptyFolder)
 			posts, err := repo.GetAllPosts()
 
-			assert.Equal(t, []blog.Post{}, posts)
+			assert.Equal(t, []entities.Post{}, posts)
 			assert.Nil(t, err)
 		})
 
@@ -48,13 +48,13 @@ func TestPostRepo(t *testing.T) {
 			repo := filesystem.NewPostRepo(invalidPath)
 			posts, err := repo.GetAllPosts()
 
-			assert.Equal(t, []blog.Post{}, posts)
+			assert.Equal(t, []entities.Post{}, posts)
 			assert.NotNil(t, err)
 		})
 
 		t.Run("Given a path with post files, it returns all posts sorted by descending date", func(t *testing.T) {
 			repo := filesystem.NewPostRepo(postPath)
-			expectedPosts := []blog.Post{testPost1, testPost3, testPost2}
+			expectedPosts := []entities.Post{testPost1, testPost3, testPost2}
 
 			actualPosts, err := repo.GetAllPosts()
 
@@ -64,7 +64,7 @@ func TestPostRepo(t *testing.T) {
 
 		t.Run("Given an invalid post in the folder, it ignores the invalid and returns the rest", func(t *testing.T) {
 			repo := filesystem.NewPostRepo(pathWithInvalidPost)
-			expectedPosts := []blog.Post{testPost1, testPost2}
+			expectedPosts := []entities.Post{testPost1, testPost2}
 
 			actualPosts, err := repo.GetAllPosts()
 
@@ -74,7 +74,7 @@ func TestPostRepo(t *testing.T) {
 
 		t.Run("Given a path other types of files, it ignores the other files", func(t *testing.T) {
 			repo := filesystem.NewPostRepo(pathWithDifferentFiles)
-			expectedPosts := []blog.Post{testPost1}
+			expectedPosts := []entities.Post{testPost1}
 
 			actualPosts, err := repo.GetAllPosts()
 
@@ -84,7 +84,7 @@ func TestPostRepo(t *testing.T) {
 	})
 }
 
-var testPost1 = blog.Post{
+var testPost1 = entities.Post{
 	Title:       "Test Post 1",
 	Author:      "Geison Biazus",
 	Path:        "test-post-1",
@@ -97,7 +97,7 @@ var testPost1 = blog.Post{
 		"Content\n",
 }
 
-var testPost2 = blog.Post{
+var testPost2 = entities.Post{
 	Title:       "Test Post 2",
 	Author:      "Geison Biazus",
 	Path:        "test-post-2",
@@ -107,7 +107,7 @@ var testPost2 = blog.Post{
 	Markdown:    "",
 }
 
-var testPost3 = blog.Post{
+var testPost3 = entities.Post{
 	Title:       "Test Post 3",
 	Author:      "Geison Biazus",
 	Path:        "test-post-3",

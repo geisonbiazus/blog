@@ -2,14 +2,13 @@ package filesystem
 
 import (
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
-	"github.com/geisonbiazus/blog/internal/blog"
+	"github.com/geisonbiazus/blog/internal/blog/entities"
 )
 
 type PostRepo struct {
@@ -20,11 +19,11 @@ func NewPostRepo(basePath string) *PostRepo {
 	return &PostRepo{BasePath: basePath}
 }
 
-func (r *PostRepo) GetPostByPath(path string) (blog.Post, error) {
-	content, err := ioutil.ReadFile(filepath.Join(r.BasePath, path+".md"))
+func (r *PostRepo) GetPostByPath(path string) (entities.Post, error) {
+	content, err := os.ReadFile(filepath.Join(r.BasePath, path+".md"))
 
 	if err != nil {
-		return blog.Post{}, blog.ErrPostNotFound
+		return entities.Post{}, entities.ErrPostNotFound
 	}
 
 	post, err := ParseFileContent(string(content))
@@ -33,8 +32,8 @@ func (r *PostRepo) GetPostByPath(path string) (blog.Post, error) {
 	return post, err
 }
 
-func (r *PostRepo) GetAllPosts() ([]blog.Post, error) {
-	posts := []blog.Post{}
+func (r *PostRepo) GetAllPosts() ([]entities.Post, error) {
+	posts := []entities.Post{}
 	entries, err := os.ReadDir(r.BasePath)
 
 	if err != nil {
@@ -48,7 +47,7 @@ func (r *PostRepo) GetAllPosts() ([]blog.Post, error) {
 	return r.sortPostsByTimeDesc(posts), err
 }
 
-func (r *PostRepo) maybeLoadPostFromFile(posts []blog.Post, entry fs.DirEntry) []blog.Post {
+func (r *PostRepo) maybeLoadPostFromFile(posts []entities.Post, entry fs.DirEntry) []entities.Post {
 	if !strings.HasSuffix(entry.Name(), ".md") {
 		return posts
 	}
@@ -65,7 +64,7 @@ func (r *PostRepo) maybeLoadPostFromFile(posts []blog.Post, entry fs.DirEntry) [
 	return append(posts, post)
 }
 
-func (r *PostRepo) sortPostsByTimeDesc(posts []blog.Post) []blog.Post {
+func (r *PostRepo) sortPostsByTimeDesc(posts []entities.Post) []entities.Post {
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].Time.After(posts[j].Time)
 	})

@@ -4,18 +4,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/blog"
 	"github.com/geisonbiazus/blog/internal/blog/adapters/postrepo/filesystem"
+	"github.com/geisonbiazus/blog/internal/blog/entities"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParseFileContent(t *testing.T) {
 	t.Run("It parses content header into a Post", func(t *testing.T) {
-		assertParsedContent(t, "title: Post Title\n--\n", blog.Post{Title: "Post Title"})
-		assertParsedContent(t, "author: Author Name\n--\n", blog.Post{Author: "Author Name"})
-		assertParsedContent(t, "description: Post description\n--\n", blog.Post{Description: "Post description"})
-		assertParsedContent(t, "image_path: /image.png\n--\n", blog.Post{ImagePath: "/image.png"})
-		assertParsedContent(t, "time: 2021-04-04 22:00\n--\n", blog.Post{Time: toTime("2021-04-04T22:00:00Z")})
+		assertParsedContent(t, "title: Post Title\n--\n", entities.Post{Title: "Post Title"})
+		assertParsedContent(t, "author: Author Name\n--\n", entities.Post{Author: "Author Name"})
+		assertParsedContent(t, "description: Post description\n--\n", entities.Post{Description: "Post description"})
+		assertParsedContent(t, "image_path: /image.png\n--\n", entities.Post{ImagePath: "/image.png"})
+		assertParsedContent(t, "time: 2021-04-04 22:00\n--\n", entities.Post{Time: toTime("2021-04-04T22:00:00Z")})
 		assertParsedContent(t, ""+
 			"title: Post Title\n"+
 			"author: Author Name\n"+
@@ -23,7 +23,7 @@ func TestParseFileContent(t *testing.T) {
 			"image_path: /image.png\n"+
 			"time: 2021-04-04 22:00\n"+
 			"--\n",
-			blog.Post{
+			entities.Post{
 				Title:       "Post Title",
 				Author:      "Author Name",
 				Description: "Description",
@@ -36,7 +36,7 @@ func TestParseFileContent(t *testing.T) {
 		assertParsedContent(t, ""+
 			"--\n"+
 			"Content\n",
-			blog.Post{
+			entities.Post{
 				Markdown: "" +
 					"Content\n",
 			})
@@ -46,7 +46,7 @@ func TestParseFileContent(t *testing.T) {
 			"Only first separator is considered\n"+
 			"--\n"+
 			"After second separator\n",
-			blog.Post{
+			entities.Post{
 				Markdown: "" +
 					"Only first separator is considered\n" +
 					"--\n" +
@@ -68,7 +68,7 @@ func TestParseFileContent(t *testing.T) {
 			"Content\n"+
 			"--\n"+
 			"- list\n",
-			blog.Post{
+			entities.Post{
 				Title:       "Post Title",
 				Author:      "Author Name",
 				Description: "Description",
@@ -94,7 +94,7 @@ func TestParseFileContent(t *testing.T) {
 	})
 }
 
-func assertParsedContent(t *testing.T, content string, expectedPost blog.Post) {
+func assertParsedContent(t *testing.T, content string, expectedPost entities.Post) {
 	t.Helper()
 	post, err := filesystem.ParseFileContent(content)
 	assert.Equal(t, expectedPost, post)
@@ -104,7 +104,7 @@ func assertParsedContent(t *testing.T, content string, expectedPost blog.Post) {
 func assertParseError(t *testing.T, content string, expectedError error) {
 	t.Helper()
 	post, err := filesystem.ParseFileContent(content)
-	assert.Equal(t, blog.Post{}, post)
+	assert.Equal(t, entities.Post{}, post)
 	assert.Equal(t, expectedError, err)
 }
 
