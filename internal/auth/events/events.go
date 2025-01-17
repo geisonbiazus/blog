@@ -1,8 +1,9 @@
-package auth
+package events
 
 import (
 	"time"
 
+	"github.com/geisonbiazus/blog/internal/auth/entities"
 	"github.com/geisonbiazus/blog/pkg/eventing"
 )
 
@@ -11,7 +12,7 @@ const (
 	UserUpdatedEvent = "UserUpdated"
 )
 
-func NewUserCreatedEvent(user User) eventing.Event {
+func NewUserCreatedEvent(user entities.User) eventing.Event {
 	return eventing.Event{
 		Type:       UserCreatedEvent,
 		OccurredOn: time.Now(),
@@ -24,7 +25,7 @@ func NewUserCreatedEvent(user User) eventing.Event {
 	}
 }
 
-func NewUserUpdatedEvent(user User) eventing.Event {
+func NewUserUpdatedEvent(user entities.User) eventing.Event {
 	return eventing.Event{
 		Type:       UserUpdatedEvent,
 		OccurredOn: time.Now(),

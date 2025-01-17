@@ -1,4 +1,4 @@
-package auth_test
+package usecases_test
 
 import (
 	"context"
@@ -9,6 +9,8 @@ import (
 	"github.com/geisonbiazus/blog/internal/auth"
 	staterepo "github.com/geisonbiazus/blog/internal/auth/adapters/staterepo/memory"
 	userrepo "github.com/geisonbiazus/blog/internal/auth/adapters/userrepo/memory"
+	"github.com/geisonbiazus/blog/internal/auth/entities"
+	"github.com/geisonbiazus/blog/internal/auth/usecases"
 	"github.com/geisonbiazus/blog/pkg/eventing"
 	fakepublisher "github.com/geisonbiazus/blog/pkg/eventing/fake"
 	fakegen "github.com/geisonbiazus/blog/pkg/gen/fake"
@@ -17,7 +19,7 @@ import (
 )
 
 type confirmOAuth2UseCaseFixture struct {
-	usecase      *auth.ConfirmOAuth2UseCase
+	usecase      *usecases.ConfirmOAuth2UseCase
 	provider     *OAuth2ProviderSpy
 	stateRepo    *staterepo.StateRepo
 	userRepo     *userrepo.UserRepo
@@ -31,7 +33,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 	code := "code"
 	state := "state"
 
-	providerUser := auth.ProviderUser{
+	providerUser := entities.ProviderUser{
 		ID:        "provider_id",
 		Email:     "user@example.com",
 		Name:      "name",
@@ -46,7 +48,7 @@ func TestConfirmOAuth2UseCase(t *testing.T) {
 		tokenEncoder := NewTokenEncoderSpy()
 		txManager := transaction.NewFakeManager()
 		publisher := eventing.NewFakePublisher()
-		usecase := auth.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder, txManager, publisher)
+		usecase := usecases.NewConfirmOAuth2UseCase(provider, stateRepo, userRepo, idGen, tokenEncoder, txManager, publisher)
 		return &confirmOAuth2UseCaseFixture{
 			usecase:      usecase,
 			provider:     provider,

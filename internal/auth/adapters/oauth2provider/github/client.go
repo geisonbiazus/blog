@@ -3,11 +3,11 @@ package github
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
-	"github.com/geisonbiazus/blog/internal/auth"
+	"github.com/geisonbiazus/blog/internal/auth/entities"
 )
 
 type HTTPClient interface {
@@ -22,10 +22,10 @@ func NewClient(httpClient HTTPClient) *Client {
 	return &Client{httpClient: httpClient}
 }
 
-func (c *Client) GetAuthenticatedUser() (auth.ProviderUser, error) {
+func (c *Client) GetAuthenticatedUser() (entities.ProviderUser, error) {
 	resp, err := c.requestCurrentUser()
 	if err != nil {
-		return auth.ProviderUser{}, err
+		return entities.ProviderUser{}, err
 	}
 
 	defer resp.Body.Close()
@@ -42,17 +42,17 @@ func (c *Client) requestCurrentUser() (*http.Response, error) {
 	return resp, nil
 }
 
-func (c *Client) parseResponse(resp *http.Response) (auth.ProviderUser, error) {
+func (c *Client) parseResponse(resp *http.Response) (entities.ProviderUser, error) {
 	if resp.StatusCode != http.StatusOK {
 		return c.errorResponse(resp)
 	}
 
 	user, err := c.decodeResponseBody(resp)
 	if err != nil {
-		return auth.ProviderUser{}, err
+		return entities.ProviderUser{}, err
 	}
 
-	return auth.ProviderUser{
+	return entities.ProviderUser{
 		ID:        strconv.Itoa(user.ID),
 		AvatarURL: user.AvatarURL,
 		Name:      user.Name,
@@ -60,10 +60,10 @@ func (c *Client) parseResponse(resp *http.Response) (auth.ProviderUser, error) {
 	}, nil
 }
 
-func (c *Client) errorResponse(resp *http.Response) (auth.ProviderUser, error) {
-	body, _ := ioutil.ReadAll(resp.Body)
+func (c *Client) errorResponse(resp *http.Response) (entities.ProviderUser, error) {
+	body, _ := io.ReadAll(resp.Body)
 	err := fmt.Errorf("error requesting user. Status: %d. Response: %s", resp.StatusCode, body)
-	return auth.ProviderUser{}, err
+	return entities.ProviderUser{}, err
 }
 
 func (c *Client) decodeResponseBody(resp *http.Response) (*githubUser, error) {

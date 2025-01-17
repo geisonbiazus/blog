@@ -3,12 +3,12 @@ package blog
 import (
 	"path/filepath"
 
+	"github.com/geisonbiazus/blog/internal/app/shared"
 	"github.com/geisonbiazus/blog/internal/blog/adapters/postrepo"
 	"github.com/geisonbiazus/blog/internal/blog/adapters/renderer"
 	"github.com/geisonbiazus/blog/internal/blog/entities"
 	"github.com/geisonbiazus/blog/internal/blog/ports"
 	"github.com/geisonbiazus/blog/internal/blog/usecases"
-	"github.com/geisonbiazus/blog/pkg/caching"
 	"github.com/geisonbiazus/blog/pkg/env"
 )
 
@@ -20,25 +20,25 @@ type Renderer = ports.Renderer
 var ErrPostNotFound = entities.ErrPostNotFound
 
 type Context struct {
-	postPath string
-	cache    func() caching.Cache
+	sharedContext *shared.Context
+	postPath      string
 }
 
-func NewContext(cache func() caching.Cache) *Context {
+func NewContext(sharedContext *shared.Context) *Context {
 	return &Context{
-		postPath: env.GetString("POST_PATH", filepath.Join("posts")),
-		cache:    cache,
+		sharedContext: sharedContext,
+		postPath:      env.GetString("POST_PATH", filepath.Join("posts")),
 	}
 }
 
 // Use cases
 
 func (c *Context) ViewPostUseCase() *usecases.ViewPostUseCase {
-	return usecases.NewViewPostUseCase(c.postRepo(), c.renderer(), c.cache())
+	return usecases.NewViewPostUseCase(c.postRepo(), c.renderer(), c.sharedContext.Cache())
 }
 
 func (c *Context) ListPostsUseCase() *usecases.ListPostsUseCase {
-	return usecases.NewListPostsUseCase(c.postRepo(), c.renderer(), c.cache())
+	return usecases.NewListPostsUseCase(c.postRepo(), c.renderer(), c.sharedContext.Cache())
 }
 
 // Adapters

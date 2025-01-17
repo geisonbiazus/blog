@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/geisonbiazus/blog/internal/auth"
+	"github.com/geisonbiazus/blog/internal/auth/entities"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
 )
 
@@ -18,7 +18,7 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 	return &UserRepo{Base: dbrepo.NewBase(db)}
 }
 
-func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
+func (r *UserRepo) CreateUser(ctx context.Context, user entities.User) error {
 	err := r.Insert(ctx, "auth_users", map[string]interface{}{
 		"id":               user.ID,
 		"name":             user.Name,
@@ -34,7 +34,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, user auth.User) error {
 	return nil
 }
 
-func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
+func (r *UserRepo) UpdateUser(ctx context.Context, user entities.User) error {
 	err := r.Update(ctx, "auth_users", user.ID, map[string]interface{}{
 		"name":             user.Name,
 		"email":            user.Email,
@@ -44,7 +44,7 @@ func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
 
 	if err != nil {
 		if errors.Is(err, dbrepo.ErrNoRowsUpdated) {
-			return auth.ErrUserNotFound
+			return entities.ErrUserNotFound
 		}
 
 		return fmt.Errorf("error on UpdateAuthor: %w", err)
@@ -53,15 +53,15 @@ func (r *UserRepo) UpdateUser(ctx context.Context, user auth.User) error {
 	return nil
 }
 
-func (r *UserRepo) FindUserByID(ctx context.Context, id string) (auth.User, error) {
+func (r *UserRepo) FindUserByID(ctx context.Context, id string) (entities.User, error) {
 	return r.findUserBy(ctx, "id", id)
 }
 
-func (r *UserRepo) FindUserByProviderUserID(ctx context.Context, providerUserID string) (auth.User, error) {
+func (r *UserRepo) FindUserByProviderUserID(ctx context.Context, providerUserID string) (entities.User, error) {
 	return r.findUserBy(ctx, "provider_user_id", providerUserID)
 }
 
-func (r *UserRepo) findUserBy(ctx context.Context, field string, value interface{}) (auth.User, error) {
+func (r *UserRepo) findUserBy(ctx context.Context, field string, value interface{}) (entities.User, error) {
 	conn := r.Conn(ctx)
 
 	row := conn.QueryRowContext(ctx, `
@@ -72,16 +72,16 @@ func (r *UserRepo) findUserBy(ctx context.Context, field string, value interface
 		value,
 	)
 
-	user := auth.User{}
+	user := entities.User{}
 
 	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.ProviderUserID, &user.AvatarURL)
 
 	if errors.Is(err, sql.ErrNoRows) {
-		return auth.User{}, auth.ErrUserNotFound
+		return entities.User{}, entities.ErrUserNotFound
 	}
 
 	if err != nil {
-		return auth.User{}, fmt.Errorf("error on findUserBy when executing query: %w", err)
+		return entities.User{}, fmt.Errorf("error on findUserBy when executing query: %w", err)
 	}
 
 	return user, err

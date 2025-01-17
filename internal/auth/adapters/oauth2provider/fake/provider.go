@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/geisonbiazus/blog/internal/auth"
+	"github.com/geisonbiazus/blog/internal/auth/entities"
 	"github.com/geisonbiazus/blog/pkg/gen/uuid"
 )
 
@@ -26,8 +26,8 @@ func (p *Provider) AuthURL(state string) string {
 	return fmt.Sprintf("%s/login/github/confirm?state=%s&code=%s", p.BaseURL, p.State, p.Code)
 }
 
-func (p *Provider) AuthenticatedUser(ctx context.Context, code string) (auth.ProviderUser, error) {
-	return auth.ProviderUser{
+func (p *Provider) AuthenticatedUser(ctx context.Context, code string) (entities.ProviderUser, error) {
+	return entities.ProviderUser{
 		ID:        "userID",
 		Email:     "user@example.com",
 		Name:      "User",

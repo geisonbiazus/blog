@@ -7,18 +7,14 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/geisonbiazus/blog/internal/app/shared"
 	"github.com/geisonbiazus/blog/internal/auth"
-	"github.com/geisonbiazus/blog/internal/auth/adapters/oauth2provider"
-	"github.com/geisonbiazus/blog/internal/auth/adapters/staterepo"
-	"github.com/geisonbiazus/blog/internal/auth/adapters/tokenencoder"
-	"github.com/geisonbiazus/blog/internal/auth/adapters/userrepo"
 	"github.com/geisonbiazus/blog/internal/blog"
 	"github.com/geisonbiazus/blog/internal/discussion"
 	"github.com/geisonbiazus/blog/internal/discussion/adapters/commentrepo"
 	"github.com/geisonbiazus/blog/internal/subscriptions"
 	"github.com/geisonbiazus/blog/internal/web"
 	webports "github.com/geisonbiazus/blog/internal/web/ports"
-	"github.com/geisonbiazus/blog/pkg/caching"
 	"github.com/geisonbiazus/blog/pkg/env"
 	"github.com/geisonbiazus/blog/pkg/eventing"
 	"github.com/geisonbiazus/blog/pkg/eventing/memory"
@@ -38,23 +34,17 @@ type Context struct {
 	MigrationsPath string
 	BaseURL        string
 
-	GitHubClientID     string
-	GitHubClientSecret string
-
-	AuthTokenSecret string
-
 	PostgresURL     string
 	PostgresTestURL string
 
 	db                 *sql.DB
 	transactionManager transaction.Manager
 	pubsub             *memory.PubSub
-	cache              caching.Cache
-	stateRepo          auth.StateRepo
-	userRepo           auth.UserRepo
 	commentRepo        discussion.CommentRepo
 
-	blog *blog.Context
+	sharedContext *shared.Context
+	blog          *blog.Context
+	auth          *auth.Context
 }
 
 func NewContext() *Context {
@@ -67,22 +57,31 @@ func NewContext() *Context {
 		MigrationsPath: env.GetString("MIGRATIONS_PATH", "file://"+filepath.Join("db", "migrations")),
 		BaseURL:        env.GetString("BASE_URL", "http://localhost:3000"),
 
-		GitHubClientID:     env.GetString("GITHUB_CLIENT_ID", ""),
-		GitHubClientSecret: env.GetString("GITHUB_CLIENT_SECRET", ""),
-
-		AuthTokenSecret: env.GetString("AUTH_TOKEN_SECRET", ""),
-
 		PostgresURL:     env.GetString("POSTGRES_URL", "postgres://postgres:postgres@localhost:5432/blog?sslmode=disable"),
 		PostgresTestURL: env.GetString("POSTGRES_TEST_URL", "postgres://postgres:postgres@localhost:5433/blog_test?sslmode=disable"),
 	}
 }
 
+func (c *Context) SharedContext() *shared.Context {
+	if c.sharedContext == nil {
+		c.sharedContext = shared.NewContext()
+	}
+	return c.sharedContext
+}
+
 // Components
 func (c *Context) Blog() *blog.Context {
 	if c.blog == nil {
-		c.blog = blog.NewContext(c.Cache)
+		c.blog = blog.NewContext(c.SharedContext())
 	}
 	return c.blog
+}
+
+func (c *Context) Auth() *auth.Context {
+	if c.auth == nil {
+		c.auth = auth.NewContext(c.SharedContext())
+	}
+	return c.auth
 }
 
 // UI
@@ -105,8 +104,8 @@ func (c *Context) UseCases() *webports.UseCases {
 	return &webports.UseCases{
 		ViewPost:      c.Blog().ViewPostUseCase(),
 		ListPosts:     c.Blog().ListPostsUseCase(),
-		RequestOAuth2: c.RequestOAuth2UseCase(),
-		ConfirmOAuth2: c.ConfirmOAuth2UseCase(),
+		RequestOAuth2: c.Auth().RequestOAuth2UseCase(),
+		ConfirmOAuth2: c.Auth().ConfirmOAuth2UseCase(),
 		ListComments:  c.ListCommentsUseCase(),
 	}
 }
@@ -115,14 +114,6 @@ func (c *Context) SubscriptionUseCases() *subscriptions.UseCases {
 	return &subscriptions.UseCases{
 		SaveAuthor: c.SaveAuthorUseCase(),
 	}
-}
-
-func (c *Context) RequestOAuth2UseCase() *auth.RequestOAuth2UseCase {
-	return auth.NewRequestOAuth2UseCase(c.OAuth2Provider(), c.IDGenerator(), c.StateRepo())
-}
-
-func (c *Context) ConfirmOAuth2UseCase() *auth.ConfirmOAuth2UseCase {
-	return auth.NewConfirmOAuth2UseCase(c.OAuth2Provider(), c.StateRepo(), c.UserRepo(), c.IDGenerator(), c.TokenEncoder(), c.TransactionManager(), c.PubSub())
 }
 
 func (c *Context) ListCommentsUseCase() *discussion.ListCommentsUseCase {
@@ -134,20 +125,6 @@ func (c *Context) SaveAuthorUseCase() *discussion.SaveAuthorUseCase {
 }
 
 // Adapters
-
-func (c *Context) Cache() caching.Cache {
-	if c.cache == nil {
-		c.cache = c.resolveCache()
-	}
-	return c.cache
-}
-
-func (c *Context) resolveCache() caching.Cache {
-	if c.isDevelopment() {
-		return caching.NewNullCache()
-	}
-	return caching.NewMemoryCache()
-}
 
 func (c *Context) DB() *sql.DB {
 	if c.db == nil {
@@ -193,37 +170,8 @@ func (c *Context) PubSub() *memory.PubSub {
 	return c.pubsub
 }
 
-func (c *Context) OAuth2Provider() auth.OAuth2Provider {
-	if c.isTest() {
-		return c.FakeOAuth2Provider()
-	}
-	return c.GithubOAuth2Provider()
-}
-
-func (c *Context) GithubOAuth2Provider() auth.OAuth2Provider {
-	return oauth2provider.NewGithubProvider(c.GitHubClientID, c.GitHubClientSecret)
-}
-
-func (c *Context) FakeOAuth2Provider() auth.OAuth2Provider {
-	return oauth2provider.NewFakeProvider(c.BaseURL)
-}
-
 func (c *Context) IDGenerator() gen.Generator {
 	return gen.NewUUIDGenerator()
-}
-
-func (c *Context) StateRepo() auth.StateRepo {
-	if c.stateRepo == nil {
-		c.stateRepo = staterepo.NewMemoryStateRepo()
-	}
-	return c.stateRepo
-}
-
-func (c *Context) UserRepo() auth.UserRepo {
-	if c.userRepo == nil {
-		c.userRepo = userrepo.NewPostgresUserRepo(c.DB())
-	}
-	return c.userRepo
 }
 
 func (c *Context) CommentRepo() discussion.CommentRepo {
@@ -231,10 +179,6 @@ func (c *Context) CommentRepo() discussion.CommentRepo {
 		c.commentRepo = commentrepo.NewPostgresCommentRepo(c.DB())
 	}
 	return c.commentRepo
-}
-
-func (c *Context) TokenEncoder() auth.TokenEncoder {
-	return tokenencoder.NewJWTTokenEncoder(c.AuthTokenSecret)
 }
 
 func (c *Context) Logger() *log.Logger {
@@ -245,8 +189,4 @@ func (c *Context) Logger() *log.Logger {
 
 func (c *Context) isTest() bool {
 	return c.Env == "test"
-}
-
-func (c *Context) isDevelopment() bool {
-	return c.Env == "development"
 }

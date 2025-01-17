@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/geisonbiazus/blog/internal/auth"
+	"github.com/geisonbiazus/blog/internal/auth/entities"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -28,10 +28,10 @@ func (p *Provider) AuthURL(state string) string {
 	return p.config.AuthCodeURL(state)
 }
 
-func (p *Provider) AuthenticatedUser(ctx context.Context, code string) (auth.ProviderUser, error) {
+func (p *Provider) AuthenticatedUser(ctx context.Context, code string) (entities.ProviderUser, error) {
 	httpClient, err := p.exchangeTokenAndGetClient(ctx, code)
 	if err != nil {
-		return auth.ProviderUser{}, err
+		return entities.ProviderUser{}, err
 	}
 
 	return NewClient(httpClient).GetAuthenticatedUser()

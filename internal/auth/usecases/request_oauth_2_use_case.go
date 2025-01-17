@@ -1,21 +1,22 @@
-package auth
+package usecases
 
 import (
 	"fmt"
 
+	"github.com/geisonbiazus/blog/internal/auth/ports"
 	"github.com/geisonbiazus/blog/pkg/gen"
 )
 
 type RequestOAuth2UseCase struct {
-	provider  OAuth2Provider
+	provider  ports.OAuth2Provider
 	idGen     gen.Generator
-	stateRepo StateRepo
+	stateRepo ports.StateRepo
 }
 
 func NewRequestOAuth2UseCase(
-	provider OAuth2Provider,
+	provider ports.OAuth2Provider,
 	idGen gen.Generator,
-	stateRepo StateRepo,
+	stateRepo ports.StateRepo,
 ) *RequestOAuth2UseCase {
 	return &RequestOAuth2UseCase{
 		provider:  provider,

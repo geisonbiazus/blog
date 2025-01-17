@@ -1,15 +1,15 @@
-package auth_test
+package usecases_test
 
 import (
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/auth"
 	"github.com/geisonbiazus/blog/internal/auth/adapters/staterepo/memory"
+	"github.com/geisonbiazus/blog/internal/auth/usecases"
 	"github.com/stretchr/testify/assert"
 )
 
 type requestOAuth2UseCaseFixture struct {
-	usecase   *auth.RequestOAuth2UseCase
+	usecase   *usecases.RequestOAuth2UseCase
 	provider  *OAuth2ProviderSpy
 	idGen     *IDGeneratorStub
 	stateRepo *memory.StateRepo
@@ -20,7 +20,7 @@ func TestRequestOAuth2UseCase(t *testing.T) {
 		stateRepo := memory.NewStateRepo()
 		idGen := NewIDGeneratorStub()
 		provider := NewOAuth2ProviderSpy()
-		usecase := auth.NewRequestOAuth2UseCase(provider, idGen, stateRepo)
+		usecase := usecases.NewRequestOAuth2UseCase(provider, idGen, stateRepo)
 
 		return &requestOAuth2UseCaseFixture{
 			usecase:   usecase,

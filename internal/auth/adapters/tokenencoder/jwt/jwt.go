@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/geisonbiazus/blog/internal/auth"
+	"github.com/geisonbiazus/blog/internal/auth/entities"
 )
 
 type TokenEncoder struct {
@@ -50,7 +50,7 @@ func (m *TokenEncoder) Decode(token string) (string, error) {
 
 func (m *TokenEncoder) handleDecodingError(err error) error {
 	if strings.Contains(err.Error(), "token is expired") {
-		return auth.ErrTokenExpired
+		return entities.ErrTokenExpired
 	}
 
 	return fmt.Errorf("error parsing token on jwt.TokenManager: %w", err)
