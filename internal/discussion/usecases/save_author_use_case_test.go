@@ -1,11 +1,12 @@
-package discussion_test
+package usecases_test
 
 import (
 	"context"
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/discussion"
 	"github.com/geisonbiazus/blog/internal/discussion/adapters/commentrepo/memory"
+	"github.com/geisonbiazus/blog/internal/discussion/entities"
+	"github.com/geisonbiazus/blog/internal/discussion/usecases"
 	"github.com/geisonbiazus/blog/pkg/gen"
 	"github.com/geisonbiazus/blog/pkg/gen/fake"
 	"github.com/geisonbiazus/blog/pkg/transaction"
@@ -14,7 +15,7 @@ import (
 
 type SaveAuthorUseCaseSuite struct {
 	suite.Suite
-	usecase *discussion.SaveAuthorUseCase
+	usecase *usecases.SaveAuthorUseCase
 	repo    *memory.CommentRepo
 	ctx     context.Context
 	idGen   *fake.Generator
@@ -26,7 +27,7 @@ func (s *SaveAuthorUseCaseSuite) SetupTest() {
 	txManager := transaction.NewFakeManager()
 	s.idGen = gen.NewFakeGenerator()
 	s.idGen.ReturnID = s.AuthorID()
-	s.usecase = discussion.NewSaveAuthorUseCase(s.repo, txManager, s.idGen)
+	s.usecase = usecases.NewSaveAuthorUseCase(s.repo, txManager, s.idGen)
 }
 
 func (s *SaveAuthorUseCaseSuite) TestRun() {
@@ -55,26 +56,26 @@ func (s *SaveAuthorUseCaseSuite) TestRun() {
 	})
 }
 
-func (s *SaveAuthorUseCaseSuite) input() discussion.SaveAuthorInput {
-	return discussion.SaveAuthorInput{
+func (s *SaveAuthorUseCaseSuite) input() usecases.SaveAuthorInput {
+	return usecases.SaveAuthorInput{
 		UserID:    "USER_ID",
 		Name:      "Name",
 		AvatarURL: "https://example.com/avatar",
 	}
 }
 
-func (s *SaveAuthorUseCaseSuite) updatedInput() discussion.SaveAuthorInput {
-	return discussion.SaveAuthorInput{
+func (s *SaveAuthorUseCaseSuite) updatedInput() usecases.SaveAuthorInput {
+	return usecases.SaveAuthorInput{
 		UserID:    s.input().UserID,
 		Name:      "Updated Name",
 		AvatarURL: "https://example.com/updated-avatar",
 	}
 }
 
-func (s *SaveAuthorUseCaseSuite) author() *discussion.Author {
+func (s *SaveAuthorUseCaseSuite) author() *entities.Author {
 	input := s.input()
 
-	return &discussion.Author{
+	return &entities.Author{
 		ID:        s.AuthorID(),
 		UserID:    input.UserID,
 		Name:      input.Name,
@@ -82,10 +83,10 @@ func (s *SaveAuthorUseCaseSuite) author() *discussion.Author {
 	}
 }
 
-func (s *SaveAuthorUseCaseSuite) updatedAuthor() *discussion.Author {
+func (s *SaveAuthorUseCaseSuite) updatedAuthor() *entities.Author {
 	input := s.updatedInput()
 
-	return &discussion.Author{
+	return &entities.Author{
 		ID:        s.AuthorID(),
 		UserID:    input.UserID,
 		Name:      input.Name,

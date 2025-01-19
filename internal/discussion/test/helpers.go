@@ -3,11 +3,11 @@ package test
 import (
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/discussion"
+	"github.com/geisonbiazus/blog/internal/discussion/entities"
 )
 
-func NewComment(params discussion.Comment) *discussion.Comment {
-	return &discussion.Comment{
+func NewComment(params entities.Comment) *entities.Comment {
+	return &entities.Comment{
 		ID:        valueOrDefault(params.ID, "COMMENT_ID"),
 		SubjectID: valueOrDefault(params.SubjectID, "SUBJECT_ID"),
 		AuthorID:  valueOrDefault(params.AuthorID, "AUTHOR_ID"),
@@ -15,12 +15,12 @@ func NewComment(params discussion.Comment) *discussion.Comment {
 		Markdown:  valueOrDefault(params.Markdown, "Markdown"),
 		HTML:      valueOrDefault(params.HTML, "HTML"),
 		CreatedAt: valueOrDefault(params.CreatedAt, time.Now()),
-		Replies:   sliceOrDefault(params.Replies, []*discussion.Comment{}),
+		Replies:   sliceOrDefault(params.Replies, []*entities.Comment{}),
 	}
 }
 
-func NewAuthor(params discussion.Author) *discussion.Author {
-	return &discussion.Author{
+func NewAuthor(params entities.Author) *entities.Author {
+	return &entities.Author{
 		ID:        valueOrDefault(params.ID, "AUTHOR_ID"),
 		UserID:    valueOrDefault(params.UserID, "USER_ID"),
 		Name:      valueOrDefault(params.Name, "Author"),

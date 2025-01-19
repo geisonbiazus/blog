@@ -1,4 +1,4 @@
-package discussion
+package entities
 
 import (
 	"time"

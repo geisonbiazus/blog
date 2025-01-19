@@ -1,29 +1,30 @@
-package discussion_test
+package usecases_test
 
 import (
 	"context"
 	"testing"
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/discussion"
 	"github.com/geisonbiazus/blog/internal/discussion/adapters/commentrepo/memory"
+	"github.com/geisonbiazus/blog/internal/discussion/entities"
 	. "github.com/geisonbiazus/blog/internal/discussion/test"
+	"github.com/geisonbiazus/blog/internal/discussion/usecases"
 	"github.com/stretchr/testify/assert"
 )
 
 type listCommentsUseCaseFixture struct {
-	usecase *discussion.ListCommentsUseCase
+	usecase *usecases.ListCommentsUseCase
 	repo    *memory.CommentRepo
 	ctx     context.Context
-	author  *discussion.Author
+	author  *entities.Author
 }
 
 func TestListCommentsUseCase(t *testing.T) {
 	setup := func() *listCommentsUseCaseFixture {
 		ctx := context.Background()
 		repo := memory.NewCommentRepo()
-		usecase := discussion.NewListCommentsUseCase(repo)
-		author := &discussion.Author{
+		usecase := usecases.NewListCommentsUseCase(repo)
+		author := &entities.Author{
 			ID:        "AUTHOR_ID",
 			Name:      "Author",
 			AvatarURL: "https://example.com/avatar",
@@ -45,21 +46,21 @@ func TestListCommentsUseCase(t *testing.T) {
 
 		result, err := f.usecase.Run(f.ctx, subjectID)
 
-		assert.Equal(t, []*discussion.Comment{}, result)
+		assert.Equal(t, []*entities.Comment{}, result)
 		assert.Nil(t, err)
 	})
 
 	t.Run("It fetches and returns the comments of the given subject in chronological order", func(t *testing.T) {
 		f := setup()
 
-		comment1 := NewComment(discussion.Comment{
+		comment1 := NewComment(entities.Comment{
 			ID:        "ID_1",
 			AuthorID:  f.author.ID,
 			Author:    f.author,
 			CreatedAt: time.Date(2022, time.October, 4, 9, 0, 0, 0, time.UTC),
 		})
 
-		comment2 := NewComment(discussion.Comment{
+		comment2 := NewComment(entities.Comment{
 			ID:        "ID_2",
 			AuthorID:  f.author.ID,
 			Author:    f.author,
@@ -71,25 +72,25 @@ func TestListCommentsUseCase(t *testing.T) {
 
 		result, err := f.usecase.Run(f.ctx, comment1.SubjectID)
 
-		assert.Equal(t, []*discussion.Comment{comment2, comment1}, result)
+		assert.Equal(t, []*entities.Comment{comment2, comment1}, result)
 		assert.Nil(t, err)
 	})
 
 	t.Run("It fetches replies recursively", func(t *testing.T) {
 		f := setup()
 
-		comment := NewComment(discussion.Comment{
+		comment := NewComment(entities.Comment{
 			ID:       "COMMENT",
 			AuthorID: f.author.ID,
 		})
 
-		reply1 := NewComment(discussion.Comment{
+		reply1 := NewComment(entities.Comment{
 			ID:        "REPLY_1",
 			SubjectID: comment.ID,
 			AuthorID:  f.author.ID,
 		})
 
-		reply2 := NewComment(discussion.Comment{
+		reply2 := NewComment(entities.Comment{
 			ID:        "REPLY_2",
 			SubjectID: reply1.ID,
 			AuthorID:  f.author.ID,
@@ -103,21 +104,21 @@ func TestListCommentsUseCase(t *testing.T) {
 
 		// TODO: Return author
 
-		commentWithReplies := []*discussion.Comment{
-			NewComment(discussion.Comment{
+		commentWithReplies := []*entities.Comment{
+			NewComment(entities.Comment{
 				ID:        comment.ID,
 				CreatedAt: comment.CreatedAt,
 				AuthorID:  comment.AuthorID,
 				Author:    f.author,
-				Replies: []*discussion.Comment{
-					NewComment(discussion.Comment{
+				Replies: []*entities.Comment{
+					NewComment(entities.Comment{
 						ID:        reply1.ID,
 						SubjectID: reply1.SubjectID,
 						CreatedAt: reply1.CreatedAt,
 						AuthorID:  reply1.AuthorID,
 						Author:    f.author,
-						Replies: []*discussion.Comment{
-							NewComment(discussion.Comment{
+						Replies: []*entities.Comment{
+							NewComment(entities.Comment{
 								ID:        reply2.ID,
 								SubjectID: reply2.SubjectID,
 								CreatedAt: reply2.CreatedAt,

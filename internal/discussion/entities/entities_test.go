@@ -1,9 +1,9 @@
-package discussion_test
+package entities_test
 
 import (
 	"testing"
 
-	"github.com/geisonbiazus/blog/internal/discussion"
+	"github.com/geisonbiazus/blog/internal/discussion/entities"
 	. "github.com/geisonbiazus/blog/internal/discussion/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -11,7 +11,7 @@ import (
 func TestComment(t *testing.T) {
 	t.Run("Clone", func(t *testing.T) {
 		t.Run("It makes a copy of the comment", func(t *testing.T) {
-			comment := NewComment(discussion.Comment{})
+			comment := NewComment(entities.Comment{})
 			clone := comment.Clone()
 
 			assert.False(t, comment == clone)

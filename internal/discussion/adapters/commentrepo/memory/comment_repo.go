@@ -4,36 +4,36 @@ import (
 	"context"
 	"sort"
 
-	"github.com/geisonbiazus/blog/internal/discussion"
+	"github.com/geisonbiazus/blog/internal/discussion/entities"
 )
 
 type CommentRepo struct {
-	comments map[string]*discussion.Comment
-	authors  map[string]*discussion.Author
+	comments map[string]*entities.Comment
+	authors  map[string]*entities.Author
 }
 
 func NewCommentRepo() *CommentRepo {
 	return &CommentRepo{
-		comments: make(map[string]*discussion.Comment),
-		authors:  make(map[string]*discussion.Author),
+		comments: make(map[string]*entities.Comment),
+		authors:  make(map[string]*entities.Author),
 	}
 }
 
-func (r *CommentRepo) SaveComment(ctx context.Context, comment *discussion.Comment) error {
+func (r *CommentRepo) SaveComment(ctx context.Context, comment *entities.Comment) error {
 	r.comments[comment.ID] = comment
 	return nil
 }
 
-func (r *CommentRepo) SaveAuthor(ctx context.Context, author *discussion.Author) error {
+func (r *CommentRepo) SaveAuthor(ctx context.Context, author *entities.Author) error {
 	r.authors[author.ID] = author
 	return nil
 }
 
-func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion.Author, error) {
+func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*entities.Author, error) {
 	return r.authors[id], nil
 }
 
-func (r *CommentRepo) GetAuthorByUserID(ctx context.Context, userID string) (*discussion.Author, error) {
+func (r *CommentRepo) GetAuthorByUserID(ctx context.Context, userID string) (*entities.Author, error) {
 	for _, author := range r.authors {
 		if author.UserID == userID {
 			return author, nil
@@ -43,8 +43,8 @@ func (r *CommentRepo) GetAuthorByUserID(ctx context.Context, userID string) (*di
 	return nil, nil
 }
 
-func (r *CommentRepo) GetCommentsAndRepliesRecursively(ctx context.Context, subjectID string) ([]*discussion.Comment, error) {
-	result := []*discussion.Comment{}
+func (r *CommentRepo) GetCommentsAndRepliesRecursively(ctx context.Context, subjectID string) ([]*entities.Comment, error) {
+	result := []*entities.Comment{}
 
 	for _, comment := range r.comments {
 		if comment.SubjectID == subjectID {
@@ -63,7 +63,7 @@ func (r *CommentRepo) GetCommentsAndRepliesRecursively(ctx context.Context, subj
 	return result, nil
 }
 
-type byCreatedAt []*discussion.Comment
+type byCreatedAt []*entities.Comment
 
 func (c byCreatedAt) Len() int           { return len(c) }
 func (a byCreatedAt) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }

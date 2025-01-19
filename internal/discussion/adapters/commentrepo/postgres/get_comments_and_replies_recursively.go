@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/geisonbiazus/blog/internal/discussion"
+	"github.com/geisonbiazus/blog/internal/discussion/entities"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
 )
 
@@ -13,9 +13,9 @@ type getCommentsAndRepliesRecursivelyQuery struct {
 	conn       dbrepo.Connection
 	ctx        context.Context
 	subjectID  string
-	result     []*discussion.Comment
+	result     []*entities.Comment
 	rows       *sql.Rows
-	commentMap map[string][]*discussion.Comment
+	commentMap map[string][]*entities.Comment
 }
 
 func newGetCommentsAndRepliesRecursivelyQuery(conn dbrepo.Connection, ctx context.Context, subjectID string) *getCommentsAndRepliesRecursivelyQuery {
@@ -26,7 +26,7 @@ func newGetCommentsAndRepliesRecursivelyQuery(conn dbrepo.Connection, ctx contex
 	}
 }
 
-func (q *getCommentsAndRepliesRecursivelyQuery) run() ([]*discussion.Comment, error) {
+func (q *getCommentsAndRepliesRecursivelyQuery) run() ([]*entities.Comment, error) {
 	q.initializeVariables()
 
 	if err := q.executeQuery(); err != nil {
@@ -43,8 +43,8 @@ func (q *getCommentsAndRepliesRecursivelyQuery) run() ([]*discussion.Comment, er
 }
 
 func (q *getCommentsAndRepliesRecursivelyQuery) initializeVariables() {
-	q.result = []*discussion.Comment{}
-	q.commentMap = map[string][]*discussion.Comment{}
+	q.result = []*entities.Comment{}
+	q.commentMap = map[string][]*entities.Comment{}
 	q.rows = nil
 }
 
@@ -95,9 +95,9 @@ func (q *getCommentsAndRepliesRecursivelyQuery) scanRowsAndBuildCommentMap() err
 	return nil
 }
 
-func (q *getCommentsAndRepliesRecursivelyQuery) scanRow(row *sql.Rows) (*discussion.Comment, error) {
-	comment := &discussion.Comment{
-		Author: &discussion.Author{Persisted: true},
+func (q *getCommentsAndRepliesRecursivelyQuery) scanRow(row *sql.Rows) (*entities.Comment, error) {
+	comment := &entities.Comment{
+		Author: &entities.Author{Persisted: true},
 	}
 
 	err := q.rows.Scan(
@@ -120,9 +120,9 @@ func (q *getCommentsAndRepliesRecursivelyQuery) scanRow(row *sql.Rows) (*discuss
 	return comment, err
 }
 
-func (q *getCommentsAndRepliesRecursivelyQuery) addToCommentMap(comment *discussion.Comment) {
+func (q *getCommentsAndRepliesRecursivelyQuery) addToCommentMap(comment *entities.Comment) {
 	if q.commentMap[comment.SubjectID] == nil {
-		q.commentMap[comment.SubjectID] = []*discussion.Comment{}
+		q.commentMap[comment.SubjectID] = []*entities.Comment{}
 	}
 
 	q.commentMap[comment.SubjectID] = append(q.commentMap[comment.SubjectID], comment)
@@ -133,12 +133,12 @@ func (q *getCommentsAndRepliesRecursivelyQuery) buildResult() {
 	q.appendRepliesRecursively(q.result)
 }
 
-func (q *getCommentsAndRepliesRecursivelyQuery) appendRepliesRecursively(comments []*discussion.Comment) {
+func (q *getCommentsAndRepliesRecursivelyQuery) appendRepliesRecursively(comments []*entities.Comment) {
 	for _, comment := range comments {
 		comment.Replies = q.commentMap[comment.ID]
 
 		if comment.Replies == nil {
-			comment.Replies = []*discussion.Comment{}
+			comment.Replies = []*entities.Comment{}
 		}
 
 		q.appendRepliesRecursively(comment.Replies)

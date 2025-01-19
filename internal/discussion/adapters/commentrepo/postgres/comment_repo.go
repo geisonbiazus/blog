@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/geisonbiazus/blog/internal/discussion"
+	"github.com/geisonbiazus/blog/internal/discussion/entities"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
 )
 
@@ -18,7 +18,7 @@ func NewCommentRepo(db *sql.DB) *CommentRepo {
 	return &CommentRepo{Base: dbrepo.NewBase(db)}
 }
 
-func (r *CommentRepo) SaveAuthor(ctx context.Context, author *discussion.Author) error {
+func (r *CommentRepo) SaveAuthor(ctx context.Context, author *entities.Author) error {
 	if author.Persisted {
 		return r.updateAuthor(ctx, author)
 	} else {
@@ -26,7 +26,7 @@ func (r *CommentRepo) SaveAuthor(ctx context.Context, author *discussion.Author)
 	}
 }
 
-func (r *CommentRepo) insertAuthor(ctx context.Context, author *discussion.Author) error {
+func (r *CommentRepo) insertAuthor(ctx context.Context, author *entities.Author) error {
 	err := r.Insert(ctx, "discussion_authors", map[string]interface{}{
 		"id":           author.ID,
 		"auth_user_id": author.UserID,
@@ -43,7 +43,7 @@ func (r *CommentRepo) insertAuthor(ctx context.Context, author *discussion.Autho
 	return nil
 }
 
-func (r *CommentRepo) updateAuthor(ctx context.Context, author *discussion.Author) error {
+func (r *CommentRepo) updateAuthor(ctx context.Context, author *entities.Author) error {
 	err := r.Update(ctx, "discussion_authors", author.ID, map[string]interface{}{
 		"auth_user_id": author.UserID,
 		"name":         author.Name,
@@ -57,7 +57,7 @@ func (r *CommentRepo) updateAuthor(ctx context.Context, author *discussion.Autho
 	return nil
 }
 
-func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion.Author, error) {
+func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*entities.Author, error) {
 	conn := r.Conn(ctx)
 
 	row := conn.QueryRowContext(ctx, `
@@ -68,7 +68,7 @@ func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion
 		id,
 	)
 
-	author := &discussion.Author{Persisted: true}
+	author := &entities.Author{Persisted: true}
 
 	err := row.Scan(&author.ID, &author.UserID, &author.Name, &author.AvatarURL)
 
@@ -83,7 +83,7 @@ func (r *CommentRepo) GetAuthorByID(ctx context.Context, id string) (*discussion
 	return author, nil
 }
 
-func (r *CommentRepo) GetAuthorByUserID(ctx context.Context, userID string) (*discussion.Author, error) {
+func (r *CommentRepo) GetAuthorByUserID(ctx context.Context, userID string) (*entities.Author, error) {
 	conn := r.Conn(ctx)
 
 	row := conn.QueryRowContext(ctx, `
@@ -94,7 +94,7 @@ func (r *CommentRepo) GetAuthorByUserID(ctx context.Context, userID string) (*di
 		userID,
 	)
 
-	author := &discussion.Author{Persisted: true}
+	author := &entities.Author{Persisted: true}
 
 	err := row.Scan(&author.ID, &author.UserID, &author.Name, &author.AvatarURL)
 
@@ -109,7 +109,7 @@ func (r *CommentRepo) GetAuthorByUserID(ctx context.Context, userID string) (*di
 	return author, nil
 }
 
-func (r *CommentRepo) SaveComment(ctx context.Context, comment *discussion.Comment) error {
+func (r *CommentRepo) SaveComment(ctx context.Context, comment *entities.Comment) error {
 	err := r.Insert(ctx, "discussion_comments", map[string]interface{}{
 		"id":         comment.ID,
 		"subject_id": comment.SubjectID,
@@ -126,6 +126,6 @@ func (r *CommentRepo) SaveComment(ctx context.Context, comment *discussion.Comme
 	return nil
 }
 
-func (r *CommentRepo) GetCommentsAndRepliesRecursively(ctx context.Context, subjectID string) ([]*discussion.Comment, error) {
+func (r *CommentRepo) GetCommentsAndRepliesRecursively(ctx context.Context, subjectID string) ([]*entities.Comment, error) {
 	return newGetCommentsAndRepliesRecursivelyQuery(r.Conn(ctx), ctx, subjectID).run()
 }

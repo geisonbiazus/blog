@@ -45,6 +45,7 @@ type Context struct {
 	sharedContext *shared.Context
 	blog          *blog.Context
 	auth          *auth.Context
+	discussion    *discussion.Context
 }
 
 func NewContext() *Context {
@@ -84,6 +85,13 @@ func (c *Context) Auth() *auth.Context {
 	return c.auth
 }
 
+func (c *Context) Discussion() *discussion.Context {
+	if c.discussion == nil {
+		c.discussion = discussion.NewContext(c.SharedContext())
+	}
+	return c.discussion
+}
+
 // UI
 
 func (c *Context) WebServer() *web.Server {
@@ -106,22 +114,14 @@ func (c *Context) UseCases() *webports.UseCases {
 		ListPosts:     c.Blog().ListPostsUseCase(),
 		RequestOAuth2: c.Auth().RequestOAuth2UseCase(),
 		ConfirmOAuth2: c.Auth().ConfirmOAuth2UseCase(),
-		ListComments:  c.ListCommentsUseCase(),
+		ListComments:  c.Discussion().ListCommentsUseCase(),
 	}
 }
 
 func (c *Context) SubscriptionUseCases() *subscriptions.UseCases {
 	return &subscriptions.UseCases{
-		SaveAuthor: c.SaveAuthorUseCase(),
+		SaveAuthor: c.Discussion().SaveAuthorUseCase(),
 	}
-}
-
-func (c *Context) ListCommentsUseCase() *discussion.ListCommentsUseCase {
-	return discussion.NewListCommentsUseCase(c.CommentRepo())
-}
-
-func (c *Context) SaveAuthorUseCase() *discussion.SaveAuthorUseCase {
-	return discussion.NewSaveAuthorUseCase(c.CommentRepo(), c.TransactionManager(), c.IDGenerator())
 }
 
 // Adapters
@@ -146,21 +146,6 @@ func (c *Context) resolvePostgresURL() string {
 
 func (c *Context) Migration() *migration.Migration {
 	return migration.New(c.DB(), c.MigrationsPath)
-}
-
-func (c *Context) TransactionManager() transaction.Manager {
-	if c.transactionManager == nil {
-		c.transactionManager = c.resolveTransactionManager()
-	}
-	return c.transactionManager
-}
-
-func (c *Context) resolveTransactionManager() transaction.Manager {
-	tm := transaction.NewPostgresManager(c.DB())
-	if c.isTest() {
-		tm.EnableTestMode()
-	}
-	return tm
 }
 
 func (c *Context) PubSub() *memory.PubSub {

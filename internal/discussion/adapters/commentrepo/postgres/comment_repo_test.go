@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/geisonbiazus/blog/internal/discussion"
 	"github.com/geisonbiazus/blog/internal/discussion/adapters/commentrepo/postgres"
+	"github.com/geisonbiazus/blog/internal/discussion/entities"
 	. "github.com/geisonbiazus/blog/internal/discussion/test"
 	"github.com/geisonbiazus/blog/pkg/dbrepo"
 	"github.com/geisonbiazus/blog/pkg/gen/uuid"
@@ -18,22 +18,22 @@ type CommentRepoSuite struct {
 	suite.Suite
 	repo                *postgres.CommentRepo
 	uuidGen             *uuid.Generator
-	author              *discussion.Author
+	author              *entities.Author
 	subjectID           string
-	comment1            *discussion.Comment
-	comment2            *discussion.Comment
-	reply1              *discussion.Comment
-	reply2              *discussion.Comment
-	comment1WithReplies *discussion.Comment
+	comment1            *entities.Comment
+	comment2            *entities.Comment
+	reply1              *entities.Comment
+	reply2              *entities.Comment
+	comment1WithReplies *entities.Comment
 }
 
 func (s *CommentRepoSuite) SetupSubTest() {
 	s.uuidGen = uuid.NewGenerator()
 
-	s.author = NewAuthor(discussion.Author{ID: s.uuidGen.Generate(), UserID: s.uuidGen.Generate()})
+	s.author = NewAuthor(entities.Author{ID: s.uuidGen.Generate(), UserID: s.uuidGen.Generate()})
 	s.subjectID = "SUBJECT_ID"
 
-	s.comment1 = NewComment(discussion.Comment{
+	s.comment1 = NewComment(entities.Comment{
 		ID:        s.uuidGen.Generate(),
 		SubjectID: s.subjectID,
 		AuthorID:  s.author.ID,
@@ -41,7 +41,7 @@ func (s *CommentRepoSuite) SetupSubTest() {
 		CreatedAt: time.Date(2022, time.October, 4, 9, 0, 0, 0, time.UTC),
 	})
 
-	s.comment2 = NewComment(discussion.Comment{
+	s.comment2 = NewComment(entities.Comment{
 		ID:        s.uuidGen.Generate(),
 		SubjectID: s.subjectID,
 		AuthorID:  s.author.ID,
@@ -49,7 +49,7 @@ func (s *CommentRepoSuite) SetupSubTest() {
 		CreatedAt: time.Date(2022, time.October, 4, 10, 0, 0, 0, time.UTC),
 	})
 
-	s.reply1 = NewComment(discussion.Comment{
+	s.reply1 = NewComment(entities.Comment{
 		ID:        s.uuidGen.Generate(),
 		SubjectID: s.comment1.ID,
 		AuthorID:  s.author.ID,
@@ -57,7 +57,7 @@ func (s *CommentRepoSuite) SetupSubTest() {
 		CreatedAt: time.Date(2022, time.October, 4, 11, 0, 0, 0, time.UTC),
 	})
 
-	s.reply2 = NewComment(discussion.Comment{
+	s.reply2 = NewComment(entities.Comment{
 		ID:        s.uuidGen.Generate(),
 		SubjectID: s.reply1.ID,
 		AuthorID:  s.author.ID,
@@ -66,10 +66,10 @@ func (s *CommentRepoSuite) SetupSubTest() {
 	})
 
 	reply1WithReplies := NewComment(*s.reply1)
-	reply1WithReplies.Replies = []*discussion.Comment{s.reply2}
+	reply1WithReplies.Replies = []*entities.Comment{s.reply2}
 
 	s.comment1WithReplies = NewComment(*s.comment1)
-	s.comment1WithReplies.Replies = []*discussion.Comment{reply1WithReplies}
+	s.comment1WithReplies.Replies = []*entities.Comment{reply1WithReplies}
 }
 
 func (s *CommentRepoSuite) TestGetAuthorByID() {
@@ -189,7 +189,7 @@ func (s *CommentRepoSuite) TestGetCommentsAndRepliesRecursively() {
 			comments, err := s.repo.GetCommentsAndRepliesRecursively(ctx, s.subjectID)
 
 			s.Nil(err)
-			s.Equal([]*discussion.Comment{
+			s.Equal([]*entities.Comment{
 				s.comment1,
 				s.comment2,
 			}, comments)
@@ -208,7 +208,7 @@ func (s *CommentRepoSuite) TestGetCommentsAndRepliesRecursively() {
 			comments, err := s.repo.GetCommentsAndRepliesRecursively(ctx, s.subjectID)
 
 			s.Nil(err)
-			s.Equal([]*discussion.Comment{
+			s.Equal([]*entities.Comment{
 				s.comment1WithReplies,
 			}, comments)
 		})
