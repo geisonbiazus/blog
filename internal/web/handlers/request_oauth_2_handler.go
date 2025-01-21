@@ -3,16 +3,16 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/geisonbiazus/blog/internal/auth"
 	"github.com/geisonbiazus/blog/internal/web/lib"
-	"github.com/geisonbiazus/blog/internal/web/ports"
 )
 
 type RequestOAuth2Handler struct {
-	usecase  ports.RequestOAuth2UseCase
+	usecase  auth.RequestOAuth2UseCase
 	template *lib.TemplateRenderer
 }
 
-func NewRequestOAuth2Handler(usecase ports.RequestOAuth2UseCase, template *lib.TemplateRenderer) *RequestOAuth2Handler {
+func NewRequestOAuth2Handler(usecase auth.RequestOAuth2UseCase, template *lib.TemplateRenderer) *RequestOAuth2Handler {
 	return &RequestOAuth2Handler{usecase: usecase, template: template}
 }
 

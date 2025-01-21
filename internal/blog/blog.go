@@ -16,6 +16,8 @@ type Post = entities.Post
 type RenderedPost = entities.RenderedPost
 type PostRepo = ports.PostRepo
 type Renderer = ports.Renderer
+type ListPostsUseCase = ports.ListPostsUseCase
+type ViewPostUseCase = ports.ViewPostUseCase
 
 var ErrPostNotFound = entities.ErrPostNotFound
 
@@ -33,11 +35,11 @@ func NewContext(sharedContext *shared.Context) *Context {
 
 // Use cases
 
-func (c *Context) ViewPostUseCase() *usecases.ViewPostUseCase {
+func (c *Context) ViewPostUseCase() ViewPostUseCase {
 	return usecases.NewViewPostUseCase(c.postRepo(), c.renderer(), c.sharedContext.Cache())
 }
 
-func (c *Context) ListPostsUseCase() *usecases.ListPostsUseCase {
+func (c *Context) ListPostsUseCase() ListPostsUseCase {
 	return usecases.NewListPostsUseCase(c.postRepo(), c.renderer(), c.sharedContext.Cache())
 }
 

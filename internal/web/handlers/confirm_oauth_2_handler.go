@@ -6,17 +6,16 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/auth"
 	"github.com/geisonbiazus/blog/internal/web/lib"
-	"github.com/geisonbiazus/blog/internal/web/ports"
 )
 
 type ConfirmOAuth2Handler struct {
-	usecase  ports.ConfirmOAuth2UseCase
+	usecase  auth.ConfirmOAuth2UseCase
 	template *lib.TemplateRenderer
 	baseURL  string
 }
 
 func NewConfirmOAuth2Handler(
-	usecase ports.ConfirmOAuth2UseCase,
+	usecase auth.ConfirmOAuth2UseCase,
 	templateRenderer *lib.TemplateRenderer,
 	baseURL string,
 ) *ConfirmOAuth2Handler {

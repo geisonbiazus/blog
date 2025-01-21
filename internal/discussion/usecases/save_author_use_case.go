@@ -10,12 +10,6 @@ import (
 	"github.com/geisonbiazus/blog/pkg/transaction"
 )
 
-type SaveAuthorInput struct {
-	UserID    string
-	Name      string
-	AvatarURL string
-}
-
 type SaveAuthorUseCase struct {
 	commentRepo ports.CommentRepo
 	txManager   transaction.Manager
@@ -30,7 +24,7 @@ func NewSaveAuthorUseCase(commentRepo ports.CommentRepo, txManager transaction.M
 	}
 }
 
-func (u *SaveAuthorUseCase) Run(ctx context.Context, input SaveAuthorInput) (author *entities.Author, err error) {
+func (u *SaveAuthorUseCase) Run(ctx context.Context, input ports.SaveAuthorInput) (author *entities.Author, err error) {
 	u.txManager.Transaction(ctx, func(ctx context.Context) error {
 		author, err = u.run(ctx, input)
 		return err
@@ -38,7 +32,7 @@ func (u *SaveAuthorUseCase) Run(ctx context.Context, input SaveAuthorInput) (aut
 	return
 }
 
-func (u *SaveAuthorUseCase) run(ctx context.Context, input SaveAuthorInput) (*entities.Author, error) {
+func (u *SaveAuthorUseCase) run(ctx context.Context, input ports.SaveAuthorInput) (*entities.Author, error) {
 	author, err := u.findOrInitializeAuthor(ctx, input.UserID)
 	if err != nil {
 		return &entities.Author{}, err
@@ -67,7 +61,7 @@ func (u *SaveAuthorUseCase) findOrInitializeAuthor(ctx context.Context, id strin
 	return author, nil
 }
 
-func (u *SaveAuthorUseCase) setAuthorAttributes(author *entities.Author, input SaveAuthorInput) {
+func (u *SaveAuthorUseCase) setAuthorAttributes(author *entities.Author, input ports.SaveAuthorInput) {
 	author.UserID = input.UserID
 	author.Name = input.Name
 	author.AvatarURL = input.AvatarURL

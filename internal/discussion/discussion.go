@@ -13,9 +13,9 @@ type Author = entities.Author
 
 type CommentRepo = ports.CommentRepo
 
-type ListCommentsUseCase = usecases.ListCommentsUseCase
-type SaveAuthorUseCase = usecases.SaveAuthorUseCase
-type SaveAuthorInput = usecases.SaveAuthorInput
+type SaveAuthorInput = ports.SaveAuthorInput
+type SaveAuthorUseCase = ports.SaveAuthorUseCase
+type ListCommentsUseCase = ports.ListCommentsUseCase
 
 var NewListCommentsUseCase = usecases.NewListCommentsUseCase
 var NewSaveAuthorUseCase = usecases.NewSaveAuthorUseCase
@@ -31,11 +31,11 @@ func NewContext(sharedContext *shared.Context) *Context {
 	}
 }
 
-func (c *Context) ListCommentsUseCase() *usecases.ListCommentsUseCase {
+func (c *Context) ListCommentsUseCase() ListCommentsUseCase {
 	return usecases.NewListCommentsUseCase(c.CommentRepo())
 }
 
-func (c *Context) SaveAuthorUseCase() *usecases.SaveAuthorUseCase {
+func (c *Context) SaveAuthorUseCase() SaveAuthorUseCase {
 	return usecases.NewSaveAuthorUseCase(
 		c.CommentRepo(),
 		c.sharedContext.TransactionManager(),

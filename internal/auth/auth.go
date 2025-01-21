@@ -20,6 +20,8 @@ type OAuth2Provider = ports.OAuth2Provider
 type StateRepo = ports.StateRepo
 type UserRepo = ports.UserRepo
 type TokenEncoder = ports.TokenEncoder
+type RequestOAuth2UseCase = ports.RequestOAuth2UseCase
+type ConfirmOAuth2UseCase = ports.ConfirmOAuth2UseCase
 
 const UserCreatedEvent = events.UserCreatedEvent
 const UserUpdatedEvent = events.UserUpdatedEvent
@@ -51,11 +53,11 @@ func NewContext(sharedContext *shared.Context) *Context {
 
 // Use cases
 
-func (c *Context) RequestOAuth2UseCase() *usecases.RequestOAuth2UseCase {
+func (c *Context) RequestOAuth2UseCase() RequestOAuth2UseCase {
 	return usecases.NewRequestOAuth2UseCase(c.OAuth2Provider(), c.sharedContext.IDGenerator(), c.StateRepo())
 }
 
-func (c *Context) ConfirmOAuth2UseCase() *usecases.ConfirmOAuth2UseCase {
+func (c *Context) ConfirmOAuth2UseCase() ConfirmOAuth2UseCase {
 	return usecases.NewConfirmOAuth2UseCase(
 		c.OAuth2Provider(),
 		c.StateRepo(),

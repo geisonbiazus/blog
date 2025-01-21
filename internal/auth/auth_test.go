@@ -5,7 +5,6 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/app/shared"
 	"github.com/geisonbiazus/blog/internal/auth"
-	"github.com/geisonbiazus/blog/internal/auth/usecases"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -20,12 +19,12 @@ func (s *ContextSuite) SetupTest() {
 }
 
 func (s *ContextSuite) TestRequestOAuth2UseCase() {
-	var usecase *usecases.RequestOAuth2UseCase = s.context.RequestOAuth2UseCase()
+	var usecase auth.RequestOAuth2UseCase = s.context.RequestOAuth2UseCase()
 	s.NotNil(usecase)
 }
 
 func (s *ContextSuite) TestConfirmOAuth2UseCase() {
-	var usecase *usecases.ConfirmOAuth2UseCase = s.context.ConfirmOAuth2UseCase()
+	var usecase auth.ConfirmOAuth2UseCase = s.context.ConfirmOAuth2UseCase()
 	s.NotNil(usecase)
 }
 func TestContextSuite(t *testing.T) {

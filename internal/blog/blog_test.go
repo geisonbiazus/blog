@@ -5,7 +5,6 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/app/shared"
 	"github.com/geisonbiazus/blog/internal/blog"
-	"github.com/geisonbiazus/blog/internal/blog/usecases"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -18,13 +17,13 @@ func (s *ContextSuite) SetupTest() {
 	s.context = blog.NewContext(shared.NewContext())
 }
 func (s *ContextSuite) TestViewPostUseCase() {
-	var usecase *usecases.ViewPostUseCase = s.context.ViewPostUseCase()
-	s.NotEqual(nil, usecase)
+	var usecase blog.ViewPostUseCase = s.context.ViewPostUseCase()
+	s.NotNil(usecase)
 }
 
 func (s *ContextSuite) TestListPostsUseCase() {
-	var usecase *usecases.ListPostsUseCase = s.context.ListPostsUseCase()
-	s.NotEqual(nil, usecase)
+	var usecase blog.ListPostsUseCase = s.context.ListPostsUseCase()
+	s.NotNil(usecase)
 }
 
 func TestContextSuite(t *testing.T) {

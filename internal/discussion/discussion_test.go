@@ -5,7 +5,6 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/app/shared"
 	"github.com/geisonbiazus/blog/internal/discussion"
-	"github.com/geisonbiazus/blog/internal/discussion/usecases"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -19,12 +18,12 @@ func (s *ContextSuite) SetupTest() {
 }
 
 func (s *ContextSuite) TestListCommentsUseCase() {
-	var usecase *usecases.ListCommentsUseCase = s.context.ListCommentsUseCase()
+	var usecase discussion.ListCommentsUseCase = s.context.ListCommentsUseCase()
 	s.NotNil(usecase)
 }
 
 func (s *ContextSuite) TestSaveAuthorUseCase() {
-	var usecase *usecases.SaveAuthorUseCase = s.context.SaveAuthorUseCase()
+	var usecase discussion.SaveAuthorUseCase = s.context.SaveAuthorUseCase()
 	s.NotNil(usecase)
 }
 

@@ -6,15 +6,14 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/blog"
 	"github.com/geisonbiazus/blog/internal/web/lib"
-	"github.com/geisonbiazus/blog/internal/web/ports"
 )
 
 type ListPostsHandler struct {
-	usecase  ports.ListPostUseCase
+	usecase  blog.ListPostsUseCase
 	template *lib.TemplateRenderer
 }
 
-func NewListPostsHandler(usecase ports.ListPostUseCase, templateRenderer *lib.TemplateRenderer) *ListPostsHandler {
+func NewListPostsHandler(usecase blog.ListPostsUseCase, templateRenderer *lib.TemplateRenderer) *ListPostsHandler {
 	return &ListPostsHandler{
 		usecase:  usecase,
 		template: templateRenderer,

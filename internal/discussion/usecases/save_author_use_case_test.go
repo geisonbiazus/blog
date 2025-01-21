@@ -6,6 +6,7 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/discussion/adapters/commentrepo/memory"
 	"github.com/geisonbiazus/blog/internal/discussion/entities"
+	"github.com/geisonbiazus/blog/internal/discussion/ports"
 	"github.com/geisonbiazus/blog/internal/discussion/usecases"
 	"github.com/geisonbiazus/blog/pkg/gen"
 	"github.com/geisonbiazus/blog/pkg/gen/fake"
@@ -56,16 +57,16 @@ func (s *SaveAuthorUseCaseSuite) TestRun() {
 	})
 }
 
-func (s *SaveAuthorUseCaseSuite) input() usecases.SaveAuthorInput {
-	return usecases.SaveAuthorInput{
+func (s *SaveAuthorUseCaseSuite) input() ports.SaveAuthorInput {
+	return ports.SaveAuthorInput{
 		UserID:    "USER_ID",
 		Name:      "Name",
 		AvatarURL: "https://example.com/avatar",
 	}
 }
 
-func (s *SaveAuthorUseCaseSuite) updatedInput() usecases.SaveAuthorInput {
-	return usecases.SaveAuthorInput{
+func (s *SaveAuthorUseCaseSuite) updatedInput() ports.SaveAuthorInput {
+	return ports.SaveAuthorInput{
 		UserID:    s.input().UserID,
 		Name:      "Updated Name",
 		AvatarURL: "https://example.com/updated-avatar",

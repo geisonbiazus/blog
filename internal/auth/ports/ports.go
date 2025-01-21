@@ -7,6 +7,18 @@ import (
 	"github.com/geisonbiazus/blog/internal/auth/entities"
 )
 
+// Driving ports
+
+type RequestOAuth2UseCase interface {
+	Run() (string, error)
+}
+
+type ConfirmOAuth2UseCase interface {
+	Run(ctx context.Context, state, code string) (string, error)
+}
+
+// Driven ports
+
 type OAuth2Provider interface {
 	AuthURL(state string) string
 	AuthenticatedUser(ctx context.Context, code string) (entities.ProviderUser, error)

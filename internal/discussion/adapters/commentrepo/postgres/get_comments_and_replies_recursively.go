@@ -100,7 +100,7 @@ func (q *getCommentsAndRepliesRecursivelyQuery) scanRow(row *sql.Rows) (*entitie
 		Author: &entities.Author{Persisted: true},
 	}
 
-	err := q.rows.Scan(
+	err := row.Scan(
 		&comment.ID,
 		&comment.SubjectID,
 		&comment.AuthorID,

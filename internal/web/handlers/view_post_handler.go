@@ -9,18 +9,17 @@ import (
 	"github.com/geisonbiazus/blog/internal/blog"
 	"github.com/geisonbiazus/blog/internal/discussion"
 	"github.com/geisonbiazus/blog/internal/web/lib"
-	"github.com/geisonbiazus/blog/internal/web/ports"
 )
 
 type ViewPostHandler struct {
-	viewPostUseCase     ports.ViewPostUseCase
-	listCommentsUseCase ports.ListCommentsUseCase
+	viewPostUseCase     blog.ViewPostUseCase
+	listCommentsUseCase discussion.ListCommentsUseCase
 	template            *lib.TemplateRenderer
 }
 
 func NewViewPostHandler(
-	viewPostUseCase ports.ViewPostUseCase,
-	listCommentsUseCase ports.ListCommentsUseCase,
+	viewPostUseCase blog.ViewPostUseCase,
+	listCommentsUseCase discussion.ListCommentsUseCase,
 	templateRenderer *lib.TemplateRenderer,
 ) *ViewPostHandler {
 	return &ViewPostHandler{

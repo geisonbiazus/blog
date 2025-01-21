@@ -7,17 +7,16 @@ import (
 
 	"github.com/geisonbiazus/blog/internal/blog"
 	"github.com/geisonbiazus/blog/internal/web/lib"
-	"github.com/geisonbiazus/blog/internal/web/ports"
 	"github.com/gorilla/feeds"
 )
 
 type FeedHandler struct {
-	usecase  ports.ListPostUseCase
+	usecase  blog.ListPostsUseCase
 	template *lib.TemplateRenderer
 	baseURL  string
 }
 
-func NewFeedHandler(usecase ports.ListPostUseCase, templateRenderer *lib.TemplateRenderer, baseURL string) *FeedHandler {
+func NewFeedHandler(usecase blog.ListPostsUseCase, templateRenderer *lib.TemplateRenderer, baseURL string) *FeedHandler {
 	return &FeedHandler{
 		usecase:  usecase,
 		template: templateRenderer,
